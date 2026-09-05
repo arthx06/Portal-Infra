@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Infra</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- CABEÇALHO -->
+    <header class="header">
+
+        <div class="logo">
+            <span>Portal</span> Infra
+        </div>
+
+        <nav>
+            <a href="#" class="active">Início</a>
+            <a href="#">Mapa</a>
+            <a href="reclamacoes.html">Reclamações</a>
+            <a href="#">Sobre</a>
+        </nav>
+
+        <button class="btn-login">Entrar</button>
+
+    </header>
+
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+
+            <div class="hero-text">
+
+                <span class="tag">INFRAESTRUTURA DE SÃO PAULO</span>
+
+                <h1>
+                    Ajude a melhorar
+                    <strong>São Paulo.</strong>
+                </h1>
+
+                <p>
+                    Encontre problemas de infraestrutura na cidade
+                    ou registre uma nova reclamação.
+                </p>
+
+                <div class="hero-buttons">
+                    <button class="btn-primary">
+                        + Registrar problema
+                    </button>
+
+                    <button class="btn-secondary">
+                        Ver mapa
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ESTATÍSTICAS -->
+        <section class="stats">
+
+            <div class="stat-card">
+                <div class="red-recl">!</div>
+
+                <div>
+                    <span>Total de reclamações</span>
+                    <h2>X VALORES</h2>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="analise-yel">?</div>
+
+                <div>
+                    <span>Em análise</span>
+                    <h2>X VALORES</h2>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="resolvidas-gre">OK</div>
+
+                <div>
+                    <span>Resolvidas</span>
+                    <h2>X VALORES</h2>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- MAPA -->
+        <section class="map-section">
+
+            <div class="section-title">
+
+                <div>
+                    <span class="small-title">LOCALIZAÇÃO</span>
+                    <h2>Problemas pela cidade</h2>
+                </div>
+
+                <button class="see-map">
+                    Ver mapa completo 
+                </button>
+
+            </div>
+
+
+            <div class="map">
+
+                <h1> MAPA</h1>
+
+            </div>
+
+
+            <!-- LEGENDA -->
+            <div class="legend">
+
+                <div>
+                    <span class="legend-dot red-dot"></span>
+                    Buraco / asfalto
+                </div>
+
+                <div>
+                    <span class="legend-dot yellow-dot"></span>
+                    Iluminação
+                </div>
+
+                <div>
+                    <span class="legend-dot green-dot"></span>
+                    Árvores
+                </div>
+
+                <div>
+                    <span class="legend-dot blue-dot"></span>
+                    Outros
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RECLAMAÇÕES RECENTES -->
+        <section class="complaints">
+
+            <div class="section-title">
+
+                <div>
+                    <span class="small-title">RECENTES</span>
+                    <h2>Últimas reclamações</h2>
+                </div>
+
+                <button class="see-map">
+                    Ver todas 
+                </button>
+
+            </div>
+
+
+            <div class="complaint-list">
+
+
+                <!-- RECLAMAÇÃO 1 -->
+                <article class="complaint">
+
+                    <div class="red-recl">
+                        !
+                    </div>
+
+                    <div class="complaint-info">
+
+                        <h3>Buraco na rua</h3>
+
+                        <p>
+                            Rua Antônio Carlos — Tatuapé
+                        </p>
+
+                        <span class="date">
+                            Registrado em 03/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status pending">
+                        Pendente
+                    </span>
+
+                    <button class="arrow">
+                        →
+                    </button>
+
+                </article>
+
+
+                <!-- RECLAMAÇÃO 2 -->
+                <article class="complaint">
+
+                    <div class="analise-yel">
+                        ?
+                    </div>
+
+                    <div class="complaint-info">
+
+                        <h3>Poste sem iluminação</h3>
+
+                        <p>
+                            Rua das Flores — Itaquera
+                        </p>
+
+                        <span class="date">
+                            Registrado em 02/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status analysis">
+                        Em análise
+                    </span>
+
+                    <button class="arrow">
+                        →
+                    </button>
+
+                </article>
+
+
+                <!-- RECLAMAÇÃO 3 -->
+                <article class="complaint">
+
+                    <div class="resolvidas-gre">
+                        OK
+                    </div>
+
+                    <div class="complaint-info">
+
+                        <h3>Árvore caída</h3>
+
+                        <p>
+                            Rua Vergueiro — Vila Mariana
+                        </p>
+
+                        <span class="date">
+                            Registrado em 01/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status resolved">
+                        Resolvido
+                    </span>
+
+                    <button class="arrow">
+                        →
+                    </button>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- CTA -->
+        <section class="cta">
+
+            <div>
+
+                <h2>Encontrou um problema?</h2>
+
+                <p>
+                    Registre uma reclamação e ajude a identificar
+                    problemas de infraestrutura na cidade.
+                </p>
+
+            </div>
+
+            <button class="btn-primary">
+                Registrar problema
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- RODAPÉ -->
+    <footer>
+
+        <div class="logo">
+            <span>Portal</span> Infra
+        </div>
+
+        <p>
+            Projeto acadêmico de monitoramento da infraestrutura urbana.
+        </p>
+
+        <span>
+            © 2026 SP em Foco
+        </span>
+
+    </footer>
+
+
+
+    
+</body>
+</html>
