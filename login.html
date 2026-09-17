@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrar - Portal Infra</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- CABEÇALHO -->
+    <header class="header">
+      <div class="logo"><span>Portal</span> Infra</div>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="#">Mapa</a>
+        <a href="reclamacoes.html">Reclamações</a>
+        <a href="#">Sobre</a>
+      </nav>
+      <!-- Como já estamos na página de login, podemos omitir ou mudar o botão do cabeçalho -->
+      <a href="index.html"><button class="btn-secondary">Voltar</button></a>
+    </header>
+
+    <!-- CONTEÚDO DE AUTENTICAÇÃO -->
+    <main class="auth-page">
+      <div class="auth-container">
+        <!-- FORMULÁRIO DE LOGIN -->
+        <div class="auth-card" id="form-login">
+          <div class="auth-header">
+            <h2>Bem-vindo de volta</h2>
+            <p>Acesse sua conta para continuar</p>
+          </div>
+
+          <form action="#" method="POST">
+            <div class="input-group">
+              <label for="email">E-mail</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Digite seu e-mail"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="senha">Senha</label>
+              <input
+                type="password"
+                id="senha"
+                name="senha"
+                placeholder="Digite sua senha"
+                required
+              />
+            </div>
+
+            <div class="auth-options">
+              <label>
+                <input type="checkbox" name="lembrar" /> Lembrar de mim
+              </label>
+              <a href="#" class="forgot-password">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full">Entrar</button>
+          </form>
+
+          <div class="auth-footer">
+            Não tem uma conta?
+            <button class="btn-link" onclick="toggleAuth()">Cadastre-se</button>
+          </div>
+        </div>
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <div class="auth-card" id="form-cadastro" style="display: none">
+          <div class="auth-header">
+            <h2>Crie sua conta</h2>
+            <p>Junte-se a nós e ajude a melhorar a cidade</p>
+          </div>
+
+          <form action="#" method="POST">
+            <div class="input-group">
+              <label for="nome_cad">Nome completo</label>
+              <input
+                type="text"
+                id="nome_cad"
+                name="nome"
+                placeholder="Digite seu nome"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="email_cad">E-mail</label>
+              <input
+                type="email"
+                id="email_cad"
+                name="email"
+                placeholder="Digite seu e-mail"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="senha_cad">Senha</label>
+              <input
+                type="password"
+                id="senha_cad"
+                name="senha"
+                placeholder="Crie uma senha"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn-primary btn-full">
+              Cadastrar
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            Já possui uma conta?
+            <button class="btn-link" onclick="toggleAuth()">Faça login</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+      <div class="logo"><span>Portal</span> Infra</div>
+      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+      <span>© 2026 SP em Foco</span>
+    </footer>
+
+    <!-- SCRIPT PARA ALTERNAR ENTRE LOGIN E CADASTRO -->
+    <script>
+      function toggleAuth() {
+        const loginForm = document.getElementById("form-login");
+        const cadastroForm = document.getElementById("form-cadastro");
+
+        if (loginForm.style.display === "none") {
+          loginForm.style.display = "block";
+          cadastroForm.style.display = "none";
+        } else {
+          loginForm.style.display = "none";
+          cadastroForm.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>
