@@ -30,7 +30,7 @@
             <p>Acesse sua conta para continuar</p>
           </div>
 
-          <form action="#" method="POST">
+          <form action="#" method="POST" id="login-form">
             <div class="input-group">
               <label for="email">E-mail</label>
               <input
@@ -57,7 +57,7 @@
               <label>
                 <input type="checkbox" name="lembrar" /> Lembrar de mim
               </label>
-              <a href="#" class="forgot-password">Esqueceu a senha?</a>
+              <a href="#" class="forgot-password" onclick="toggleAuth('recuperar'); return false;">Esqueceu a senha?</a>
             </div>
 
             <button type="submit" class="btn-primary btn-full">Entrar</button>
@@ -65,7 +65,7 @@
 
           <div class="auth-footer">
             Não tem uma conta?
-            <button class="btn-link" onclick="toggleAuth()">Cadastre-se</button>
+            <button class="btn-link" onclick="toggleAuth('cadastro')">Cadastre-se</button>
           </div>
         </div>
 
@@ -76,7 +76,7 @@
             <p>Junte-se a nós e ajude a melhorar a cidade</p>
           </div>
 
-          <form action="#" method="POST">
+          <form action="#" method="POST" id="cadastro-form">
             <div class="input-group">
               <label for="nome_cad">Nome completo</label>
               <input
@@ -106,21 +106,79 @@
                 id="senha_cad"
                 name="senha"
                 placeholder="Crie uma senha"
+                minlength="6"
                 required
               />
             </div>
 
-            <button type="submit" class="btn-primary btn-full">
-              Cadastrar
+           <button
+              type="button"
+              id="btn-enviar-codigo"
+              class="submit btn-primary btn-full"
+          >
+              Enviar código
+          </button>
+          <div id="area-verificacao" style="display: none;">
+
+            <div class="input-group">
+                <label for="codigo_cad">Código de verificação</label>
+
+                <input
+                    type="text"
+                    id="codigo_cad"
+                    maxlength="6"
+                    inputmode="numeric"
+                    placeholder="Digite o código recebido"
+                />
+            </div>
+
+            <button
+                type="submit"
+                id="btn-confirmar-cadastro"
+                class="submit btn-primary btn-full"
+            >
+                Confirmar cadastro
             </button>
+
+        </div>
           </form>
 
           <div class="auth-footer">
             Já possui uma conta?
-            <button class="btn-link" onclick="toggleAuth()">Faça login</button>
+            <button class="btn-link" onclick="toggleAuth('login')">Faça login</button>
+          </div>
+        </div>
+          <div class="auth-card" id="form-recuperar" style="display: none">
+            <div class="auth-header">
+              <h2>Recuperar senha</h2>
+              <p>Digite seu e-mail para receber instruções de recuperação</p>
+            </div>
+
+            <form action="#" method="POST" id="recuperar-form">
+              <div class="input-group">
+                <label for="email_rec">E-mail cadastrado</label>
+                <input
+                  type="email"
+                  id="email_rec"
+                  name="email"
+                  placeholder="Digite seu e-mail"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="submit btn-primary btn-full">
+                Enviar instruções
+              </button>
+            </form>
+
+            <div class="auth-footer">
+              Lembrou sua senha?
+              <button class="btn-link" onclick="toggleAuth('login')">Faça login</button>
+            </div>
           </div>
         </div>
       </div>
+      
     </main>
 
     <!-- RODAPÉ -->
@@ -130,20 +188,239 @@
       <span>© 2026 SP em Foco</span>
     </footer>
 
-    <!-- SCRIPT PARA ALTERNAR ENTRE LOGIN E CADASTRO -->
-    <script>
-      function toggleAuth() {
-        const loginForm = document.getElementById("form-login");
-        const cadastroForm = document.getElementById("form-cadastro");
+    <!-- SCRIPT PARA ALTERNAR ENTRE LOGIN E CADASTRO e VALIDAÇÃO -->
 
-        if (loginForm.style.display === "none") {
-          loginForm.style.display = "block";
-          cadastroForm.style.display = "none";
-        } else {
-          loginForm.style.display = "none";
-          cadastroForm.style.display = "block";
+    <script>
+
+      // =====================================================
+      // CONFIGURAÇÃO DA API
+      // =====================================================
+
+      const API_BASE = "https://portal-infra-backend.onrender.com";
+
+
+      // =====================================================
+      // ALTERNAR ENTRE LOGIN E CADASTRO
+      // =====================================================
+
+      function toggleAuth(tela) {
+
+        const loginCard = document.getElementById("form-login");
+        const cadastroCard = document.getElementById("form-cadastro");
+        const recuperarCard = document.getElementById("form-recuperar");
+
+        // Esconde todas as telas
+        loginCard.style.display = "none";
+        cadastroCard.style.display = "none";
+        recuperarCard.style.display = "none";
+
+        // Mostra a tela escolhida
+        if (tela === "login") {
+            loginCard.style.display = "block";
         }
+
+        if (tela === "cadastro") {
+            cadastroCard.style.display = "block";
+        }
+
+        if (tela === "recuperar") {
+            recuperarCard.style.display = "block";
+        }
+    }
+
+
+      // =====================================================
+      // FUNÇÃO PARA ENVIAR JSON PARA O BACKEND
+      // =====================================================
+
+      async function postJSON(path, body) {
+
+        const response = await fetch(API_BASE + path, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify(body)
+
+        });
+
+
+        // Tenta transformar a resposta em JSON
+        const data = await response.json().catch(() => ({}));
+
+
+        // Se o backend retornar erro
+        if (!response.ok) {
+
+          throw new Error(
+            data.erro ||
+            data.message ||
+            "Erro na requisição"
+          );
+
+        }
+
+
+        // Retorna os dados recebidos do backend
+        return data;
+
       }
+
+
+      // =====================================================
+      // LOGIN
+      // =====================================================
+
+      const loginForm = document.getElementById("login-form");
+
+
+      loginForm.addEventListener("submit", async function(event) {
+
+        // Impede o HTML de recarregar a página
+        event.preventDefault();
+
+
+        // Pega os valores dos inputs
+        const email = document.getElementById("email").value.trim();
+
+        const senha = document.getElementById("senha").value;
+
+
+        // Verifica se os campos foram preenchidos
+        if (!email || !senha) {
+
+          alert("Preencha o e-mail e a senha.");
+
+          return;
+
+        }
+
+
+        try {
+
+          // Envia para o Spring Boot
+          const data = await postJSON(
+            "/usuarios/login",
+            {
+              email: email,
+              senha: senha
+            }
+          );
+          localStorage.setItem("usuarioLogado", "true");
+
+          localStorage.setItem(
+              "usuario",
+              JSON.stringify({
+                  id: data.id,
+                  nome: data.nome,
+                  email: data.email,
+                  tipo: data.tipo
+              })
+          );
+
+          console.log("Login realizado:", data);
+
+
+          alert(
+            "Bem-vindo(a), " +
+            (data.nome || data.email || "usuário") +
+            "!"
+          );
+
+
+          // Depois podemos colocar aqui a página
+          // para onde o usuário será enviado.
+          //
+          // window.location.href = "index.html";
+
+
+        } catch (error) {
+
+          console.error("Erro no login:", error);
+
+          alert(error.message);
+
+        }
+
+      });
+
+
+
+      // =====================================================
+      // CADASTRO
+      // =====================================================
+        const cadastroForm = document.getElementById("cadastro-form");
+      
+        const btnEnviarCodigo = document.getElementById("btn-enviar-codigo");
+
+        btnEnviarCodigo.addEventListener("click", async function () {
+          const email = document.getElementById("email_cad").value.trim();
+
+          if (!email) {
+            alert("Digite seu e-mail antes de pedir o código.");
+            return;
+          }
+
+          btnEnviarCodigo.disabled = true;
+          try {
+            await postJSON("/usuarios/enviar-codigo", { email });
+            document.getElementById("area-verificacao").style.display = "block";
+            btnEnviarCodigo.textContent = "Reenviar código";
+            alert("Código enviado! Verifique seu e-mail.");
+          } catch (error) {
+            alert(error.message);
+          } finally {
+            btnEnviarCodigo.disabled = false;
+          }
+        });
+
+        cadastroForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const nome = document.getElementById("nome_cad").value.trim();
+          const email = document.getElementById("email_cad").value.trim();
+          const senha = document.getElementById("senha_cad").value;
+          const codigo = document.getElementById("codigo_cad").value.trim();
+
+          if (!nome || !email || !senha || !codigo) {
+            alert("Preencha todos os campos, inclusive o código.");
+            return;
+          }
+          if (senha.length < 6) {
+            alert("A senha deve ter no mínimo 6 caracteres.");
+            return;
+          }
+
+          try {
+            await postJSON(
+              "/usuarios/registration?codigo=" + encodeURIComponent(codigo),
+              { nome, email, senha }
+            );
+            alert("Conta criada com sucesso! Faça login.");
+            cadastroForm.reset();
+            document.getElementById("area-verificacao").style.display = "none";
+            toggleAuth("login");
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+        document.getElementById("recuperar-form").addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const email = document.getElementById("email_rec").value.trim();
+          try {
+            const data = await postJSON("/usuarios/recuperar-senha", { email });
+            alert(data.mensagem);
+            toggleAuth("login");
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+
     </script>
+
+
   </body>
 </html>

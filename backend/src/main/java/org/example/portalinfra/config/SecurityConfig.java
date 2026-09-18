@@ -31,7 +31,7 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/usuarios/**").permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             );
 
         return http.build();
@@ -43,7 +43,8 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5500",
-            "http://127.0.0.1:5500"
+            "http://127.0.0.1:5500",
+            "https://arthx06.github.io"
         ));
 
         configuration.setAllowedMethods(List.of(

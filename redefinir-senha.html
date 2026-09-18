@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Redefinir senha - Portal Infra</title>
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+
+<!-- CABEÇALHO -->
+<header class="header">
+
+    <div class="logo">
+        <span>Portal</span> Infra
+    </div>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="#">Mapa</a>
+        <a href="reclamacoes.html">Reclamações</a>
+        <a href="#">Sobre</a>
+    </nav>
+
+    <a href="login.html">
+        <button class="btn-secondary">Voltar</button>
+    </a>
+
+</header>
+
+
+<!-- CONTEÚDO -->
+<main class="auth-page">
+
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <!-- CABEÇALHO -->
+            <div class="auth-header">
+
+                <h2>Redefinir senha</h2>
+
+                <p>
+                    Digite sua nova senha para recuperar o acesso à sua conta.
+                </p>
+
+            </div>
+
+
+            <!-- FORMULÁRIO -->
+            <form id="redefinir-form">
+
+                <div class="input-group">
+
+                    <label for="novaSenha">
+                        Nova senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="novaSenha"
+                        name="novaSenha"
+                        placeholder="Digite sua nova senha"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="confirmarSenha">
+                        Confirmar nova senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmarSenha"
+                        name="confirmarSenha"
+                        placeholder="Digite novamente sua senha"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn-primary btn-full"
+                >
+                    Redefinir senha
+                </button>
+
+            </form>
+
+
+            <!-- RODAPÉ DO CARD -->
+            <div class="auth-footer">
+
+                Lembrou sua senha?
+
+                <a href="login.html" class="btn-link">
+                    Faça login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- RODAPÉ -->
+<footer>
+
+    <div class="logo">
+        <span>Portal</span> Infra
+    </div>
+
+    <p>
+        Projeto acadêmico de monitoramento da infraestrutura urbana.
+    </p>
+
+    <span>
+        © 2026 SP em Foco
+    </span>
+
+</footer>
+
+
+<!-- SCRIPT -->
+<script>
+
+    // =====================================================
+    // CONFIGURAÇÃO DA API
+    // =====================================================
+
+    const API_BASE = "https://portal-infra-backend.onrender.com";
+
+
+    // =====================================================
+    // PEGA O TOKEN DO LINK DO E-MAIL
+    // =====================================================
+
+    const parametros = new URLSearchParams(
+        window.location.search
+    );
+
+    const token = parametros.get("token");
+
+
+    // =====================================================
+    // FORMULÁRIO
+    // =====================================================
+
+    const form = document.getElementById("redefinir-form");
+
+
+    // =====================================================
+    // VERIFICA SE O LINK POSSUI TOKEN
+    // =====================================================
+
+    if (!token) {
+
+        alert("Link de recuperação inválido.");
+
+        form.style.display = "none";
+
+    }
+
+
+    // =====================================================
+    // ENVIA JSON PARA O BACKEND
+    // =====================================================
+
+    async function postJSON(path, body) {
+
+        const response = await fetch(
+            API_BASE + path,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(body)
+            }
+        );
+
+
+        const data = await response
+            .json()
+            .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.erro ||
+                data.message ||
+                "Erro na requisição."
+            );
+
+        }
+
+
+        return data;
+    }
+
+
+    // =====================================================
+    // REDEFINIR SENHA
+    // =====================================================
+
+    form.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            // Pega as senhas
+
+            const novaSenha =
+                document.getElementById("novaSenha").value;
+
+            const confirmarSenha =
+                document.getElementById("confirmarSenha").value;
+
+
+            // =================================================
+            // VALIDAÇÕES
+            // =================================================
+
+            if (!novaSenha || !confirmarSenha) {
+
+                alert(
+                    "Preencha todos os campos."
+                );
+
+                return;
+            }
+
+
+            if (novaSenha.length < 6) {
+
+                alert(
+                    "A senha deve ter no mínimo 6 caracteres."
+                );
+
+                return;
+            }
+
+
+            if (novaSenha !== confirmarSenha) {
+
+                alert(
+                    "As senhas não coincidem."
+                );
+
+                return;
+            }
+
+
+            // =================================================
+            // ENVIA PARA O SPRING BOOT
+            // =================================================
+
+            try {
+
+                const data = await postJSON(
+                    "/usuarios/redefinir-senha",
+                    {
+                        token: token,
+                        novaSenha: novaSenha
+                    }
+                );
+
+
+                console.log(
+                    "Senha redefinida:",
+                    data
+                );
+
+
+                alert(
+                    data.mensagem ||
+                    "Senha redefinida com sucesso!"
+                );
+
+
+                // Volta para o login
+
+                window.location.href = "login.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Erro ao redefinir senha:",
+                    error
+                );
+
+
+                alert(
+                    error.message
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
+
