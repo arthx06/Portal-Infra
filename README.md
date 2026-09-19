@@ -111,32 +111,27 @@ arthx06-portal-infra/
     ├── DockerFile
     ├── pom.xml
     └── src/
-        ├── main/
-        │   ├── java/
-        │   │   └── org/example/portalinfra/
-        │   │       ├── PortalInfraApplication.java
-        │   │       ├── config/
-        │   │       │   └── SecurityConfig.java
-        │   │       ├── controller/
-        │   │       │   └── UsuarioController.java
-        │   │       ├── model/
-        │   │       │   ├── EmailVerification.java
-        │   │       │   ├── PasswordResetToken.java
-        │   │       │   └── Usuario.java
-        │   │       ├── repository/
-        │   │       │   ├── EmailVerificationRepository.java
-        │   │       │   ├── PasswordResetTokenRepository.java
-        │   │       │   └── UsuarioRepository.java
-        │   │       └── service/
-        │   │           ├── EmailService.java
-        │   │           └── UsuarioService.java
-        │   └── resources/
-        │       └── application.properties
-        │
-        └── test/
-            └── java/
-                └── org/example/portalinfra/
-                    └── PortalInfraApplicationTests.java
+        └── main/
+            ├── java/
+            │   └── org/example/portalinfra/
+            │       ├── PortalInfraApplication.java
+            │       ├── config/
+            │       │   └── SecurityConfig.java
+            │       ├── controller/
+            │       │   └── UsuarioController.java
+            │       ├── model/
+            │       │   ├── EmailVerification.java
+            │       │   ├── PasswordResetToken.java
+            │       │   └── Usuario.java
+            │       ├── repository/
+            │       │   ├── EmailVerificationRepository.java
+            │       │   ├── PasswordResetTokenRepository.java
+            │       │   └── UsuarioRepository.java
+            │       └── service/
+            │           ├── EmailService.java
+            │           └── UsuarioService.java
+            └── resources/
+               └── application.properties
 ```
 
 **`UsuarioController`** é responsável pelos endpoints relacionados aos usuários, incluindo as operações de cadastro, autenticação e recuperação de senha.
