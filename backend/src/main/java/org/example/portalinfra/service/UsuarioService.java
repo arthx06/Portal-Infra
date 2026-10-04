@@ -282,4 +282,92 @@ public class UsuarioService {
                 resetToken
         );
     }
+
+
+    // ============================================
+    // MINHA CONTA
+    // ============================================
+
+    @Transactional(readOnly = true)
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado!")
+                );
+    }
+
+    @Transactional
+    public Usuario alterarTelefone(Long id, String telefone) {
+        Usuario usuario = buscarPorId(id);
+
+        // Considera somente os dígitos, desconsidera () e =
+        String digitos = telefone == null
+                ? ""
+                : telefone.replaceAll("\\D", "");
+
+        // Garante que somente números de telefone celular serão aceitos
+        if (!digitos.matches("[1-9]{2}9\\d{8}")) {
+            throw new RuntimeException(
+                    "Telefone inválido. Informe um número de telefone celular com DDD (11 Dígitos)."
+            );
+        }
+
+        usuario.setTelefone(digitos);
+
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void enviarCodigoTrocaEmail(Long id, String novoEmail) {
+
+        // Verifica se o usuário já existe
+        buscarPorId(id);
+
+        // Valida duplicidade, gera o código e envia para o novo email
+        enviarCodigoVerificacao(novoEmail);
+    }
+
+    @Transactional
+    public Usuario alterarEmail(
+            Long id,
+            String novoEmail,
+            String codigo,
+            String senha
+    ) {
+        Usuario usuario = buscarPorId(id);
+
+        if (!passwordEncoder.matches(senha, usuario.getSenha())) {
+            throw new RuntimeException("Senha incorreta!");
+        }
+
+        String email = novoEmail.trim().toLowerCase();
+
+        if (usuarioRepository.existsByEmail(email)) {
+            throw new RuntimeException("O e-mail informado já está cadastrado!");
+        }
+
+        EmailVerification verificacao =
+                emailVerificationRepository
+                        .findByEmailAndCodigo(email, codigo)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Código de verificação inválido!"
+                                )
+                        );
+
+        if (verificacao.isExpirado()) {
+            throw new RuntimeException("Código de verificação expirado!");
+        }
+
+        usuario.setEmail(email);
+
+        Usuario salvo = usuarioRepository.save(usuario);
+
+        // Apaga o código de verificação para impedir que ele seja reutilizado
+        emailVerificationRepository.delete(verificacao);
+
+        return salvo;
+    }
+
 }

@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import org.example.portalinfra.dto.AlterarEmailRequest;
+import org.example.portalinfra.dto.AlterarTelefoneRequest;
+import org.example.portalinfra.dto.PerfilResponse;
+import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
+
+
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -208,4 +215,93 @@ public class UsuarioController {
             );
         }
     }
+
+
+    // =============================================
+    // MINHA CONTA: LEITURA
+    // =============================================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarPerfil(@PathVariable Long id) {
+        try {
+
+            return ResponseEntity.ok(
+                    PerfilResponse.de(usuarioService.buscarPorId(id))
+            );
+        } catch (RuntimeException e) {
+
+            return ResponseEntity.status(404).body(
+                    Map.of("Erro", e.getMessage())
+            );
+        }
+    }
+
+
+    // =============================================
+    // MINHA CONTA: ALTERAR TELEFONE
+    // =============================================
+
+    @PatchMapping("/{id}/telefone")
+    public ResponseEntity<?> alterarTelefone(
+            @PathVariable Long id,
+            @Valid @RequestBody AlterarTelefoneRequest body
+    ) {
+        try {
+            return ResponseEntity.ok(
+                    PerfilResponse.de(
+                            usuarioService.alterarTelefone(id, body.telefone())
+                    )
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("erro", e.getMessage())
+            );
+        }
+    }
+
+    // =============================================
+    // MINHA CONTA: ALTERAR E-MAIL (2 PASSOS)
+    // =============================================
+
+    @PostMapping("/{id}/email/enviar-codigo")
+    public ResponseEntity<?> enviarCodigoTrocaEmail(
+            @PathVariable Long id,
+            @Valid @RequestBody SolicitarTrocaEmailRequest body
+    ) {
+        try {
+            usuarioService.enviarCodigoTrocaEmail(id, body.novoEmail());
+
+            return ResponseEntity.ok(
+                    Map.of("mensagem", "Código enviado para o novo e-mail")
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("erro", e.getMessage())
+            );
+        }
+    }
+
+    @PatchMapping("/{id}/email")
+    public ResponseEntity<?> alterEmail(
+            @PathVariable Long id,
+            @Valid @RequestBody AlterarEmailRequest body
+    ) {
+        try {
+            return ResponseEntity.ok(
+                    PerfilResponse.de(
+                            usuarioService.alterarEmail(
+                                    id,
+                                    body.novoEmail(),
+                                    body.codigo(),
+                                    body.senha()
+                            )
+                    )
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("erro", e.getMessage())
+            );
+        }
+    }
+    
 }
