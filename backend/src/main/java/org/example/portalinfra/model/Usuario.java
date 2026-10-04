@@ -33,6 +33,9 @@ public class Usuario {
     @Column(nullable = false)
     private String tipo;
 
+    @Column(name = "esta_ativo", nullable = false, columnDefinition = "boolean default true")
+    private boolean estaAtivo = true;
+
     public Usuario() {}
 
     public Usuario(Long id, String nome, String email, String telefone, String senha, String tipo) {
@@ -42,6 +45,7 @@ public class Usuario {
         this.telefone = telefone;
         this.senha = senha;
         this.tipo = tipo;
+        this.estaAtivo = estaAtivo;
     }
 
     public Long getId() { return id; }
@@ -55,4 +59,6 @@ public class Usuario {
     public void setSenha(String senha) { this.senha = senha; }
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
+    public boolean isEstaAtivo() { return estaAtivo; }
+    public void setEstaAtivo(boolean estaAtivo) { this.estaAtivo = estaAtivo; }
 }

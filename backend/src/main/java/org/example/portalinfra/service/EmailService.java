@@ -45,6 +45,7 @@ public class EmailService {
                 "Seu código de verificação do Portal Infra é:\n\n" +
                 codigo + "\n\n" +
                 "Esse código é válido por 10 minutos.\n\n" +
+                "Para sua segurança, não compartilhe este código com ninguém!\n\n" +
                 "Se você não solicitou esse código, ignore este e-mail.";
 
         enviar(email, "Código de verificação - Portal Infra", texto);
