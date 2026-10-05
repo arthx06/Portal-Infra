@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu Perfil - Portal Infra</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="perfil.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="header">
+
+        <a href="index.html" class="logo">
+            <span>Portal</span>
+            Infra
+        </a>
+
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="mapa.html">Mapa</a>
+            <a href="reclamacoes.html">Reclamações</a>
+            <a href="sobre.html">Sobre</a>
+        </nav>
+
+        <a href="perfil.html" class="btn-login">
+            Meu perfil
+        </a>
+
+    </header>
+
+
+    <!-- =========================
+         CONTEÚDO
+    ========================== -->
+    <main class="pagina-perfil">
+
+        <!-- CARD DO PERFIL -->
+        <section class="card-perfil">
+
+            <div class="cabecalho-perfil">
+
+                <div class="avatar">
+                    
+                </div>
+
+                <div>
+                    <span class="small-title">MINHA CONTA</span>
+                    <h1>Meu perfil</h1>
+                    <p>Visualize e altere seus dados pessoais.</p>
+                </div>
+
+            </div>
+
+
+            <form id="formularioPerfil">
+
+                <div class="linha-formulario">
+
+                    <div class="grupo-input">
+                        <label for="nome">Nome completo</label>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            value=""
+                            disabled
+                        >
+                    </div>
+
+                    <div class="grupo-input">
+                        <label for="email">E-mail</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            value=""
+                            disabled
+                        >
+                    </div>
+                  
+
+                </div>
+
+
+                <div class="linha-formulario">
+
+                    <div class="grupo-input">
+                        <label for="telefone">Telefone</label>
+
+                        <input
+                            type="tel"
+                            id="telefone"
+                            value=""
+                            disabled
+                        >
+                    </div>
+
+                    <div class="grupo-input">
+                        <label for="dataNascimento">Data de nascimento</label>
+
+                        <input
+                            type="date"
+                            id="dataNascimento"
+                            value=""
+                            disabled
+                        >
+                    </div>
+
+                </div>
+
+                <div class="linha-formulario">
+
+                    <div class="grupo-input">
+                        <label for="cep">CEP</label>
+
+                        <input
+                            type="text"
+                            id="cep"
+                            value=""
+                            disabled
+                        >
+                    </div>
+
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="logradouro">Logradouro</label>
+
+                        <input
+                            type="text"
+                            id="logradouro"
+                            value=""
+                            disabled
+                        >
+                    </div>
+                    <div class="grupo-input">
+                        <label for="bairro">Bairro</label>
+                        <input
+                            type="text"
+                            id="bairro "
+                            value=""
+                            disabled
+                        >
+                    </div>
+                </div>
+                
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="cidade">Cidade</label>
+
+                        <input
+                            type="text"
+                            id="cidade"
+                            value=""
+                            disabled
+                        >
+                    </div>
+                    <div class="grupo-input">
+                        <label for="estado">Estado</label>
+                        <input
+                            type="text"
+                            id="estado"
+                            value=""
+                            disabled
+                        >
+                    </div>
+                </div>
+
+
+                <div class="acoes-perfil">
+
+                    <button
+                        type="button"
+                        class="btn-secundario"
+                        id="botaoAlterar"
+                        onclick="habilitarEdicao()">
+                        Alterar informações
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-principal"
+                        id="botaoSalvar"
+                        style="display: none;">
+                        Salvar alterações
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- REDEFINIÇÃO DE SENHA -->
+            <div class="senha-area">
+
+                <div>
+                    <h3>Senha</h3>
+
+                    <p>
+                        Para alterar sua senha, enviaremos um link
+                        de redefinição para seu e-mail.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-secundario"
+                    onclick="redefinirSenha()">
+                    Redefinir senha
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MINHAS RECLAMAÇÕES
+        ========================== -->
+        <section class="card-reclamacoes">
+
+            <div class="cabecalho-secao">
+
+                <div>
+                    <span class="small-title">MINHAS OCORRÊNCIAS</span>
+
+                    <h2>Minhas reclamações</h2>
+
+                    <p>
+                        Acompanhe as reclamações que você registrou.
+                    </p>
+                </div>
+
+                <span class="contador">
+                    3 reclamações
+                </span>
+
+            </div>
+
+
+            <div class="lista-reclamacoes">
+
+                <!-- RECLAMAÇÃO 1 -->
+                <article class="reclamacao">
+
+                    <div class="icone-reclamacao grave">
+                        !
+                    </div>
+
+                    <div class="informacoes-reclamacao">
+
+                        <h3>Poste sem iluminação</h3>
+
+                        <p>
+                            Rua Exemplo, 120 - São Paulo
+                        </p>
+
+                        <span class="data-reclamacao">
+                            Registrada em 28/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status-reclamacao analise">
+                        Em análise
+                    </span>
+
+                    <a href="reclamacao.html" class="seta">
+                        →
+                    </a>
+
+                </article>
+
+
+                <!-- RECLAMAÇÃO 2 -->
+                <article class="reclamacao">
+
+                    <div class="icone-reclamacao moderado">
+                        !
+                    </div>
+
+                    <div class="informacoes-reclamacao">
+
+                        <h3>Buraco na rua</h3>
+
+                        <p>
+                            Avenida São João, 450 - São Paulo
+                        </p>
+
+                        <span class="data-reclamacao">
+                            Registrada em 20/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status-reclamacao pendente">
+                        Pendente
+                    </span>
+
+                    <a href="reclamacao.html" class="seta">
+                        →
+                    </a>
+
+                </article>
+
+
+                <!-- RECLAMAÇÃO 3 -->
+                <article class="reclamacao">
+
+                    <div class="icone-reclamacao leve">
+                        ✓
+                    </div>
+
+                    <div class="informacoes-reclamacao">
+
+                        <h3>Árvore caída</h3>
+
+                        <p>
+                            Rua das Flores, 85 - São Paulo
+                        </p>
+
+                        <span class="data-reclamacao">
+                            Registrada em 10/09/2026
+                        </span>
+
+                    </div>
+
+                    <span class="status-reclamacao resolvida">
+                        Resolvida
+                    </span>
+
+                    <a href="reclamacao.html" class="seta">
+                        →
+                    </a>
+
+                </article>
+
+            </div>
+
+
+            <div class="rodape-reclamacoes">
+
+                <a href="reclamacoes.html">
+                    Ver todas as reclamações →
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer>
+
+        <span>
+            Projeto acadêmico de monitoramento da infraestrutura urbana.
+        </span>
+
+        <span>
+            © 2026 SP em Foco
+        </span>
+
+    </footer>
+
+
+  
+</body>
+
+</html>
+

@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import org.example.portalinfra.model.Usuario;
 import org.example.portalinfra.service.UsuarioService;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ import org.example.portalinfra.dto.AlterarEmailRequest;
 import org.example.portalinfra.dto.AlterarTelefoneRequest;
 import org.example.portalinfra.dto.PerfilResponse;
 import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
-
+import java.util.Map;
 
 
 @RestController
@@ -22,6 +22,9 @@ import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+
+    @Value("${google.maps.api-key}")
+    private String googleMapsApiKey;
 
     public UsuarioController(
             UsuarioService usuarioService
@@ -258,7 +261,7 @@ public class UsuarioController {
             );
         }
     }
-
+    
     // =============================================
     // MINHA CONTA: ALTERAR E-MAIL (2 PASSOS)
     // =============================================
@@ -303,5 +306,11 @@ public class UsuarioController {
             );
         }
     }
+        @GetMapping("/config/maps")
+        public ResponseEntity<?> getMapsConfig() {
+        return ResponseEntity.ok(
+                Map.of("apiKey", googleMapsApiKey)
+        );
+        }
 
 }
