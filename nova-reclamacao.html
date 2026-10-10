@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nova Reclamação | Portal Infra</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="nova-reclamacao.css">
+    <script src="nova-reclamacao.js" defer></script>
+</head>
+
+<body>
+
+    <header class="header">
+
+        <a href="index.html" class="logo">
+            <span>Portal</span> Infra
+        </a>
+
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="#">Mapa</a>
+            <a href="reclamacoes.html" class="active">Reclamações</a>
+            <a href="#">Sobre</a>
+        </nav>
+
+        <a href="reclamacoes.html">
+            <button type="button" class="btn-secondary">Voltar</button>
+        </a>
+
+    </header>
+
+    <main class="nova-reclamacao">
+
+        <section class="formulario-reclamacao">
+
+            <div class="formulario-cabecalho">
+                <span class="formulario-tag">PORTAL INFRA</span>
+
+                <h1>Registrar uma reclamação</h1>
+
+                <p>
+                    Encontrou um problema na infraestrutura da cidade?
+                    Informe os detalhes para registrar a ocorrência.
+                </p>
+            </div>
+
+            <form id="form-reclamacao">
+
+                <div class="campo-reclamacao">
+                    <label for="titulo">Título da reclamação *</label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        placeholder="Ex.: Buraco grande na rua"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="campo-reclamacao">
+                    <label for="categoria">Tipo de problema *</label>
+
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecione o problema</option>
+                        <option value="Buraco na rua">Buraco na rua</option>
+                        <option value="Rua sem asfalto">Rua sem asfalto</option>
+                        <option value="Poste sem iluminação">Poste sem iluminação</option>
+                        <option value="Poste danificado">Poste danificado</option>
+                        <option value="Árvore caída">Árvore caída</option>
+                        <option value="Calçada danificada">Calçada danificada</option>
+                        <option value="Alagamento">Alagamento</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="campo-reclamacao">
+                    <label for="descricao">Descrição do problema *</label>
+
+                    <textarea
+                        id="descricao"
+                        name="descricao"
+                        placeholder="Descreva o que aconteceu e como o problema afeta a região..."
+                        maxlength="1500"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="campo-reclamacao">
+                    <label for="endereco">Endereço do problema *</label>
+
+                    <input
+                        type="text"
+                        id="endereco"
+                        name="endereco"
+                        placeholder="Nome da rua, avenida ou local"
+                        maxlength="255"
+                        required
+                    >
+                </div>
+
+                <div class="campos-linha">
+
+                    <div class="campo-reclamacao">
+                        <label for="bairro">Bairro *</label>
+
+                        <select id="bairro" name="bairro" required>
+                            <option value="">Selecione o bairro</option>
+                            <option value="Itaquera">Itaquera</option>
+                            <option value="Tatuapé">Tatuapé</option>
+                            <option value="Mooca">Mooca</option>
+                            <option value="Vila Mariana">Vila Mariana</option>
+                            <option value="São Mateus">São Mateus</option>
+                            <option value="Aricanduva">Aricanduva</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-reclamacao">
+                        <label for="gravidade">Gravidade *</label>
+
+                        <select id="gravidade" name="gravidade" required>
+                            <option value="">Selecione</option>
+                            <option value="Leve">Leve</option>
+                            <option value="Moderado">Moderado</option>
+                            <option value="Grave">Grave</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="campo-reclamacao">
+                    <label for="foto">Foto do problema</label>
+
+                    <input
+                        type="file"
+                        id="foto"
+                        name="foto"
+                        accept="image/jpeg,image/png"
+                        required
+                    >
+
+                    <small>Formatos aceitos: JPG e PNG. Tamanho máximo: 5 MB.</small>
+                </div>
+
+                <p id="mensagem-formulario" role="status" aria-live="polite"></p>
+
+                <div class="acoes-formulario">
+
+                    <a href="reclamacoes.html" class="btn-cancelar">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn-primary">
+                        Enviar reclamação
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <div class="logo">
+            <span>Portal</span> Infra
+        </div>
+
+        <p>
+            Projeto acadêmico de monitoramento da infraestrutura urbana.
+        </p>
+
+        <span>© 2026 SP em Foco</span>
+
+    </footer>
+
+ 
+
+</body>
+
+</html>
