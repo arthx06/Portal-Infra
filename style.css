@@ -691,3 +691,78 @@ footer {
     padding: 30px 20px;
   }
 }
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-row .input-group {
+  flex: 1;
+  min-width: 0; /* evita o input estourar a coluna */
+}
+
+/* o último campo da linha (Número e UF) fica estreito */
+.input-row .input-group:last-child {
+  flex: 0 0 110px;
+}
+
+#cep-status {
+  display: block;
+  min-height: 1em;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+#cep-status[data-erro] {
+  color: #dc2626;
+}
+.auth-container {
+  max-width: 720px;
+}
+
+
+#form-login,
+#form-recuperar {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#form-cadastro {
+  padding: 32px 35px;
+}
+
+#cadastro-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+#cadastro-form > .input-group:first-child {
+  grid-column: 1 / -1;
+}
+
+
+#btn-enviar-codigo {
+  grid-column: 1 / -1;
+}
+
+
+#form-cadastro .input-group {
+  margin-bottom: 16px;
+}
+
+#form-cadastro .input-group input {
+  padding: 11px 14px;
+}
+
+#area-verificacao {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  #cadastro-form {
+    grid-template-columns: 1fr;
+  }
+}

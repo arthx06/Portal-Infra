@@ -28,6 +28,9 @@ public class UsuarioService {
 
     private final SecureRandom secureRandom = new SecureRandom();
 
+    private static boolean vazio(String s) {
+    return s == null || s.isBlank();
+}
     @Autowired
     public UsuarioService(
             UsuarioRepository usuarioRepository,
@@ -105,6 +108,14 @@ public class UsuarioService {
                     "E-mail já cadastrado"
             );
         }
+        if (vazio(usuario.getTelefone()) || vazio(usuario.getCep())
+                || vazio(usuario.getLogradouro()) || vazio(usuario.getNumero())
+                || vazio(usuario.getBairro()) || vazio(usuario.getCidade())
+                || vazio(usuario.getUf())) {
+        throw new RuntimeException("Telefone e endereço completo são obrigatórios");
+        }
+
+        usuario.setUf(usuario.getUf().trim().toUpperCase());
 
         EmailVerification verificacao =
                 emailVerificationRepository

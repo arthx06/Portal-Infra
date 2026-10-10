@@ -76,7 +76,9 @@ public class UsuarioController {
     ) {
 
         try {
-
+                System.out.println("CADASTRO >> cep=" + usuario.getCep()
+        + " | tel=" + usuario.getTelefone()
+        + " | cidade=" + usuario.getCidade());
             Usuario salvo =
                     usuarioService.registerUsuario(
                             usuario,
