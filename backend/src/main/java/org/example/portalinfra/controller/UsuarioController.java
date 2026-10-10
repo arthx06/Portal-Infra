@@ -14,7 +14,7 @@ import org.example.portalinfra.dto.AlterarEmailRequest;
 import org.example.portalinfra.dto.AlterarTelefoneRequest;
 import org.example.portalinfra.dto.PerfilResponse;
 import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
-import java.util.Map;
+import org.example.portalinfra.dto.AtualizarPerfilRequest;
 
 
 @RestController
@@ -240,6 +240,25 @@ public class UsuarioController {
             );
         }
     }
+    
+
+        
+      
+        @PutMapping("/{id}/perfil")
+        public ResponseEntity<PerfilResponse> atualizarPerfil(
+                @PathVariable Long id,
+                @Valid @RequestBody AtualizarPerfilRequest request) {
+
+        System.out.println("PUT PERFIL RECEBIDO - ID: " + id);
+
+        PerfilResponse resposta =
+                usuarioService.atualizarPerfil(id, request);
+
+        return ResponseEntity.ok(resposta);
+        }
+
+
+
 
 
     // =============================================

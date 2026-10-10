@@ -59,140 +59,108 @@
             </div>
 
 
+            
             <form id="formularioPerfil">
 
-                <div class="linha-formulario">
+                <h3 class="titulo-secao">Dados pessoais</h3>
 
+                <div class="linha-formulario">
                     <div class="grupo-input">
                         <label for="nome">Nome completo</label>
-
-                        <input
-                            type="text"
-                            id="nome"
-                            value=""
-                            disabled
-                        >
+                        <input type="text" id="nome" disabled>
                     </div>
 
                     <div class="grupo-input">
                         <label for="email">E-mail</label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            value=""
-                            disabled
-                        >
+                        <input type="email" id="email" disabled>
                     </div>
-                  
-
                 </div>
 
-
                 <div class="linha-formulario">
-
                     <div class="grupo-input">
                         <label for="telefone">Telefone</label>
-
-                        <input
-                            type="tel"
-                            id="telefone"
-                            value=""
-                            disabled
-                        >
+                        <input type="tel" id="telefone" disabled>
                     </div>
 
                     <div class="grupo-input">
                         <label for="dataNascimento">Data de nascimento</label>
-
-                        <input
-                            type="date"
-                            id="dataNascimento"
-                            value=""
-                            disabled
-                        >
+                        <input type="date" id="dataNascimento" disabled>
                     </div>
-
                 </div>
 
-                <div class="linha-formulario">
+                <h3 class="titulo-secao">Endereço</h3>
 
+                <div class="linha-formulario">
                     <div class="grupo-input">
                         <label for="cep">CEP</label>
-
-                        <input
-                            type="text"
-                            id="cep"
-                            value=""
-                            disabled
-                        >
+                        <input type="text" id="cep" disabled>
                     </div>
 
+                    <div class="grupo-input">
+                        <label for="numero">Número</label>
+                        <input type="text" id="numero" disabled>
+                    </div>
                 </div>
 
                 <div class="linha-formulario">
                     <div class="grupo-input">
                         <label for="logradouro">Logradouro</label>
-
-                        <input
-                            type="text"
-                            id="logradouro"
-                            value=""
-                            disabled
-                        >
+                        <input type="text" id="logradouro" disabled>
                     </div>
+
                     <div class="grupo-input">
-                        <label for="bairro">Bairro</label>
-                        <input
-                            type="text"
-                            id="bairro "
-                            value=""
-                            disabled
-                        >
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" disabled>
                     </div>
                 </div>
-                
+
                 <div class="linha-formulario">
                     <div class="grupo-input">
-                        <label for="cidade">Cidade</label>
-
-                        <input
-                            type="text"
-                            id="cidade"
-                            value=""
-                            disabled
-                        >
+                        <label for="bairro">Bairro</label>
+                        <input type="text" id="bairro" disabled>
                     </div>
+
                     <div class="grupo-input">
-                        <label for="estado">Estado</label>
+                        <label for="cidade">Cidade</label>
+                        <input type="text" id="cidade" disabled>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="estado">Estado (UF)</label>
                         <input
                             type="text"
                             id="estado"
-                            value=""
+                            maxlength="2"
                             disabled
                         >
                     </div>
                 </div>
 
-
                 <div class="acoes-perfil">
-
                     <button
                         type="button"
-                        class="btn-secundario"
                         id="botaoAlterar"
-                        onclick="">
+                        class="btn-secundario">
                         Alterar informações
                     </button>
 
                     <button
                         type="submit"
-                        class="btn-principal"
                         id="botaoSalvar"
+                        class="btn-principal"
                         style="display: none;">
                         Salvar alterações
                     </button>
 
+                    <button
+                        type="button"
+                        id="botaoCancelar"
+                        class="btn-secundario"
+                        style="display: none;">
+                        Cancelar
+                    </button>
                 </div>
 
             </form>

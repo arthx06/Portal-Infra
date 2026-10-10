@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.example.portalinfra.dto.AtualizarPerfilRequest;
+import org.example.portalinfra.dto.PerfilResponse;
 
 @Service
 public class UsuarioService {
@@ -306,7 +308,36 @@ public class UsuarioService {
                 .orElseThrow(() ->
                         new RuntimeException("Usuário não encontrado!")
                 );
-    }
+    }   
+   
+        @Transactional
+        public PerfilResponse atualizarPerfil(
+                Long id,
+                AtualizarPerfilRequest request) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        usuario.setNome(request.nome());
+        usuario.setTelefone(request.telefone());
+        usuario.setDataNascimento(request.dataNascimento());
+        usuario.setCep(request.cep());
+        usuario.setLogradouro(request.logradouro());
+        usuario.setNumero(request.numero());
+        usuario.setComplemento(request.complemento());
+        usuario.setBairro(request.bairro());
+        usuario.setCidade(request.cidade());
+        usuario.setUf(
+                request.uf() == null ? null : request.uf().trim().toUpperCase()
+        );
+
+        Usuario atualizado = usuarioRepository.save(usuario);
+
+        return PerfilResponse.de(atualizado);
+        }
+
+
 
     @Transactional
     public Usuario alterarTelefone(Long id, String telefone) {
