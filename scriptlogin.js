@@ -131,12 +131,7 @@
           console.log("Login realizado:", data);
 
 
-          alert(
-            "Bem-vindo(a), " +
-            (data.nome || data.email || "usuário") +
-            "!"
-          );
-
+            window.location.href = "index.html";
 
           // Depois podemos colocar aqui a página
           // para onde o usuário será enviado.
@@ -256,6 +251,7 @@
             const senha = document.getElementById("senha_cad").value;
             const codigo = document.getElementById("codigo_cad").value.trim();
             const cep = document.getElementById("cep_cad").value.trim();
+            const dataNascimento = document.getElementById("data_nasc").value;
             const logradouro = document.getElementById("logradouro_cad").value.trim();
             const numero = document.getElementById("numero_cad").value.trim();
             const complemento = document.getElementById("complemento_cad").value.trim();
@@ -265,7 +261,7 @@
             const telefone = document.getElementById("telefone_cad").value.replace(/\D/g, "");
 
 
-          if (!nome || !email || !senha || !codigo || !telefone || !cep || !logradouro || !numero || !bairro || !cidade || !uf) {
+          if (!nome || !email || !senha || !codigo || !telefone || !cep || !dataNascimento || !logradouro || !numero || !bairro || !cidade || !uf  ) {
             alert("Preencha todos os campos, inclusive o código.");
             return;
           }
@@ -277,7 +273,7 @@
           try {
             await postJSON(
                 "/usuarios/registration?codigo=" + encodeURIComponent(codigo),
-                { nome, email, telefone, senha, cep, logradouro, numero, complemento, bairro, cidade, uf }
+                { nome, email, telefone, senha, cep, dataNascimento, logradouro, numero, complemento, bairro, cidade, uf }
             );
           alert("Conta criada com sucesso! Faça login.");
             cadastroForm.reset();

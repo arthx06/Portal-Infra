@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "usuario")
@@ -37,6 +38,10 @@ public class Usuario {
     @Pattern(regexp = "\\d{5}-?\\d{3}", message = "CEP inválido")
     @Column(length = 9)
     private String cep;
+
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+
 
     @Size(max = 255, message = "Rua muito longa")
     private String logradouro;
@@ -118,4 +123,12 @@ public class Usuario {
 
     public boolean isEstaAtivo() { return estaAtivo; }
     public void setEstaAtivo(boolean estaAtivo) { this.estaAtivo = estaAtivo; }
+    
+    public LocalDate getDataNascimento() {
+    return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
 }
