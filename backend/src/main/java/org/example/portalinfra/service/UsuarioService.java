@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.example.portalinfra.dto.AtualizarPerfilRequest;
+import org.example.portalinfra.dto.PerfilResponse;
 
 @Service
 public class UsuarioService {
@@ -28,6 +30,9 @@ public class UsuarioService {
 
     private final SecureRandom secureRandom = new SecureRandom();
 
+    private static boolean vazio(String s) {
+    return s == null || s.isBlank();
+}
     @Autowired
     public UsuarioService(
             UsuarioRepository usuarioRepository,
@@ -105,6 +110,14 @@ public class UsuarioService {
                     "E-mail já cadastrado"
             );
         }
+        if (vazio(usuario.getTelefone()) || vazio(usuario.getCep())
+                || vazio(usuario.getLogradouro()) || vazio(usuario.getNumero())
+                || vazio(usuario.getBairro()) || vazio(usuario.getCidade())
+                || vazio(usuario.getUf())) {
+        throw new RuntimeException("Telefone e endereço completo são obrigatórios");
+        }
+
+        usuario.setUf(usuario.getUf().trim().toUpperCase());
 
         EmailVerification verificacao =
                 emailVerificationRepository
@@ -155,33 +168,52 @@ public class UsuarioService {
     // LOGIN
     // ==========================================
 
-    public Usuario loginUsuario(
-            String email,
-            String rawSenha
-    ) {
+    
+        public Usuario loginUsuario(String email, String rawSenha) {
+
+        if (email == null || email.isBlank()
+                || rawSenha == null) {
+                throw new RuntimeException("E-mail ou senha inválidos");
+        }
 
         email = email.trim().toLowerCase();
 
-        Usuario usuario =
-                usuarioRepository
-                        .findByEmail(email)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "E-mail ou senha inválidos"
-                                )
-                        );
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("E-mail ou senha inválidos"));
 
-        if (!passwordEncoder.matches(
-                rawSenha,
-                usuario.getSenha()
-        )) {
-            throw new RuntimeException(
-                    "E-mail ou senha inválidos"
-            );
+        if (!passwordEncoder.matches(rawSenha, usuario.getSenha())) {
+                throw new RuntimeException("E-mail ou senha inválidos");
+        }
+
+        if (!usuario.isEstaAtivo()) {
+                throw new RuntimeException("Esta conta está desativada.");
         }
 
         return usuario;
-    }
+        }
+
+        
+        @Transactional
+        public void desativarConta(Long id, String senha) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Não foi possível desativar a conta."));
+
+        if (senha == null
+                || !passwordEncoder.matches(senha, usuario.getSenha())) {
+                throw new RuntimeException("Senha incorreta.");
+        }
+
+        if (!usuario.isEstaAtivo()) {
+                throw new RuntimeException("Esta conta já está desativada.");
+        }
+
+        usuario.setEstaAtivo(false);
+
+        usuarioRepository.save(usuario);
+        }
 
     // ==========================================
     // RECUPERAÇÃO DE SENHA
@@ -295,7 +327,36 @@ public class UsuarioService {
                 .orElseThrow(() ->
                         new RuntimeException("Usuário não encontrado!")
                 );
-    }
+    }   
+   
+        @Transactional
+        public PerfilResponse atualizarPerfil(
+                Long id,
+                AtualizarPerfilRequest request) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        usuario.setNome(request.nome());
+        usuario.setTelefone(request.telefone());
+        usuario.setDataNascimento(request.dataNascimento());
+        usuario.setCep(request.cep());
+        usuario.setLogradouro(request.logradouro());
+        usuario.setNumero(request.numero());
+        usuario.setComplemento(request.complemento());
+        usuario.setBairro(request.bairro());
+        usuario.setCidade(request.cidade());
+        usuario.setUf(
+                request.uf() == null ? null : request.uf().trim().toUpperCase()
+        );
+
+        Usuario atualizado = usuarioRepository.save(usuario);
+
+        return PerfilResponse.de(atualizado);
+        }
+
+
 
     @Transactional
     public Usuario alterarTelefone(Long id, String telefone) {

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Entrar - Portal Infra</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="scriptlogin.js" defer></script>
   </head>
   <body>
     <!-- CABEÇALHO -->
@@ -70,10 +72,32 @@
         </div>
 
         <!-- FORMULÁRIO DE CADASTRO -->
-        <div class="auth-card" id="form-cadastro" style="display: none">
+       <div class="auth-card" id="form-cadastro" style="display: none">
           <div class="auth-header">
             <h2>Crie sua conta</h2>
             <p>Junte-se a nós e ajude a melhorar a cidade</p>
+          </div>
+
+          <div id="area-verificacao" style="display: none;">
+            <div class="input-group">
+              <label for="codigo_cad">Código de verificação</label>
+              <input
+                type="text"
+                id="codigo_cad"
+                maxlength="6"
+                inputmode="numeric"
+                placeholder="Digite o código recebido"
+              />
+            </div>
+
+            <button
+              type="submit"
+              form="cadastro-form"
+              id="btn-confirmar-cadastro"
+              class="submit btn-primary btn-full"
+            >
+              Confirmar cadastro
+            </button>
           </div>
 
           <form action="#" method="POST" id="cadastro-form">
@@ -98,6 +122,21 @@
                 required
               />
             </div>
+            <div class="input-group">
+              <label for="telefone_cad">Telefone</label>
+              <input
+                type="tel"
+                id="telefone_cad"
+                name="telefone"
+                placeholder="(00) 00000-0000"
+                maxlength="15"
+                inputmode="numeric"
+                autocomplete="tel-national"
+                pattern="\(\d{2}\) \d{4,5}-\d{4}"
+                title="Digite o DDD e o número, por exemplo (11) 98765-4321"
+                required
+              />
+            </div>
 
             <div class="input-group">
               <label for="senha_cad">Senha</label>
@@ -111,42 +150,111 @@
               />
             </div>
 
-           <button
-              type="button"
-              id="btn-enviar-codigo"
-              class="submit btn-primary btn-full"
-          >
-              Enviar código
-          </button>
-          <div id="area-verificacao" style="display: none;">
-
             <div class="input-group">
-                <label for="codigo_cad">Código de verificação</label>
-
+              <label for="cep_cad">CEP</label>
+              <input
+                type="text"
+                id="cep_cad"
+                name="cep"
+                placeholder="00000-000"
+                maxlength="9"
+                inputmode="numeric"
+                autocomplete="postal-code"
+                required
+              />
+              <small id="cep-status"></small>
+            </div>
+            <div class="input-group">
+                <label for="data_nasc">Data de Nascimento</label>
                 <input
-                    type="text"
-                    id="codigo_cad"
-                    maxlength="6"
-                    inputmode="numeric"
-                    placeholder="Digite o código recebido"
+                  type="date"
+                  id="data_nasc"
+                  name="dataNascimento"
+                  placeholder="Digite sua data de nascimento"
+                  required
                 />
             </div>
 
+            <div class="input-row">
+              <div class="input-group">
+                <label for="logradouro_cad">Rua</label>
+                <input
+                  type="text"
+                  id="logradouro_cad"
+                  name="logradouro"
+                  placeholder="Rua / Avenida"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="numero_cad">Número</label>
+                <input
+                  type="text"
+                  id="numero_cad"
+                  name="numero"
+                  placeholder="Nº"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="complemento_cad">Complemento</label>
+              <input
+                type="text"
+                id="complemento_cad"
+                name="complemento"
+                placeholder="Apto, bloco (opcional)"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="bairro_cad">Bairro</label>
+              <input
+                type="text"
+                id="bairro_cad"
+                name="bairro"
+                placeholder="Bairro"
+                required
+              />
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label for="cidade_cad">Cidade</label>
+                <input
+                  type="text"
+                  id="cidade_cad"
+                  name="cidade"
+                  placeholder="Cidade"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="uf_cad">UF</label>
+                <input
+                  type="text"
+                  id="uf_cad"
+                  name="uf"
+                  placeholder="UF"
+                  maxlength="2"
+                  required
+                />
+              </div>
+            </div>
+
             <button
-                type="submit"
-                id="btn-confirmar-cadastro"
-                class="submit btn-primary btn-full"
+              type="button"
+              id="btn-enviar-codigo"
+              class="submit btn-primary btn-full"
             >
-                Confirmar cadastro
+              Enviar código
             </button>
-
-        </div>
           </form>
+        </div>
+          
 
-          <div class="auth-footer">
-            Já possui uma conta?
-            <button class="btn-link" onclick="toggleAuth('login')">Faça login</button>
-          </div>
+         
         </div>
           <div class="auth-card" id="form-recuperar" style="display: none">
             <div class="auth-header">
@@ -188,239 +296,7 @@
       <span>© 2026 SP em Foco</span>
     </footer>
 
-    <!-- SCRIPT PARA ALTERNAR ENTRE LOGIN E CADASTRO e VALIDAÇÃO -->
-
-    <script>
-
-      // =====================================================
-      // CONFIGURAÇÃO DA API
-      // =====================================================
-
-      const API_BASE = "https://portal-infra-backend.onrender.com";
-
-
-      // =====================================================
-      // ALTERNAR ENTRE LOGIN E CADASTRO
-      // =====================================================
-
-      function toggleAuth(tela) {
-
-        const loginCard = document.getElementById("form-login");
-        const cadastroCard = document.getElementById("form-cadastro");
-        const recuperarCard = document.getElementById("form-recuperar");
-
-        // Esconde todas as telas
-        loginCard.style.display = "none";
-        cadastroCard.style.display = "none";
-        recuperarCard.style.display = "none";
-
-        // Mostra a tela escolhida
-        if (tela === "login") {
-            loginCard.style.display = "block";
-        }
-
-        if (tela === "cadastro") {
-            cadastroCard.style.display = "block";
-        }
-
-        if (tela === "recuperar") {
-            recuperarCard.style.display = "block";
-        }
-    }
-
-
-      // =====================================================
-      // FUNÇÃO PARA ENVIAR JSON PARA O BACKEND
-      // =====================================================
-
-      async function postJSON(path, body) {
-
-        const response = await fetch(API_BASE + path, {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify(body)
-
-        });
-
-
-        // Tenta transformar a resposta em JSON
-        const data = await response.json().catch(() => ({}));
-
-
-        // Se o backend retornar erro
-        if (!response.ok) {
-
-          throw new Error(
-            data.erro ||
-            data.message ||
-            "Erro na requisição"
-          );
-
-        }
-
-
-        // Retorna os dados recebidos do backend
-        return data;
-
-      }
-
-
-      // =====================================================
-      // LOGIN
-      // =====================================================
-
-      const loginForm = document.getElementById("login-form");
-
-
-      loginForm.addEventListener("submit", async function(event) {
-
-        // Impede o HTML de recarregar a página
-        event.preventDefault();
-
-
-        // Pega os valores dos inputs
-        const email = document.getElementById("email").value.trim();
-
-        const senha = document.getElementById("senha").value;
-
-
-        // Verifica se os campos foram preenchidos
-        if (!email || !senha) {
-
-          alert("Preencha o e-mail e a senha.");
-
-          return;
-
-        }
-
-
-        try {
-
-          // Envia para o Spring Boot
-          const data = await postJSON(
-            "/usuarios/login",
-            {
-              email: email,
-              senha: senha
-            }
-          );
-          localStorage.setItem("usuarioLogado", "true");
-
-          localStorage.setItem(
-              "usuario",
-              JSON.stringify({
-                  id: data.id,
-                  nome: data.nome,
-                  email: data.email,
-                  tipo: data.tipo
-              })
-          );
-
-          console.log("Login realizado:", data);
-
-
-          alert(
-            "Bem-vindo(a), " +
-            (data.nome || data.email || "usuário") +
-            "!"
-          );
-
-
-          // Depois podemos colocar aqui a página
-          // para onde o usuário será enviado.
-          //
-          // window.location.href = "index.html";
-
-
-        } catch (error) {
-
-          console.error("Erro no login:", error);
-
-          alert(error.message);
-
-        }
-
-      });
-
-
-
-      // =====================================================
-      // CADASTRO
-      // =====================================================
-        const cadastroForm = document.getElementById("cadastro-form");
-      
-        const btnEnviarCodigo = document.getElementById("btn-enviar-codigo");
-
-        btnEnviarCodigo.addEventListener("click", async function () {
-          const email = document.getElementById("email_cad").value.trim();
-
-          if (!email) {
-            alert("Digite seu e-mail antes de pedir o código.");
-            return;
-          }
-
-          btnEnviarCodigo.disabled = true;
-          try {
-            await postJSON("/usuarios/enviar-codigo", { email });
-            document.getElementById("area-verificacao").style.display = "block";
-            btnEnviarCodigo.textContent = "Reenviar código";
-            alert("Código enviado! Verifique seu e-mail.");
-          } catch (error) {
-            alert(error.message);
-          } finally {
-            btnEnviarCodigo.disabled = false;
-          }
-        });
-
-        cadastroForm.addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const nome = document.getElementById("nome_cad").value.trim();
-          const email = document.getElementById("email_cad").value.trim();
-          const senha = document.getElementById("senha_cad").value;
-          const codigo = document.getElementById("codigo_cad").value.trim();
-
-          if (!nome || !email || !senha || !codigo) {
-            alert("Preencha todos os campos, inclusive o código.");
-            return;
-          }
-          if (senha.length < 6) {
-            alert("A senha deve ter no mínimo 6 caracteres.");
-            return;
-          }
-
-          try {
-            await postJSON(
-              "/usuarios/registration?codigo=" + encodeURIComponent(codigo),
-              { nome, email, senha }
-            );
-            alert("Conta criada com sucesso! Faça login.");
-            cadastroForm.reset();
-            document.getElementById("area-verificacao").style.display = "none";
-            toggleAuth("login");
-          } catch (error) {
-            alert(error.message);
-          }
-        });
-        document.getElementById("recuperar-form").addEventListener("submit", async function (event) {
-          event.preventDefault();
-          const email = document.getElementById("email_rec").value.trim();
-          try {
-            const data = await postJSON("/usuarios/recuperar-senha", { email });
-            alert(data.mensagem);
-            toggleAuth("login");
-          } catch (error) {
-            alert(error.message);
-          }
-        });
-
-    </script>
-
+   
 
   </body>
 </html>

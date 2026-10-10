@@ -14,7 +14,7 @@ import org.example.portalinfra.dto.AlterarEmailRequest;
 import org.example.portalinfra.dto.AlterarTelefoneRequest;
 import org.example.portalinfra.dto.PerfilResponse;
 import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
-import java.util.Map;
+import org.example.portalinfra.dto.AtualizarPerfilRequest;
 
 
 @RestController
@@ -76,7 +76,9 @@ public class UsuarioController {
     ) {
 
         try {
-
+                System.out.println("CADASTRO >> cep=" + usuario.getCep()
+        + " | tel=" + usuario.getTelefone()
+        + " | cidade=" + usuario.getCidade());
             Usuario salvo =
                     usuarioService.registerUsuario(
                             usuario,
@@ -238,6 +240,25 @@ public class UsuarioController {
             );
         }
     }
+    
+
+        
+      
+        @PutMapping("/{id}/perfil")
+        public ResponseEntity<PerfilResponse> atualizarPerfil(
+                @PathVariable Long id,
+                @Valid @RequestBody AtualizarPerfilRequest request) {
+
+        System.out.println("PUT PERFIL RECEBIDO - ID: " + id);
+
+        PerfilResponse resposta =
+                usuarioService.atualizarPerfil(id, request);
+
+        return ResponseEntity.ok(resposta);
+        }
+
+
+
 
 
     // =============================================
@@ -311,6 +332,27 @@ public class UsuarioController {
         return ResponseEntity.ok(
                 Map.of("apiKey", googleMapsApiKey)
         );
+        }
+
+
+                
+        @PatchMapping("/{id}/desativar")
+        public ResponseEntity<?> desativarConta(
+                @PathVariable Long id,
+                @RequestBody Map<String, String> body) {
+
+        try {
+                usuarioService.desativarConta(id, body.get("senha"));
+
+                return ResponseEntity.ok(
+                        Map.of("mensagem", "Conta desativada com sucesso.")
+                );
+
+        } catch (RuntimeException e) {
+                return ResponseEntity.badRequest().body(
+                        Map.of("erro", e.getMessage())
+                );
+        }
         }
 
 }

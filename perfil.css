@@ -413,3 +413,128 @@
     }
 }
 
+.titulo-secao {
+    font-size: 16px;
+    font-weight: 600;
+    color: #356b52;
+    margin: 24px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8e4;
+}
+
+.titulo-secao:first-child {
+    margin-top: 0;
+}
+
+.linha-formulario {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.grupo-input {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 7px;
+}
+
+.grupo-input label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #37463d;
+}
+
+.grupo-input input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 43px;
+    padding: 11px 13px;
+    border: 1px solid #d5ded8;
+    border-radius: 8px;
+    background: #fff;
+    color: #26352c;
+    font: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.grupo-input input:focus {
+    outline: none;
+    border-color: #5e8a75;
+    box-shadow: 0 0 0 3px rgba(94, 138, 117, 0.13);
+}
+
+.grupo-input input:disabled {
+    background: #f5f7f5;
+    color: #58645c;
+    cursor: default;
+}
+
+.acoes-perfil {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+@media (max-width: 600px) {
+    .linha-formulario {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .acoes-perfil button {
+        flex: 1;
+    }
+}
+
+
+.area-excluir-conta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 28px;
+    padding: 20px;
+    border: 1px solid #f0caca;
+    border-radius: 12px;
+}
+
+.area-excluir-conta h3 {
+    margin: 0 0 8px;
+    color: #a12626;
+}
+
+.area-excluir-conta p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.btn-excluir-conta {
+    flex-shrink: 0;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #b42323;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-excluir-conta:hover {
+    background-color: #8f1919;
+}
+
+.btn-excluir-conta:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .area-excluir-conta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

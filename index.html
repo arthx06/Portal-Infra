@@ -24,7 +24,28 @@
             <a href="#">Sobre</a>
         </nav>
 
-        <a href="login.html"><button class="btn-login">Entrar</button></a>
+        
+        <!-- Área do usuário -->
+        <div class="user-menu" id="user-menu" style="display: none;">
+
+            <button class="user-menu-btn" id="user-menu-btn"
+                    type="button" aria-expanded="false">
+                <span id="nome-usuario">Usuário</span>
+                <span class="seta-menu">▼</span>
+            </button>
+
+            <div class="user-dropdown" id="user-dropdown" hidden>
+                <a href="perfil.html">Meu perfil</a>
+                <a href="reclamacoes.html">Reclamações</a>
+                <button type="button" id="btn-sair">Sair</button>
+            </div>
+
+        </div>
+
+        <a href="login.html" id="btn-entrar">
+            <button class="btn-login" type="button">Entrar</button>
+        </a>
+
 
     </header>
 
@@ -50,9 +71,11 @@
                 </p>
 
                 <div class="hero-buttons">
-                    <button class="btn-primary">
-                        + Registrar problema
-                    </button>
+                    <a href="nova-reclamacao.html">
+                        <button class="btn-primary">
+                            + Registrar problema
+                        </button>
+                    </a>
 
                     <button class="btn-secondary">
                         Ver mapa

@@ -1,0 +1,192 @@
+
+/* =========================
+   NOVA RECLAMAÇÃO
+========================= */
+
+.nova-reclamacao {
+    width: 100%;
+    padding: 45px 8% 60px;
+    min-height: calc(100vh - 176px);
+}
+
+.formulario-reclamacao {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 35px 40px;
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.025);
+}
+
+.formulario-cabecalho {
+    margin-bottom: 30px;
+}
+
+.formulario-tag {
+    display: inline-block;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+}
+
+.formulario-cabecalho h1 {
+    font-size: 30px;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+.formulario-cabecalho p {
+    color: #70757d;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+/* Campos */
+
+.campo-reclamacao {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 22px;
+    min-width: 0;
+}
+
+.campo-reclamacao label {
+    color: #303744;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.campo-reclamacao input,
+.campo-reclamacao select,
+.campo-reclamacao textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d9dfe8;
+    border-radius: 8px;
+    background: #fff;
+    color: #303744;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-reclamacao input:focus,
+.campo-reclamacao select:focus,
+.campo-reclamacao textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.campo-reclamacao textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.campo-reclamacao input[type="file"] {
+    padding: 10px;
+    background: #fafbfc;
+}
+
+.campo-reclamacao small {
+    color: #818895;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Bairro e gravidade */
+
+.campos-linha {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+/* Mensagem do formulário */
+
+#mensagem-formulario {
+    color: #2563eb;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+/* Botões */
+
+.acoes-formulario {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #eeeeee;
+}
+
+.btn-cancelar {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 20px;
+    background: #f0f1f3;
+    color: #303744;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn-cancelar:hover {
+    background: #e4e7eb;
+}
+
+.acoes-formulario .btn-primary {
+    font-size: 14px;
+    border: none;
+}
+
+/* Responsividade */
+
+@media (max-width: 800px) {
+    .nova-reclamacao {
+        padding: 30px 5%;
+    }
+
+    .formulario-reclamacao {
+        padding: 28px 24px;
+    }
+
+    .formulario-cabecalho h1 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 500px) {
+    .nova-reclamacao {
+        padding: 20px 4%;
+    }
+
+    .formulario-reclamacao {
+        padding: 24px 18px;
+    }
+
+    .campos-linha {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .acoes-formulario {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-cancelar,
+    .acoes-formulario .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+}

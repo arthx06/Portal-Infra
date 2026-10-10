@@ -691,3 +691,156 @@ footer {
     padding: 30px 20px;
   }
 }
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.input-row .input-group {
+  flex: 1;
+  min-width: 0; /* evita o input estourar a coluna */
+}
+
+/* o último campo da linha (Número e UF) fica estreito */
+.input-row .input-group:last-child {
+  flex: 0 0 110px;
+}
+
+#cep-status {
+  display: block;
+  min-height: 1em;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+#cep-status[data-erro] {
+  color: #dc2626;
+}
+.auth-container {
+  max-width: 720px;
+}
+
+
+#form-login,
+#form-recuperar {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#form-cadastro {
+  padding: 32px 35px;
+}
+
+#cadastro-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+#cadastro-form > .input-group:first-child {
+  grid-column: 1 / -1;
+}
+#cadastro-form > .input-group:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
+
+#btn-enviar-codigo {
+  grid-column: 1 / -1;
+}
+
+
+#form-cadastro .input-group {
+  margin-bottom: 16px;
+}
+
+#form-cadastro .input-group input {
+  padding: 11px 14px;
+}
+
+#area-verificacao {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  #cadastro-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Menu do usuário */
+.user-menu {
+    position: relative;
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #31325b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.user-menu-btn:hover {
+    background: #f4f8f5;
+}
+
+.seta-menu {
+    font-size: 10px;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 1000;
+    width: 210px;
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid #e1e7e3;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.user-dropdown[hidden] {
+    display: none;
+}
+
+.user-dropdown a,
+.user-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #303a33;
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.user-dropdown a:hover {
+    background: #f1f6f2;
+}
+
+.user-dropdown button {
+    color: #b42318;
+    border-top: 1px solid #eeeeee;
+    border-radius: 0 0 6px 6px;
+}
+
+.user-dropdown button:hover {
+    background: #fff1f0;
+}
