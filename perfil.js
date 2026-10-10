@@ -207,4 +207,77 @@ document.addEventListener("DOMContentLoaded", async function () {
             botaoSalvar.textContent = "Salvar alterações";
         }
     });
+    
+    const botaoExcluirConta = document.getElementById("botaoExcluirConta");
+
+    botaoExcluirConta?.addEventListener("click", async function () {
+        const primeiraConfirmacao = confirm(
+            "Deseja realmente desativar sua conta?\n\n" +
+            "Se continuar, sua conta será desativada."
+        );
+
+        if (!primeiraConfirmacao) {
+            return;
+        }
+
+        const segundaConfirmacao = confirm(
+            "ATENÇÃO!\n\n" +
+            "Você não poderá mais entrar nessa conta após a desativação.\n" +
+            "Seus dados permanecerão armazenados.\n\n" +
+            "Tem certeza de que deseja continuar?"
+        );
+
+        if (!segundaConfirmacao) {
+            alert("Desativação cancelada.");
+            return;
+        }
+        const senha = prompt("Digite sua senha atual para confirmar:");
+
+        if (senha === null) return;
+
+        if (!senha.trim()) {
+            alert("Informe sua senha para continuar.");
+            return;
+        }
+
+        botaoExcluirConta.disabled = true;
+        botaoExcluirConta.textContent = "Desativando...";
+
+        try {
+            const resposta = await fetch(
+                `${API_BASE}/usuarios/${usuario.id}/desativar`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ senha })
+                }
+            );
+
+            const resultado = await resposta.json().catch(() => ({}));
+
+            if (!resposta.ok) {
+                throw new Error(
+                    resultado.erro || "Não foi possível desativar a conta."
+                );
+            }
+
+            localStorage.removeItem("usuario");
+            localStorage.removeItem("usuarioLogado");
+
+            alert("Sua conta foi desativada com sucesso.");
+
+            window.location.replace("login.html");
+
+        } catch (erro) {
+            console.error("Erro ao desativar conta:", erro);
+            alert(erro.message);
+
+        } finally {
+            botaoExcluirConta.disabled = false;
+            botaoExcluirConta.textContent = "Desativar minha conta";
+        }
+    });
+
 });

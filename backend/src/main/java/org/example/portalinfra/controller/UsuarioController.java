@@ -334,4 +334,25 @@ public class UsuarioController {
         );
         }
 
+
+                
+        @PatchMapping("/{id}/desativar")
+        public ResponseEntity<?> desativarConta(
+                @PathVariable Long id,
+                @RequestBody Map<String, String> body) {
+
+        try {
+                usuarioService.desativarConta(id, body.get("senha"));
+
+                return ResponseEntity.ok(
+                        Map.of("mensagem", "Conta desativada com sucesso.")
+                );
+
+        } catch (RuntimeException e) {
+                return ResponseEntity.badRequest().body(
+                        Map.of("erro", e.getMessage())
+                );
+        }
+        }
+
 }

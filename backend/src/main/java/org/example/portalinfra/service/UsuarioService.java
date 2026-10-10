@@ -168,33 +168,52 @@ public class UsuarioService {
     // LOGIN
     // ==========================================
 
-    public Usuario loginUsuario(
-            String email,
-            String rawSenha
-    ) {
+    
+        public Usuario loginUsuario(String email, String rawSenha) {
+
+        if (email == null || email.isBlank()
+                || rawSenha == null) {
+                throw new RuntimeException("E-mail ou senha inválidos");
+        }
 
         email = email.trim().toLowerCase();
 
-        Usuario usuario =
-                usuarioRepository
-                        .findByEmail(email)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "E-mail ou senha inválidos"
-                                )
-                        );
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("E-mail ou senha inválidos"));
 
-        if (!passwordEncoder.matches(
-                rawSenha,
-                usuario.getSenha()
-        )) {
-            throw new RuntimeException(
-                    "E-mail ou senha inválidos"
-            );
+        if (!passwordEncoder.matches(rawSenha, usuario.getSenha())) {
+                throw new RuntimeException("E-mail ou senha inválidos");
+        }
+
+        if (!usuario.isEstaAtivo()) {
+                throw new RuntimeException("Esta conta está desativada.");
         }
 
         return usuario;
-    }
+        }
+
+        
+        @Transactional
+        public void desativarConta(Long id, String senha) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Não foi possível desativar a conta."));
+
+        if (senha == null
+                || !passwordEncoder.matches(senha, usuario.getSenha())) {
+                throw new RuntimeException("Senha incorreta.");
+        }
+
+        if (!usuario.isEstaAtivo()) {
+                throw new RuntimeException("Esta conta já está desativada.");
+        }
+
+        usuario.setEstaAtivo(false);
+
+        usuarioRepository.save(usuario);
+        }
 
     // ==========================================
     // RECUPERAÇÃO DE SENHA
