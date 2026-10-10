@@ -3,8 +3,12 @@ const formulario = document.getElementById("form-reclamacao");
 const mensagem = document.getElementById("mensagem-formulario");
 const campoFoto = document.getElementById("foto");
 
-// Use a URL do seu backend publicado no Render.
-// Para testar localmente, utilize http://localhost:8080.
+const usuarioLogado = localStorage.getItem("usuarioLogado");
+const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+
+if (usuarioLogado !== "true" || !usuario.id) {
+    window.location.replace("login.html");
+}
 const API_BASE = "https://portal-infra-backend.onrender.com";
 
 formulario.addEventListener("submit", async function (event) {
