@@ -1,4 +1,3 @@
-
 package org.example.portalinfra.config;
 
 import org.springframework.context.annotation.Bean;
@@ -38,60 +37,61 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
 
-            .cors(cors ->
-                cors.configurationSource(corsConfigurationSource())
-            )
-
-            .sessionManagement(sm ->
-                sm.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
+                .cors(cors ->
+                        cors.configurationSource(corsConfigurationSource())
                 )
-            )
 
-            .authorizeHttpRequests(auth -> auth
+                .sessionManagement(sm ->
+                        sm.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
-                // Documentação
-                .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
+                .authorizeHttpRequests(auth -> auth
 
-                // Endpoints públicos de autenticação
-             .requestMatchers(
-                "/usuarios/login",
-                "/usuarios/cadastro",
-                "/usuarios/enviar-codigo",
-                "/usuarios/recuperar-senha",
-                "/usuarios/redefinir-senha",
-                "/usuarios/config/maps",
-                "/usuarios/sessao",
-                "/usuarios/logout",
-                     "/usuarios/ping"
-            ).permitAll()
+                        // Documentação
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
-                // Preflight CORS
-                .requestMatchers(
-                    HttpMethod.OPTIONS, "/**"
-                ).permitAll()
+                        // Endpoints públicos de autenticação e Ping
+                        .requestMatchers(
+                                "/usuarios/login",
+                                "/usuarios/cadastro",
+                                "/usuarios/enviar-codigo",
+                                "/usuarios/recuperar-senha",
+                                "/usuarios/redefinir-senha",
+                                "/usuarios/config/maps",
+                                "/usuarios/sessao",
+                                "/usuarios/logout",
+                                "/usuarios/ping"
+                        ).permitAll()
 
-                .requestMatchers(HttpMethod.GET,
-                        "/reclamacoes", "/reclamacoes/contagem",
-                        "/comentarios/reclamacao/**"
-                ).permitAll()
-                // Todo o restante exige autenticação
-                .anyRequest().authenticated()
-            )
-            .exceptionHandling(e -> e.authenticationEntryPoint(
-            (req, res, ex) -> res.sendError(401, "Não autenticado")))
-            // Valida o cookie JWT antes da autenticação padrão
-            .addFilterBefore(
-                jwtCookieFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
-            
+                        // Preflight CORS
+                        .requestMatchers(
+                                HttpMethod.OPTIONS, "/**"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/reclamacoes", "/reclamacoes/contagem",
+                                "/comentarios/reclamacao/**"
+                        ).permitAll()
+
+                        // Todo o restante exige autenticação
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        (req, res, ex) -> res.sendError(401, "Não autenticado")
+                ))
+                // Valida o cookie JWT antes da autenticação padrão
+                .addFilterBefore(
+                        jwtCookieFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
@@ -102,31 +102,31 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:5500",
-            "http://127.0.0.1:5500",
-            "https://arthx06.github.io"
+                "http://localhost:5500",
+                "http://127.0.0.1:5500",
+                "https://arthx06.github.io"
         ));
 
         configuration.setAllowedMethods(List.of(
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE",
-            "OPTIONS"
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of(
-            "Content-Type",
-            "Authorization",
-            "X-XSRF-TOKEN"
+                "Content-Type",
+                "Authorization",
+                "X-XSRF-TOKEN"
         ));
 
         // Necessário para permitir cookies nas requisições CORS
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+                new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", configuration);
 
