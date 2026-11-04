@@ -68,7 +68,8 @@ public class SecurityConfig {
                 "/usuarios/redefinir-senha",
                 "/usuarios/config/maps",
                 "/usuarios/sessao",
-                "/usuarios/logout"
+                "/usuarios/logout",
+                     "/usuarios/ping"
             ).permitAll()
 
                 // Preflight CORS
@@ -78,8 +79,7 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.GET,
                         "/reclamacoes", "/reclamacoes/contagem",
-                        "/comentarios/reclamacao/**",
-                        "/ping"
+                        "/comentarios/reclamacao/**"
                 ).permitAll()
                 // Todo o restante exige autenticação
                 .anyRequest().authenticated()
