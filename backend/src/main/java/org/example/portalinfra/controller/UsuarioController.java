@@ -383,7 +383,15 @@ public class UsuarioController {
         }
 
 
-                
-        
+
+    // =============================================
+    // PING PARA MANTER O SERVIDOR ATIVO
+    // =============================================
+
+
+        @GetMapping("/ping")
+        public ResponseEntity<String> ping() {
+            return ResponseEntity.ok("O servidor está ativo!");
+        }
 
 }

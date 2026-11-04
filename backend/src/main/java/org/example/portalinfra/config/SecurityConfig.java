@@ -78,7 +78,8 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.GET,
                         "/reclamacoes", "/reclamacoes/contagem",
-                        "/comentarios/reclamacao/**"
+                        "/comentarios/reclamacao/**",
+                        "/ping"
                 ).permitAll()
                 // Todo o restante exige autenticação
                 .anyRequest().authenticated()
