@@ -264,7 +264,7 @@
 
           try {
             await postJSON(
-                "/usuarios/registration?codigo=" + encodeURIComponent(codigo),
+                "/usuarios/cadastro?codigo=" + encodeURIComponent(codigo),
                 { nome, email, telefone, senha, cep, dataNascimento, logradouro, numero, complemento, bairro, cidade, uf }
             );
           alert("Conta criada com sucesso! Faça login.");
