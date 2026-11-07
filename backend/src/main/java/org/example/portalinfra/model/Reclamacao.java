@@ -50,6 +50,15 @@ public class Reclamacao {
     @OneToMany(mappedBy = "reclamacao", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private java.util.List<Comentario> comentarios = new java.util.ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "reclamacao",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("ordem ASC")
+    private java.util.List<ReclamacaoFoto> fotos =
+            new java.util.ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
@@ -115,6 +124,14 @@ public class Reclamacao {
     public Double getLatitude() {
     return latitude;
 }
+
+    public java.util.List<ReclamacaoFoto> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(java.util.List<ReclamacaoFoto> fotos) {
+        this.fotos = fotos;
+    }
 
     public void setLatitude(Double latitude) {
         this.latitude = latitude;

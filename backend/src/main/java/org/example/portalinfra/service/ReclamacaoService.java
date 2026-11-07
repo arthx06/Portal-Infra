@@ -9,6 +9,7 @@ import jakarta.persistence.criteria.Predicate;
 import org.example.portalinfra.dto.ReclamacaoRequest;
 import org.example.portalinfra.dto.ReclamacaoResponse;
 import org.example.portalinfra.model.Reclamacao;
+import org.example.portalinfra.model.ReclamacaoFoto;
 import org.example.portalinfra.model.Usuario;
 import org.example.portalinfra.repository.ReclamacaoRepository;
 import org.example.portalinfra.repository.UsuarioRepository;
@@ -165,103 +166,148 @@ public class ReclamacaoService {
     }
 
     
-    public ReclamacaoResponse criar(
-            ReclamacaoRequest request,
-            MultipartFile foto,
-            Long usuarioId) {
+    @Transactional
+public ReclamacaoResponse criar(
+        ReclamacaoRequest request,
+        List<MultipartFile> fotos,
+        Long usuarioId) {
 
+    if (fotos == null || fotos.isEmpty()) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Envie pelo menos uma foto para a reclamação."
+        );
+    }
+
+    if (fotos.size() > 3) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Uma reclamação pode ter no máximo 3 fotos."
+        );
+    }
+
+    for (MultipartFile foto : fotos) {
         if (foto == null || foto.isEmpty()) {
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "A foto da reclamação é obrigatória."
+                    HttpStatus.BAD_REQUEST,
+                    "Uma das fotos enviadas está vazia."
             );
         }
 
         if (foto.getSize() > TAMANHO_MAXIMO) {
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "A foto deve ter no máximo 5 MB."
+                    HttpStatus.BAD_REQUEST,
+                    "Cada foto deve ter no máximo 5 MB."
             );
         }
 
         String contentType = foto.getContentType();
 
         if (contentType == null ||
-            !(contentType.equalsIgnoreCase("image/jpeg") ||
-              contentType.equalsIgnoreCase("image/png"))) {
+                !(contentType.equalsIgnoreCase("image/jpeg") ||
+                  contentType.equalsIgnoreCase("image/png"))) {
 
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Envie uma imagem JPG ou PNG."
+                    HttpStatus.BAD_REQUEST,
+                    "Envie somente imagens JPG ou PNG."
             );
         }
 
-        Usuario usuario = usuarioRepository.findById(usuarioId)
+        validarArquivoImagem(foto);
+    }
+
+    Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Usuário não encontrado."
+                    HttpStatus.NOT_FOUND,
+                    "Usuário não encontrado."
             ));
 
-        if (!usuario.isEstaAtivo()) {
-            throw new ResponseStatusException(
+    if (!usuario.isEstaAtivo()) {
+        throw new ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "Esta conta está desativada."
-            );
-        }
-        
-        GeocodingService.Coordenadas coordenadas =
-            geocodingService.buscar(
-                request.endereco(),
-                request.bairro()
-            ).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "Não foi possível localizar o endereço informado. Verifique o endereço e tente novamente."
-            ));
-        
+        );
+    }
 
-        try {
+    GeocodingService.Coordenadas coordenadas =
+            geocodingService.buscar(
+                    request.endereco(),
+                    request.bairro()
+            ).orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Não foi possível localizar o endereço informado. Verifique o endereço e tente novamente."
+            ));
+
+    List<String> urlsEnviadas = new ArrayList<>();
+
+    try {
+        Reclamacao reclamacao = new Reclamacao();
+
+        reclamacao.setTitulo(request.titulo());
+        reclamacao.setCategoria(request.categoria());
+        reclamacao.setDescricao(request.descricao());
+        reclamacao.setEndereco(request.endereco());
+        reclamacao.setBairro(request.bairro());
+        reclamacao.setGravidade(request.gravidade());
+        reclamacao.setStatus("Pendente");
+        reclamacao.setUsuario(usuario);
+        reclamacao.setLatitude(coordenadas.latitude());
+        reclamacao.setLongitude(coordenadas.longitude());
+
+        for (int i = 0; i < fotos.size(); i++) {
+
+            MultipartFile foto = fotos.get(i);
+
             Map resultado = cloudinary.uploader().upload(
-                foto.getBytes(),
-                ObjectUtils.asMap(
-                    "folder", "portal-infra/reclamacoes",
-                    "resource_type", "image"
-                )
+                    foto.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "portal-infra/reclamacoes",
+                            "resource_type", "image"
+                    )
             );
 
             String fotoUrl = (String) resultado.get("secure_url");
 
             if (fotoUrl == null || fotoUrl.isBlank()) {
                 throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Não foi possível obter a URL da imagem."
+                        HttpStatus.BAD_GATEWAY,
+                        "Não foi possível obter a URL de uma das imagens."
                 );
             }
 
-            Reclamacao reclamacao = new Reclamacao();
+            urlsEnviadas.add(fotoUrl);
 
-            reclamacao.setTitulo(request.titulo());
-            reclamacao.setCategoria(request.categoria());
-            reclamacao.setDescricao(request.descricao());
-            reclamacao.setEndereco(request.endereco());
-            reclamacao.setBairro(request.bairro());
-            reclamacao.setGravidade(request.gravidade());
-            reclamacao.setFotoUrl(fotoUrl);
-            reclamacao.setStatus("Pendente");
-            reclamacao.setUsuario(usuario);
-            reclamacao.setLatitude(coordenadas.latitude());
-            reclamacao.setLongitude(coordenadas.longitude());
+            ReclamacaoFoto reclamacaoFoto = new ReclamacaoFoto();
+            reclamacaoFoto.setReclamacao(reclamacao);
+            reclamacaoFoto.setUrl(fotoUrl);
+            reclamacaoFoto.setOrdem(i);
 
-            Reclamacao salva = reclamacaoRepository.save(reclamacao);
+            reclamacao.getFotos().add(reclamacaoFoto);
 
-            return ReclamacaoResponse.de(salva);
-
-        } catch (IOException e) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_GATEWAY,
-                "Erro ao enviar a imagem para o armazenamento."
-            );
+            // A primeira foto continua sendo a imagem principal.
+            if (i == 0) {
+                reclamacao.setFotoUrl(fotoUrl);
+            }
         }
+
+        Reclamacao salva = reclamacaoRepository.save(reclamacao);
+
+        return ReclamacaoResponse.de(salva);
+
+    } catch (IOException e) {
+
+        // Remove do Cloudinary as imagens que já foram enviadas
+        // caso ocorra uma falha durante o processo.
+        for (String url : urlsEnviadas) {
+            apagarDoCloudinary(url);
+        }
+
+        throw new ResponseStatusException(
+                HttpStatus.BAD_GATEWAY,
+                "Erro ao enviar as imagens para o armazenamento."
+        );
     }
+}
 
 
 

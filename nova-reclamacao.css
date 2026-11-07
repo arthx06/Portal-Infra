@@ -241,3 +241,17 @@
     text-align: center;
   }
 }
+.preview-fotos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.preview-fotos img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}

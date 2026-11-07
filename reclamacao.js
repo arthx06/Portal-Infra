@@ -2,17 +2,36 @@
 const formulario = document.getElementById("form-reclamacao");
 const mensagem = document.getElementById("mensagem-formulario");
 const campoFoto = document.getElementById("foto");
+const previewFotos = document.getElementById("preview-fotos");
 
-const usuarioLogado = localStorage.getItem("usuarioLogado");
-const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+campoFoto.addEventListener("change", function () {
+    previewFotos.innerHTML = "";
 
-async function sessaoAtiva() { 
+    const fotos = Array.from(campoFoto.files);
+
+    if (fotos.length > 3) {
+        mensagem.textContent = "Selecione no máximo 3 fotos.";
+        campoFoto.value = "";
+        return;
+    }
+
+    mensagem.textContent = "";
+
+    fotos.forEach(foto => {
+        const imagem = document.createElement("img");
+        imagem.src = URL.createObjectURL(foto);
+        imagem.alt = "Prévia da foto selecionada";
+
+        previewFotos.appendChild(imagem);
+    });
+});
+async function verificarSessao() {
     if (!(await sessaoAtiva())) {
-    window.location.replace("login.html");
-    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
+        window.location.replace("login.html");
     }
 }
 
+verificarSessao();
 
 formulario.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -23,30 +42,40 @@ formulario.addEventListener("submit", async function (event) {
         'button[type="submit"]'
     );
 
-    const foto = campoFoto.files[0];
+    const fotos = Array.from(campoFoto.files);
 
-    // Validação da foto obrigatória.
-    if (!foto) {
-        mensagem.textContent = "Selecione uma foto do problema.";
+    // Validação da quantidade de fotos.
+    if (fotos.length === 0) {
+        mensagem.textContent = "Selecione pelo menos uma foto do problema.";
         campoFoto.focus();
         return;
     }
 
+    if (fotos.length > 3) {
+        mensagem.textContent = "Selecione no máximo 3 fotos.";
+        campoFoto.value = "";
+        return;
+    }
+
     const formatosValidos = ["image/jpeg", "image/png"];
+    const tamanhoMaximo = 5 * 1024 * 1024;
 
-    if (!formatosValidos.includes(foto.type)) {
-        mensagem.textContent = "Envie uma foto JPG ou PNG.";
-        campoFoto.value = "";
-        return;
+    // Valida cada imagem individualmente.
+    for (const foto of fotos) {
+        if (!formatosValidos.includes(foto.type)) {
+            mensagem.textContent = "Todas as fotos devem estar no formato JPG ou PNG.";
+            campoFoto.value = "";
+            return;
+        }
+
+        if (foto.size > tamanhoMaximo) {
+            mensagem.textContent = "Cada foto deve ter no máximo 5 MB.";
+            campoFoto.value = "";
+            return;
+        }
     }
 
-    if (foto.size > 5 * 1024 * 1024) {
-        mensagem.textContent = "A foto deve ter no máximo 5 MB.";
-        campoFoto.value = "";
-        return;
-    }
-
-    // Recupera o usuário salvo no navegador após o login.
+    // Recupera o usuário salvo no navegador.
     const usuario = JSON.parse(
         localStorage.getItem("usuario") || "{}"
     );
@@ -68,7 +97,7 @@ formulario.addEventListener("submit", async function (event) {
 
     const formData = new FormData();
 
-    // Parte JSON com os dados da reclamação.
+    // Dados da reclamação.
     formData.append(
         "dados",
         new Blob(
@@ -77,8 +106,10 @@ formulario.addEventListener("submit", async function (event) {
         )
     );
 
-    // Parte com o arquivo de imagem.
-    formData.append("foto", foto);
+    // Adiciona todas as fotos com o mesmo nome de campo.
+    fotos.forEach(foto => {
+        formData.append("fotos", foto);
+    });
 
     botao.disabled = true;
     botao.textContent = "Enviando...";
@@ -86,12 +117,11 @@ formulario.addEventListener("submit", async function (event) {
     try {
         const resposta = await apiFetch("/reclamacoes", {
             method: "POST",
-            body: formData      // sem Content-Type: o navegador monta o multipart sozinho
+            body: formData
         });
 
         if (!resposta.ok) {
             const erro = await resposta.text();
-
             throw new Error(
                 erro || `Erro ao cadastrar (${resposta.status}).`
             );
@@ -103,6 +133,7 @@ formulario.addEventListener("submit", async function (event) {
             `Reclamação #${reclamacao.id} cadastrada com sucesso!`;
 
         formulario.reset();
+        previewFotos.innerHTML = "";
 
     } catch (erro) {
         console.error("Erro ao enviar reclamação:", erro);

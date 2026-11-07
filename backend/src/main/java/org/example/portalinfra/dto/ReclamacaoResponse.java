@@ -1,9 +1,9 @@
-
 package org.example.portalinfra.dto;
 
 import org.example.portalinfra.model.Reclamacao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ReclamacaoResponse(
     Long id,
@@ -14,6 +14,7 @@ public record ReclamacaoResponse(
     String bairro,
     String gravidade,
     String fotoUrl,
+    List<String> fotos,
     String status,
     LocalDateTime dataCriacao,
     Long usuarioId
@@ -28,10 +29,12 @@ public record ReclamacaoResponse(
             r.getBairro(),
             r.getGravidade(),
             r.getFotoUrl(),
+            r.getFotos().stream()
+                .map(foto -> foto.getUrl())
+                .toList(),
             r.getStatus(),
             r.getDataCriacao(),
             r.getUsuario().getId()
         );
     }
 }
-

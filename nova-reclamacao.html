@@ -127,15 +127,22 @@
           </div>
 
           <div class="campo-reclamacao">
-            <label for="foto">Foto do problema</label>
+            <label for="foto">Fotos do problema *</label>
+
             <input
-              type="file"
-              id="foto"
-              name="foto"
-              accept="image/jpeg,image/png"
-              required
-            />
-            <small>Formatos aceitos: JPG e PNG. Tamanho máximo: 5 MB.</small>
+                type="file"
+                id="foto"
+                name="fotos"
+                accept="image/jpeg,image/png"
+                multiple
+                required
+            >
+
+            <small>
+                Selecione de 1 a 3 fotos JPG ou PNG.
+                Cada imagem pode ter até 5 MB.
+            </small>
+            <div id="preview-fotos" class="preview-fotos"></div>
           </div>
 
           <p id="mensagem-formulario" role="status" aria-live="polite"></p>

@@ -22,7 +22,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.server.ResponseStatusException;
 import org.example.portalinfra.config.SessaoUtil;
 import org.springframework.security.core.Authentication;
-
+import java.util.List;
 
 
 @RestController
@@ -49,11 +49,16 @@ public class ReclamacaoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReclamacaoResponse> criar(
             @Valid @RequestPart("dados") ReclamacaoRequest dados,
-            @RequestPart("foto") MultipartFile foto,
+            @RequestPart("fotos") List<MultipartFile> fotos,
             Authentication auth) {
 
         ReclamacaoResponse resposta =
-            reclamacaoService.criar(dados, foto, SessaoUtil.idLogado(auth));
+                reclamacaoService.criar(
+                        dados,
+                        fotos,
+                        SessaoUtil.idLogado(auth)
+                );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
