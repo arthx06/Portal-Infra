@@ -97,7 +97,7 @@ public class UsuarioService {
     // ==========================================
 
     @Transactional
-    public Usuario registerUsuario(
+    public Usuario cadastrarUsuario(
             Usuario usuario,
             String codigo
     ) {

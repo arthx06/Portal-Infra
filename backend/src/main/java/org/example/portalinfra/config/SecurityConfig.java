@@ -1,4 +1,3 @@
-
 package org.example.portalinfra.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -109,31 +108,31 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:5500",
-            "http://127.0.0.1:5500",
-            "https://arthx06.github.io"
+                "http://localhost:5500",
+                "http://127.0.0.1:5500",
+                "https://arthx06.github.io"
         ));
 
         configuration.setAllowedMethods(List.of(
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE",
-            "OPTIONS"
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of(
-            "Content-Type",
-            "Authorization",
-            "X-XSRF-TOKEN"
+                "Content-Type",
+                "Authorization",
+                "X-XSRF-TOKEN"
         ));
 
         // Necessário para permitir cookies nas requisições CORS
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+                new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", configuration);
 

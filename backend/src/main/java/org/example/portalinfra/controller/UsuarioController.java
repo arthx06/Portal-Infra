@@ -84,8 +84,8 @@ public class UsuarioController {
     // CADASTRO
     // ==========================================
 
-    @PostMapping("/registration")
-    public ResponseEntity<?> registerUsuario(
+    @PostMapping("/cadastro")
+    public ResponseEntity<?> cadastrarUsuario(
             @Valid @RequestBody Usuario usuario,
             @RequestParam String codigo
     ) {
@@ -95,7 +95,7 @@ public class UsuarioController {
         + " | tel=" + usuario.getTelefone()
         + " | cidade=" + usuario.getCidade());
             Usuario salvo =
-                    usuarioService.registerUsuario(
+                    usuarioService.cadastrarUsuario(
                             usuario,
                             codigo
                     );
@@ -395,7 +395,15 @@ public class UsuarioController {
         }
 
 
-                
-        
+
+    // =============================================
+    // PING PARA MANTER O SERVIDOR ATIVO
+    // =============================================
+
+
+        @GetMapping("/ping")
+        public ResponseEntity<String> ping() {
+            return ResponseEntity.ok("O servidor está ativo!");
+        }
 
 }

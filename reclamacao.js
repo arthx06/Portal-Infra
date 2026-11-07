@@ -1,4 +1,3 @@
-
 const formulario = document.getElementById("form-reclamacao");
 const mensagem = document.getElementById("mensagem-formulario");
 const campoFoto = document.getElementById("foto");
