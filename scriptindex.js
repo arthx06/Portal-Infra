@@ -130,13 +130,34 @@ function criarItemRecente(r) {
         <span class="date">Registrado em ${data}</span>
       </div>
       <span class="status ${classe}">${esc(r.status)}</span>
-      <button class="arrow">→</button>
+        <button
+            type="button"
+            class="arrow"
+            data-id="${encodeURIComponent(r.id)}"
+            aria-label="Ver detalhes da reclamação"
+        >
+            →
+        </button>
     </article>`;
 }
 
 async function carregarRecentes() {
   const lista = document.getElementById('lista-recentes');
   if (!lista) return;
+
+  lista.addEventListener("click", function (event) {
+    const botao = event.target.closest(".arrow");
+
+    if (!botao) return;
+
+    const id = botao.dataset.id;
+
+    if (id) {
+        window.location.href =
+            `detalhe-reclamacao.html?id=${id}`;
+    }
+});
+
   try {
     const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
     if (!res.ok) return;

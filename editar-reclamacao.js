@@ -187,10 +187,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             fotosAtuais.replaceChildren();
 
-            const tituloFotos = document.createElement("p");
-            tituloFotos.textContent = "Fotos atuais:";
-            fotosAtuais.appendChild(tituloFotos);
-
+         
             // Usa os dados detalhados, que possuem o ID de cada foto.
             const fotos = reclamacao.fotosDetalhadas || [];
 
