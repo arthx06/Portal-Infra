@@ -24,6 +24,7 @@ import org.example.portalinfra.config.SessaoUtil;
 import org.springframework.security.core.Authentication;
 
 
+
 @RestController
 @RequestMapping("/reclamacoes")
 public class ReclamacaoController {
@@ -114,4 +115,14 @@ public class ReclamacaoController {
         return ResponseEntity.ok(reclamacaoService.buscarPorId(id));
     }
 
+    @PostMapping("/admin/geocodificar-pendentes")
+    public ResponseEntity<java.util.Map<String, Integer>> geocodificarPendentes(
+            Authentication auth) {
+
+        return ResponseEntity.ok(
+                reclamacaoService.geocodificarReclamacoesPendentes(
+                        SessaoUtil.idLogado(auth)
+                )
+        );
+    }
 }

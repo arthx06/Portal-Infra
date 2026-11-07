@@ -26,6 +26,12 @@ public class Reclamacao {
 
     @Column(nullable = false, length = 100)
     private String bairro;
+    
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(nullable = false, length = 20)
     private String gravidade;
@@ -106,6 +112,21 @@ public class Reclamacao {
         this.bairro = bairro;
     }
 
+    public Double getLatitude() {
+    return latitude;
+}
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
     public String getGravidade() {
         return gravidade;
     }

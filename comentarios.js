@@ -20,7 +20,7 @@ async function carregarTotal() {
     console.error('Erro ao carregar total', e);
   }
 }
-carregarTotal();
+
 
 let filtroAtual = new URLSearchParams();
 
@@ -171,7 +171,8 @@ function criarElementoComentario(comentario, reclamacaoId) {
         </div>
         <div class="comentario-texto">${esc(comentario.texto)}</div>
         <button class="btn-responder" onclick="mostrarFormularioResposta(${comentario.id}, ${reclamacaoId})">Responder</button>
-        ...
+        <div id="caixa-resposta-${comentario.id}" style="display: none; margin-top: 8px;"></div>
+        <div class="respostas-container" id="respostas-${comentario.id}"></div>
     `;
 
     // Se tiver respostas aninhadas (thread estilo Twitter)
@@ -250,8 +251,7 @@ function fecharModalComentarios() {
 }
 
 async function enviarComentarioPrincipal() {
-    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
-    if (!usuario.id) {
+      if (!(await estaLogado())) {
         alert("Você precisa estar logado para comentar!");
         return;
     }

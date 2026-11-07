@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.data.domain.Sort;
 
 
@@ -46,6 +47,7 @@ public class ReclamacaoService {
     private final ReclamacaoRepository reclamacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ComentarioService comentarioService;
+    private final GeocodingService geocodingService;
 
 
     // Bairros válidos
@@ -152,14 +154,17 @@ public class ReclamacaoService {
             Cloudinary cloudinary,
             ReclamacaoRepository reclamacaoRepository,
             UsuarioRepository usuarioRepository,
-            ComentarioService comentarioService) {
+            ComentarioService comentarioService,
+            GeocodingService geocodingService) {
 
         this.cloudinary = cloudinary;
         this.reclamacaoRepository = reclamacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.comentarioService = comentarioService;
+        this.geocodingService = geocodingService;
     }
 
+    
     public ReclamacaoResponse criar(
             ReclamacaoRequest request,
             MultipartFile foto,
@@ -203,6 +208,16 @@ public class ReclamacaoService {
                 "Esta conta está desativada."
             );
         }
+        
+        GeocodingService.Coordenadas coordenadas =
+            geocodingService.buscar(
+                request.endereco(),
+                request.bairro()
+            ).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "Não foi possível localizar o endereço informado. Verifique o endereço e tente novamente."
+            ));
+        
 
         try {
             Map resultado = cloudinary.uploader().upload(
@@ -233,6 +248,8 @@ public class ReclamacaoService {
             reclamacao.setFotoUrl(fotoUrl);
             reclamacao.setStatus("Pendente");
             reclamacao.setUsuario(usuario);
+            reclamacao.setLatitude(coordenadas.latitude());
+            reclamacao.setLongitude(coordenadas.longitude());
 
             Reclamacao salva = reclamacaoRepository.save(reclamacao);
 
@@ -245,6 +262,8 @@ public class ReclamacaoService {
             );
         }
     }
+
+
 
     @Transactional(readOnly = true)
     public Page<ReclamacaoResponse> listarTodas(String titulo, String categoria, String bairro, String status, Pageable pageable) {
@@ -390,9 +409,36 @@ public class ReclamacaoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bairro inválido selecionado.");
         }
 
+        boolean bairroMudou = !java.util.Objects.equals(
+            request.bairro(),
+            reclamacao.getBairro()
+        );
+
+        boolean enderecoMudou = !java.util.Objects.equals(
+            request.endereco(),
+            reclamacao.getEndereco()
+        );
+
+        // Atualiza as coordenadas se o endereço ou bairro mudar
+        if (bairroMudou || enderecoMudou) {
+
+            var coordenadas = geocodingService.buscar(
+                request.endereco(),
+                request.bairro()
+            ).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "Não foi possível localizar o novo endereço informado."
+            ));
+
+            reclamacao.setLatitude(coordenadas.latitude());
+            reclamacao.setLongitude(coordenadas.longitude());
+        }
+
         reclamacao.setTitulo(request.titulo());
         reclamacao.setDescricao(request.descricao());
+        reclamacao.setEndereco(request.endereco());
         reclamacao.setBairro(request.bairro());
+
 
         // Se o usuário enviou uma foto nova, nós substituímos a antiga
         if (novaFoto != null && !novaFoto.isEmpty()) {
@@ -468,5 +514,56 @@ public class ReclamacaoService {
         // Deleta a reclamação do banco de dados (o cascade cuidará das linhas filhas)
         reclamacaoRepository.delete(reclamacao);
     }
+    @Transactional
+    public Map<String, Integer> geocodificarReclamacoesPendentes(Long adminId) {
+
+    // Verifica se quem solicitou a operação é administrador
+    Usuario admin = usuarioRepository.findById(adminId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Administrador não encontrado."
+            ));
+
+    if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
+        throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Apenas administradores podem realizar esta operação."
+        );
+    }
+
+    // Busca reclamações que ainda não possuem alguma coordenada
+    List<Reclamacao> reclamacoes =
+            reclamacaoRepository.findByLatitudeIsNullOrLongitudeIsNull();
+
+    int atualizadas = 0;
+    int naoLocalizadas = 0;
+
+    for (Reclamacao reclamacao : reclamacoes) {
+
+        var coordenadas = geocodingService.buscar(
+                reclamacao.getEndereco(),
+                reclamacao.getBairro()
+        );
+
+        if (coordenadas.isPresent()) {
+
+            reclamacao.setLatitude(coordenadas.get().latitude());
+            reclamacao.setLongitude(coordenadas.get().longitude());
+
+            reclamacaoRepository.save(reclamacao);
+
+            atualizadas++;
+
+        } else {
+            naoLocalizadas++;
+        }
+    }
+
+    return Map.of(
+            "totalAnalisadas", reclamacoes.size(),
+            "atualizadas", atualizadas,
+            "naoLocalizadas", naoLocalizadas
+    );
+}
 
 }
