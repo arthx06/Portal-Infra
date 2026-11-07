@@ -1,5 +1,6 @@
 package org.example.portalinfra.service;
 
+import java.util.ArrayList;
 import com.cloudinary.Cloudinary;
 import org.example.portalinfra.dto.ComentarioRequest;
 import org.example.portalinfra.dto.ComentarioResponse;
@@ -138,18 +139,53 @@ public class ComentarioService {
     }
 
     private void apagarComentarioEImagens(Comentario comentario) {
-        // 1. Apaga a imagem do comentário principal (se existir)
-        apagarDoCloudinary(comentario.getFotoUrl());
+        apagarImagensRecursivamente(comentario);
 
-        // 2. Apaga as imagens de todas as respostas vinculadas a ele (se existirem)
-        if (comentario.getRespostas() != null) {
-            for (Comentario resposta : comentario.getRespostas()) {
-                apagarDoCloudinary(resposta.getFotoUrl());
-            }
+        // O CascadeType.ALL remove as respostas no PostgreSQL.
+        comentarioRepository.delete(comentario);
+    }
+
+        // Remove as imagens do comentário e de todas as suas respostas.
+    private void apagarImagensRecursivamente(Comentario comentario) {
+
+        if (comentario == null) {
+            return;
         }
 
-        // 3. Deleta o comentário (o CascadeType.ALL apaga as respostas no banco)
-        comentarioRepository.delete(comentario);
+        // Remove a imagem do comentário atual.
+        apagarDoCloudinary(comentario.getFotoUrl());
+
+        // Percorre todas as respostas, inclusive respostas aninhadas.
+        if (comentario.getRespostas() != null) {
+
+            List<Comentario> respostas =
+                    new ArrayList<>(comentario.getRespostas());
+
+            for (Comentario resposta : respostas) {
+                apagarImagensRecursivamente(resposta);
+            }
+        }
+    }
+
+    // Utilizado quando uma reclamação inteira for excluída.
+    // Remove as imagens dos comentários sem excluir os registros individualmente.
+    public void apagarImagensDosComentariosDaReclamacao(
+            Reclamacao reclamacao) {
+
+        if (reclamacao == null || reclamacao.getComentarios() == null) {
+            return;
+        }
+
+        List<Comentario> comentarios =
+                new ArrayList<>(reclamacao.getComentarios());
+
+        // Começa somente pelos comentários principais para evitar duplicidade.
+        for (Comentario comentario : comentarios) {
+
+            if (comentario.getComentarioPai() == null) {
+                apagarImagensRecursivamente(comentario);
+            }
+        }
     }
 
     private void apagarDoCloudinary(String url) {

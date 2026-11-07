@@ -1,3 +1,20 @@
+document.getElementById("btnVoltar")?.addEventListener("click", function () {
+    const parametros = new URLSearchParams(window.location.search);
+    const origem = parametros.get("origem");
+
+    const paginasPermitidas = [
+        "reclamacoes.html",
+        "perfil.html",
+        "index.html"
+    ];
+
+    if (paginasPermitidas.includes(origem)) {
+        window.location.href = origem;
+    } else {
+        window.location.href = "reclamacoes.html";
+    }
+});
+
 (function () {
     const $ = (id) => document.getElementById(id);
     const id = Number(new URLSearchParams(window.location.search).get("id"));

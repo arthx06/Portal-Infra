@@ -888,3 +888,7 @@ footer .logo span {
   border-color: #cbd5e1;
   transform: translateY(0);
 }
+.header .btn-secondary {
+    font-family: inherit;
+    cursor: pointer;
+}

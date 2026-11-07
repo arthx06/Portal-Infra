@@ -19,7 +19,8 @@ public record ReclamacaoResponse(
     List<String> fotos,
     String status,
     LocalDateTime dataCriacao,
-    Long usuarioId
+    Long usuarioId,
+    List<ReclamacaoFotoResponse> fotosDetalhadas
     
 ) {
     public static ReclamacaoResponse de(Reclamacao r) {
@@ -39,7 +40,10 @@ public record ReclamacaoResponse(
                 .toList(),
             r.getStatus(),
             r.getDataCriacao(),
-            r.getUsuario().getId()
+            r.getUsuario().getId(),
+            r.getFotos().stream()
+                .map(ReclamacaoFotoResponse::de)
+                .toList()
         );
     }
 }

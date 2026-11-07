@@ -4,6 +4,9 @@ package org.example.portalinfra.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jakarta.persistence.criteria.Predicate;
 
 import org.example.portalinfra.dto.ReclamacaoRequest;
@@ -381,29 +384,36 @@ public ReclamacaoResponse criar(
     }
 
     private void apagarDoCloudinaryEPostgres(Reclamacao reclamacao) {
-        String publicId = extrairPublicId(reclamacao.getFotoUrl());
 
-        try {
-            if (publicId != null) {
-                cloudinary.uploader().destroy(publicId, com.cloudinary.utils.ObjectUtils.emptyMap());
-            }
-        } catch (java.io.IOException e) {
-            System.err.println("Erro ao deletar imagem do Cloudinary: " + e.getMessage());
+        // 1. Remove as imagens de todos os comentários e respostas.
+        comentarioService.apagarImagensDosComentariosDaReclamacao(reclamacao);
+
+        // 2. Reúne todas as fotos da reclamação, evitando URLs duplicadas.
+        Set<String> fotosParaApagar = new LinkedHashSet<>();
+
+        if (reclamacao.getFotoUrl() != null && !reclamacao.getFotoUrl().isBlank()) {
+            fotosParaApagar.add(reclamacao.getFotoUrl());
         }
 
+        if (reclamacao.getFotos() != null) {
+            for (ReclamacaoFoto foto : reclamacao.getFotos()) {
+                if (foto.getUrl() != null && !foto.getUrl().isBlank()) {
+                    fotosParaApagar.add(foto.getUrl());
+                }
+            }
+        }
+
+        // 3. Remove todas as imagens da reclamação no Cloudinary.
+        for (String url : fotosParaApagar) {
+            apagarDoCloudinary(url);
+        }
+
+        // 4. Remove a reclamação do PostgreSQL.
+        // O cascade da entidade cuidará dos registros relacionados.
         reclamacaoRepository.delete(reclamacao);
     }
 
-    // Extrai "portal-infra/reclamacoes/xyz123" da URL completa
-    private String extrairPublicId(String url) {
-        int inicio = url.indexOf("portal-infra/reclamacoes/");
-        int fim = url.lastIndexOf(".");
-        if (inicio != -1 && fim != -1) {
-            return url.substring(inicio, fim);
-        }
-        return null;
-    }
-
+  
     @Transactional
     public ReclamacaoResponse atualizarStatus(Long id, String novoStatus, Long adminId) {
         Usuario admin = usuarioRepository.findById(adminId)
@@ -442,72 +452,281 @@ public ReclamacaoResponse criar(
     }
 
 
+    
     @Transactional
-    public ReclamacaoResponse editarReclamacao(Long id, Long usuarioId, ReclamacaoRequest request, org.springframework.web.multipart.MultipartFile novaFoto) {
-        Reclamacao reclamacao = reclamacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+    public ReclamacaoResponse editarReclamacao(
+            Long id,
+            Long usuarioId,
+            ReclamacaoRequest request,
+            MultipartFile novaFoto) {
 
+        Reclamacao reclamacao = reclamacaoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Reclamação não encontrada."
+                ));
+
+        // Verifica se a reclamação pertence ao usuário.
         if (!reclamacao.getUsuario().getId().equals(usuarioId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você só pode editar suas próprias reclamações.");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você só pode editar suas próprias reclamações."
+            );
         }
 
         if (!BAIRROS_VALIDOS.contains(request.bairro())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bairro inválido selecionado.");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Bairro inválido selecionado."
+            );
         }
 
+        // Verifica se o endereço ou bairro mudou.
         boolean bairroMudou = !java.util.Objects.equals(
-            request.bairro(),
-            reclamacao.getBairro()
+                request.bairro(), reclamacao.getBairro()
         );
 
         boolean enderecoMudou = !java.util.Objects.equals(
-            request.endereco(),
-            reclamacao.getEndereco()
+                request.endereco(), reclamacao.getEndereco()
         );
 
-        // Atualiza as coordenadas se o endereço ou bairro mudar
+        // Atualiza as coordenadas quando necessário.
         if (bairroMudou || enderecoMudou) {
 
             var coordenadas = geocodingService.buscar(
-                request.endereco(),
-                request.bairro()
+                    request.endereco(),
+                    request.bairro()
             ).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "Não foi possível localizar o novo endereço informado."
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Não foi possível localizar o novo endereço informado."
             ));
 
             reclamacao.setLatitude(coordenadas.latitude());
             reclamacao.setLongitude(coordenadas.longitude());
         }
 
+        // Atualiza todos os campos da reclamação.
         reclamacao.setTitulo(request.titulo());
+        reclamacao.setCategoria(request.categoria());
         reclamacao.setDescricao(request.descricao());
         reclamacao.setEndereco(request.endereco());
         reclamacao.setBairro(request.bairro());
+        reclamacao.setGravidade(request.gravidade());
 
-
-        // Se o usuário enviou uma foto nova, nós substituímos a antiga
+        // Substitui somente a foto principal, se uma nova foi enviada.
         if (novaFoto != null && !novaFoto.isEmpty()) {
-            validarArquivoImagem(novaFoto); // Usa a validação pesada com ImageIO
-            apagarDoCloudinary(reclamacao.getFotoUrl()); // Apaga a antiga do Cloudinary
+
+            if (novaFoto.getSize() > TAMANHO_MAXIMO) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "A foto deve ter no máximo 5 MB."
+                );
+            }
+
+            String contentType = novaFoto.getContentType();
+
+            if (contentType == null ||
+                    !(contentType.equalsIgnoreCase("image/jpeg") ||
+                    contentType.equalsIgnoreCase("image/png"))) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Envie somente imagens JPG ou PNG."
+                );
+            }
+
+            validarArquivoImagem(novaFoto);
+
+            String fotoAntiga = reclamacao.getFotoUrl();
+            String novaFotoUrl;
 
             try {
-                var resultado = cloudinary.uploader().upload(
+                Map resultado = cloudinary.uploader().upload(
                         novaFoto.getBytes(),
-                        com.cloudinary.utils.ObjectUtils.asMap(
+                        ObjectUtils.asMap(
                                 "folder", "portal-infra/reclamacoes",
                                 "resource_type", "image"
                         )
                 );
-                reclamacao.setFotoUrl((String) resultado.get("secure_url"));
-            } catch (java.io.IOException e) {
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Erro ao fazer upload da nova imagem.");
-            }
-        }
-        // Se novaFoto for nula, o código simplesmente pula o bloco acima
-        // e a fotoUrl antiga continua salva intacta no banco de dados
 
-        Reclamacao salva = reclamacaoRepository.save(reclamacao);
+                novaFotoUrl = (String) resultado.get("secure_url");
+
+                if (novaFotoUrl == null || novaFotoUrl.isBlank()) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_GATEWAY,
+                            "Não foi possível obter a URL da nova imagem."
+                    );
+                }
+
+            } catch (IOException e) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Erro ao fazer upload da nova imagem."
+                );
+            }
+
+            // Localiza a foto principal na coleção.
+            ReclamacaoFoto fotoPrincipal = null;
+
+            for (ReclamacaoFoto foto : reclamacao.getFotos()) {
+                if (foto.getUrl().equals(fotoAntiga)) {
+                    fotoPrincipal = foto;
+                    break;
+                }
+            }
+
+            // Caso não encontre pela URL, procura a foto de menor ordem.
+            if (fotoPrincipal == null && !reclamacao.getFotos().isEmpty()) {
+                fotoPrincipal = reclamacao.getFotos().get(0);
+
+                for (ReclamacaoFoto foto : reclamacao.getFotos()) {
+                    if (foto.getOrdem() < fotoPrincipal.getOrdem()) {
+                        fotoPrincipal = foto;
+                    }
+                }
+            }
+
+            // Se ainda não existir registro, cria um.
+            if (fotoPrincipal == null) {
+                fotoPrincipal = new ReclamacaoFoto();
+                fotoPrincipal.setReclamacao(reclamacao);
+                fotoPrincipal.setOrdem(0);
+                reclamacao.getFotos().add(fotoPrincipal);
+            }
+
+            fotoPrincipal.setUrl(novaFotoUrl);
+
+            // Mantém a URL principal sincronizada com a coleção.
+            reclamacao.setFotoUrl(novaFotoUrl);
+
+            reclamacaoRepository.saveAndFlush(reclamacao);
+
+            // Só tenta apagar a imagem antiga depois de salvar a nova.
+            if (fotoAntiga != null && !fotoAntiga.equals(novaFotoUrl)) {
+                apagarDoCloudinary(fotoAntiga);
+            }
+
+        } else {
+            // Sem foto nova, mantém todas as imagens existentes.
+            reclamacaoRepository.save(reclamacao);
+        }
+
+        return ReclamacaoResponse.de(reclamacao);
+    }
+
+
+    @Transactional
+    public ReclamacaoResponse substituirFoto(
+            Long reclamacaoId,
+            Long fotoId,
+            Long usuarioId,
+            MultipartFile novaFoto) {
+
+        // Busca a reclamação.
+        Reclamacao reclamacao = reclamacaoRepository.findById(reclamacaoId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Reclamação não encontrada."
+                ));
+
+        // Verifica se a reclamação pertence ao usuário.
+        if (!reclamacao.getUsuario().getId().equals(usuarioId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você só pode alterar fotos das suas próprias reclamações."
+            );
+        }
+
+        // Verifica se o arquivo foi enviado.
+        if (novaFoto == null || novaFoto.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selecione uma nova foto."
+            );
+        }
+
+        // Valida o tamanho.
+        if (novaFoto.getSize() > TAMANHO_MAXIMO) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A foto deve ter no máximo 5 MB."
+            );
+        }
+
+        // Valida o formato.
+        String contentType = novaFoto.getContentType();
+
+        if (contentType == null ||
+                !(contentType.equalsIgnoreCase("image/jpeg") ||
+                contentType.equalsIgnoreCase("image/png"))) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Envie somente imagens JPG ou PNG."
+            );
+        }
+
+        validarArquivoImagem(novaFoto);
+
+        // Localiza somente a foto selecionada.
+        ReclamacaoFoto fotoSelecionada = reclamacao.getFotos()
+                .stream()
+                .filter(foto -> foto.getId().equals(fotoId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Foto não encontrada nesta reclamação."
+                ));
+
+        String fotoAntiga = fotoSelecionada.getUrl();
+        String novaFotoUrl;
+
+        // Envia a nova imagem para o Cloudinary.
+        try {
+            Map resultado = cloudinary.uploader().upload(
+                    novaFoto.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "portal-infra/reclamacoes",
+                            "resource_type", "image"
+                    )
+            );
+
+            novaFotoUrl = (String) resultado.get("secure_url");
+
+            if (novaFotoUrl == null || novaFotoUrl.isBlank()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Não foi possível obter a URL da nova imagem."
+                );
+            }
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Erro ao enviar a nova imagem."
+            );
+        }
+
+        // Verifica se a foto substituída é a principal.
+        boolean eraFotoPrincipal =
+                java.util.Objects.equals(reclamacao.getFotoUrl(), fotoAntiga);
+
+        // Atualiza somente a foto selecionada.
+        fotoSelecionada.setUrl(novaFotoUrl);
+
+        // Mantém a foto principal sincronizada.
+        if (eraFotoPrincipal) {
+            reclamacao.setFotoUrl(novaFotoUrl);
+        }
+
+        // Salva as alterações no banco.
+        Reclamacao salva = reclamacaoRepository.saveAndFlush(reclamacao);
+
+        // Apaga a imagem antiga somente depois de salvar a nova.
+        if (fotoAntiga != null && !fotoAntiga.equals(novaFotoUrl)) {
+            apagarDoCloudinary(fotoAntiga);
+        }
+
         return ReclamacaoResponse.de(salva);
     }
 
@@ -536,29 +755,7 @@ public ReclamacaoResponse criar(
 
     @Transactional
     public void deletarReclamacaoPeloAdmin(Long id, Long adminId) {
-        Usuario admin = usuarioRepository.findById(adminId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin não encontrado."));
-
-        if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado. Apenas administradores podem realizar esta ação.");
-        }
-
-        Reclamacao reclamacao = reclamacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
-
-        // Limpa as imagens dos comentários vinculados ANTES de deletar a reclamação
-        if (reclamacao.getComentarios() != null && !reclamacao.getComentarios().isEmpty()) {
-            // Criamos uma cópia da lista na memória para evitar ConcurrentModificationException
-            var comentariosParaDeletar = new java.util.ArrayList<>(reclamacao.getComentarios());
-            for (var comentario : comentariosParaDeletar) {
-                comentarioService.deletarComentarioPeloAdmin(comentario.getId(), adminId);
-            }
-        }
-
-        apagarDoCloudinary(reclamacao.getFotoUrl());
-
-        // Deleta a reclamação do banco de dados (o cascade cuidará das linhas filhas)
-        reclamacaoRepository.delete(reclamacao);
+        deletarPeloAdmin(id, adminId);
     }
     @Transactional
     public Map<String, Integer> geocodificarReclamacoesPendentes(Long adminId) {

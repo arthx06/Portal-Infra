@@ -4,6 +4,14 @@ const mensagem = document.getElementById("mensagem-formulario");
 const campoFoto = document.getElementById("foto");
 const previewFotos = document.getElementById("preview-fotos");
 
+document.getElementById("btnVoltar")?.addEventListener("click", function () {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
 campoFoto.addEventListener("change", function () {
     previewFotos.innerHTML = "";
 

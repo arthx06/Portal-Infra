@@ -115,6 +115,26 @@ public class ReclamacaoController {
         return ResponseEntity.ok(reclamacaoService.editarReclamacao(
             id, SessaoUtil.idLogado(auth), request, novaFoto));
     }
+
+    @PatchMapping(
+        value = "/{reclamacaoId}/fotos/{fotoId}",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ReclamacaoResponse> substituirFoto(
+        @PathVariable Long reclamacaoId,
+        @PathVariable Long fotoId,
+        Authentication auth,
+        @RequestPart("foto") MultipartFile novaFoto) {
+            return ResponseEntity.ok(
+            reclamacaoService.substituirFoto(
+                reclamacaoId,
+                fotoId,
+                SessaoUtil.idLogado(auth),
+                novaFoto
+            )
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ReclamacaoResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(reclamacaoService.buscarPorId(id));

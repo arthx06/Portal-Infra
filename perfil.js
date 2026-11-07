@@ -1,5 +1,10 @@
-
-
+document.getElementById("btnVoltar")?.addEventListener("click", function () {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "index.html";
+    }
+});
 
 document.addEventListener("DOMContentLoaded", async function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
@@ -68,10 +73,70 @@ document.addEventListener("DOMContentLoaded", async function () {
             lista.appendChild(mensagem);
         }
     }
+    async function excluirMinhaReclamacao(id, botao) {
+        const confirmar = confirm(
+            "Deseja realmente excluir esta reclamação?\n\n" +
+            "Os comentários, respostas e imagens relacionados também serão excluídos."
+        );
+
+        if (!confirmar) return;
+
+        botao.disabled = true;
+        botao.textContent = "Excluindo...";
+
+        try {
+            const resposta = await apiFetch(`/reclamacoes/${id}`, {
+                method: "DELETE"
+            });
+
+            if (!resposta.ok) {
+                const resultado = await resposta.json().catch(() => ({}));
+
+                throw new Error(
+                    resultado.message ||
+                    resultado.erro ||
+                    "Não foi possível excluir a reclamação."
+                );
+            }
+
+            alert("Reclamação excluída com sucesso!");
+
+            await carregarMinhasReclamacoes();
+
+        } catch (erro) {
+            console.error("Erro ao excluir reclamação:", erro);
+            alert(erro.message);
+
+            botao.disabled = false;
+            botao.textContent = "Excluir";
+        }
+    }
 
     function criarCardReclamacao(reclamacao) {
         const artigo = document.createElement("article");
         artigo.className = "reclamacao";
+
+        artigo.setAttribute("role", "link");
+        artigo.setAttribute("tabindex", "0");
+
+        artigo.addEventListener("click", function (evento) {
+            // Não abre os detalhes quando clicar nos botões.
+            if (evento.target.closest("button")) {
+                return;
+            }
+
+            window.location.href =
+                `detalhe-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}&origem=perfil.html`;
+        });
+
+        artigo.addEventListener("keydown", function (evento) {
+            if (evento.key === "Enter" || evento.key === " ") {
+                evento.preventDefault();
+
+                window.location.href =
+                    `detalhe-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}`;
+            }
+        });
 
         const statusNormalizado = (reclamacao.status || "")
             .toLowerCase()
@@ -131,16 +196,33 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         status.textContent = statusOriginal;
 
-        const link = document.createElement("a");
-        link.className = "seta";
-        link.href = `reclamacao.html?id=${encodeURIComponent(reclamacao.id)}`;
-        link.textContent = "→";
-        link.setAttribute(
-            "aria-label",
-            `Ver detalhes da reclamação ${reclamacao.titulo || reclamacao.id}`
-        );
+        
 
-        artigo.append(icone, informacoes, status, link);
+        const acoes = document.createElement("div");
+        acoes.className = "acoes-reclamacao";
+
+        const botaoEditar = document.createElement("button");
+        botaoEditar.type = "button";
+        botaoEditar.className = "botao-editar-reclamacao";
+        botaoEditar.textContent = "Editar";
+
+        botaoEditar.addEventListener("click", function () {
+            window.location.href =
+                `editar-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}`;
+        });
+
+        const botaoExcluir = document.createElement("button");
+        botaoExcluir.type = "button";
+        botaoExcluir.className = "botao-excluir-reclamacao";
+        botaoExcluir.textContent = "Excluir";
+
+        botaoExcluir.addEventListener("click", function () {
+            excluirMinhaReclamacao(reclamacao.id, botaoExcluir);
+        });
+
+        acoes.append(botaoEditar, botaoExcluir);
+
+        artigo.append(icone, informacoes, status, acoes);
 
         return artigo;
     }
@@ -164,13 +246,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         return `Registrada em ${dataConvertida.toLocaleDateString("pt-BR")}`;
     }
 
-    carregarMinhasReclamacoes();
+ 
 
 
     if (!(await sessaoAtiva())) {
-    window.location.replace("login.html");
-    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
+        window.location.replace("login.html");
+        return;
     }
+
+    // Inicia o carregamento das reclamações sem bloquear o perfil.
+    carregarMinhasReclamacoes();
 
     const formulario = document.getElementById("formularioPerfil");
     const botaoAlterar = document.getElementById("botaoAlterar");

@@ -1,3 +1,12 @@
+document.getElementById("btnVoltar")?.addEventListener("click", function () {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "index.html";
+    }
+});
+ 
+
 
 function mostrarTotal(total) {
   const el = document.getElementById('count-resultados');
@@ -51,30 +60,139 @@ document.getElementById('filtro-busca')?.addEventListener('keydown', (e) => {
 
 let paginaAtual = 0;
 
+let usuarioLogadoId = null;
+
+async function carregarUsuarioSessao() {
+    try {
+        const resposta = await apiFetch('/usuarios/sessao');
+
+        if (!resposta.ok) {
+            usuarioLogadoId = null;
+            return;
+        }
+
+        const sessao = await resposta.json();
+
+        usuarioLogadoId = sessao.autenticado
+            ? sessao.id
+            : null;
+
+    } catch (erro) {
+        console.error("Erro ao verificar sessão:", erro);
+        usuarioLogadoId = null;
+    }
+}
+
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+
 function criarCard(r) {
-    const classe = { pendente: 'pending', resolvida: 'resolved' }[(r.status || '').toLowerCase()] || '';
-    const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+    const classe = {
+        pendente: 'pending',
+        resolvida: 'resolved'
+    }[(r.status || '').toLowerCase()] || '';
+
+    const data = r.dataCriacao
+        ? new Date(r.dataCriacao).toLocaleDateString('pt-BR')
+        : '';
+
+    const ehDono = usuarioLogadoId != null &&
+        String(usuarioLogadoId) === String(r.usuarioId);
+
+    const botoesProprietario = ehDono ? `
+        <div class="acoes-reclamacao">
+            <button
+                type="button"
+                class="botao-editar-reclamacao"
+                data-acao="editar"
+                data-id="${Number(r.id)}">
+                Editar
+            </button>
+
+            <button
+                type="button"
+                class="botao-excluir-reclamacao"
+                data-acao="excluir"
+                data-id="${Number(r.id)}">
+                Excluir
+            </button>
+        </div>
+    ` : '';
+
     return `
     <div class="complaint-card" data-id="${Number(r.id)}">
-      <div class="image-container">
-        <img src="${esc(r.fotoUrl)}" alt="${esc(r.titulo)}" />
-        <span class="category">${esc(r.categoria)}</span>
-      </div>
-      <div class="card-content">
-        <span class="status ${classe}">${esc(r.status)}</span>
-        <h2>${esc(r.titulo)}</h2>
-        <p class="location">${esc(r.endereco)}, ${esc(r.bairro)}</p>
-        <p class="description">${esc(r.descricao)}</p>
-        <div class="card-footer">
-          <span>${data}</span>
-          <button onclick="abrirComentarios(${Number(r.id)})">Comentários</button>
+        <div class="image-container">
+            <img src="${esc(r.fotoUrl)}" alt="${esc(r.titulo)}" />
+            <span class="category">${esc(r.categoria)}</span>
         </div>
-      </div>
+
+        <div class="card-content">
+            <span class="status ${classe}">${esc(r.status)}</span>
+            <h2>${esc(r.titulo)}</h2>
+            <p class="location">${esc(r.endereco)}, ${esc(r.bairro)}</p>
+            <p class="description">${esc(r.descricao)}</p>
+
+            <div class="card-footer">
+                <span>${data}</span>
+                <button
+                    type="button"
+                    onclick="abrirComentarios(${Number(r.id)})">
+                    Comentários
+                </button>
+            </div>
+
+            ${botoesProprietario}
+        </div>
     </div>`;
 }
+
+async function excluirReclamacao(id, botao) {
+    const confirmar = confirm(
+        "Deseja realmente excluir esta reclamação?\n\n" +
+        "Os comentários, respostas e imagens relacionados também serão excluídos."
+    );
+
+    if (!confirmar) return;
+
+    botao.disabled = true;
+    botao.textContent = "Excluindo...";
+
+    try {
+        const resposta = await apiFetch(`/reclamacoes/${id}`, {
+            method: "DELETE"
+        });
+
+        if (!resposta.ok) {
+            const resultado = await resposta.json().catch(() => ({}));
+
+            throw new Error(
+                resultado.message ||
+                resultado.erro ||
+                "Não foi possível excluir a reclamação."
+            );
+        }
+
+        alert("Reclamação excluída com sucesso!");
+
+        // Atualiza a lista desde a primeira página
+        paginaAtual = 0;
+
+        const lista = document.getElementById('lista-reclamacoes');
+        if (lista) lista.innerHTML = '';
+
+        await carregarReclamacoes();
+        await carregarTotal();
+
+    } catch (erro) {
+        console.error("Erro ao excluir reclamação:", erro);
+        alert(erro.message);
+
+        botao.disabled = false;
+        botao.textContent = "Excluir";
+    }
+}
+
 
 async function carregarReclamacoes() {
   const lista = document.getElementById('lista-reclamacoes');
@@ -110,15 +228,50 @@ async function carregarReclamacoes() {
 const btnMais = document.getElementById('btn-mais');
 if (btnMais) btnMais.addEventListener('click', carregarReclamacoes);
 
+
 document.getElementById('lista-reclamacoes')?.addEventListener('click', (e) => {
-    if (e.target.closest('.card-footer button')) return; // botão de comentários segue o fluxo dele
+    const botaoAcao = e.target.closest('[data-acao]');
+
+    if (botaoAcao) {
+        e.stopPropagation();
+
+        const id = botaoAcao.dataset.id;
+        const acao = botaoAcao.dataset.acao;
+
+        if (acao === 'editar') {
+            window.location.href =
+                `editar-reclamacao.html?id=${encodeURIComponent(id)}`;
+        }
+
+        if (acao === 'excluir') {
+            excluirReclamacao(id, botaoAcao);
+        }
+
+        return;
+    }
+
+    // O botão de comentários mantém seu próprio comportamento
+    if (e.target.closest('.card-footer button')) return;
+
     const card = e.target.closest('.complaint-card');
-    if (card?.dataset.id) window.location.href = `detalhe-reclamacao.html?id=${card.dataset.id}`;
+
+    if (card?.dataset.id) {
+       window.location.href =
+            `detalhe-reclamacao.html?id=${card.dataset.id}&origem=reclamacoes.html`;
+    }
 });
 
+
 // INICIALIZA A PÁGINA PÚBLICA
-carregarTotal();
-carregarReclamacoes();
+
+async function inicializarPaginaReclamacoes() {
+    await carregarUsuarioSessao();
+
+    carregarTotal();
+    carregarReclamacoes();
+}
+
+inicializarPaginaReclamacoes();
 
 
 // =====================================================
