@@ -154,7 +154,7 @@ async function carregarRecentes() {
 
     if (id) {
         window.location.href =
-            `detalhe-reclamacao.html?id=${id}`;
+            `detalhe-reclamacao.html?id=${id}&origem=index.html`;
     }
 });
 
@@ -320,7 +320,7 @@ function adicionarMarcadores(reclamacoes) {
                     <p style="margin: 6px 0;">
                         Status: ${esc(reclamacao.status)}
                     </p>
-                    <a href="detalhe-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}">
+                    <a href="detalhe-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}&origem=index.html">
                         Ver reclamação
                     </a>
                 </div>

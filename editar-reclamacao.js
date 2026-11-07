@@ -142,8 +142,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                 status.textContent = "Foto substituída com sucesso!";
 
                 // Recarrega os dados para exibir a URL definitiva.
-                await carregarReclamacao();
+               const reclamacaoAtualizada = await resposta.json();
 
+                const fotoAtualizada = reclamacaoAtualizada.fotosDetalhadas
+                    ?.find(item => item.id === foto.id);
+
+                if (fotoAtualizada) {
+                    imagem.src = fotoAtualizada.url;
+                }
+
+                arquivoSelecionado = null;
+                input.value = "";
+
+                if (urlTemporaria) {
+                    URL.revokeObjectURL(urlTemporaria);
+                    urlTemporaria = null;
+                }
+
+                botaoConfirmar.hidden = true;
+                status.textContent = "Foto substituída com sucesso!";
                 mensagem.textContent = "Foto substituída com sucesso!";
 
             } catch (erro) {
