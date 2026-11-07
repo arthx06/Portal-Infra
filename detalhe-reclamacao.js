@@ -14,8 +14,62 @@
 
     function preencher(r) {
         document.title = r.titulo + " | Portal-Infra";
-        $("detalhe-foto").src = r.fotoUrl || "";
-        $("detalhe-foto").alt = r.titulo || "Foto da reclamação";
+        // Carrega as fotos da reclamação
+    const fotos = r.fotos && r.fotos.length > 0
+        ? r.fotos
+        : (r.fotoUrl ? [r.fotoUrl] : []);
+
+    const fotoPrincipal = $("detalhe-foto");
+    const miniaturas = $("detalhe-miniaturas");
+
+    miniaturas.innerHTML = "";
+
+    let fotoSelecionada = 0;
+
+    function atualizarGaleria() {
+        fotoPrincipal.src = fotos[fotoSelecionada];
+        fotoPrincipal.alt = `Foto ${fotoSelecionada + 1} da reclamação`;
+
+        miniaturas.innerHTML = "";
+
+        fotos.forEach((url, index) => {
+            const botao = document.createElement("button");
+            botao.type = "button";
+            botao.className = "miniatura-foto";
+
+            if (index === fotoSelecionada) {
+                botao.classList.add("selecionada");
+            }
+
+            botao.setAttribute(
+                "aria-label",
+                `Visualizar foto ${index + 1}`
+            );
+
+            const imagem = document.createElement("img");
+            imagem.src = url;
+            imagem.alt = `Foto ${index + 1}`;
+
+            botao.appendChild(imagem);
+
+            botao.addEventListener("click", function () {
+                fotoSelecionada = index;
+                atualizarGaleria();
+            });
+
+            miniaturas.appendChild(botao);
+        });
+
+        miniaturas.hidden = fotos.length <= 1;
+    }
+
+    if (fotos.length > 0) {
+        atualizarGaleria();
+    } else {
+        fotoPrincipal.removeAttribute("src");
+        fotoPrincipal.alt = "Nenhuma foto disponível";
+        miniaturas.hidden = true;
+    }
         const resolvida = String(r.status).toLowerCase().startsWith("resolv");
         $("detalhe-status").textContent = r.status;
         $("detalhe-status").className = "status " + (resolvida ? "resolved" : "pending");

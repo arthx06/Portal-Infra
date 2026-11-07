@@ -598,9 +598,68 @@ footer .logo span {
   overflow: hidden;
 }
 
-.detalhe-imagem { height: 380px; background: #e2e8f0; }
-.detalhe-imagem img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* =========================
+   GALERIA DE FOTOS DA RECLAMAÇÃO
+========================= */
 
+.detalhe-galeria {
+  width: 100%;
+  background: var(--white);
+}
+
+.detalhe-imagem {
+  width: 100%;
+  height: 420px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.detalhe-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+/* Miniaturas */
+.detalhe-miniaturas {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  overflow-x: auto;
+  background: #fff;
+}
+
+.miniatura-foto {
+  flex: 0 0 100px;
+  width: 100px;
+  height: 76px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f1f5f9;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.miniatura-foto img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.miniatura-foto:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.miniatura-foto:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
 .detalhe-corpo { padding: 28px; display: flex; flex-direction: column; gap: 14px; }
 
 .detalhe-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -634,7 +693,20 @@ footer .logo span {
 .detalhe-info dd { font-size: 14px; font-weight: 600; color: var(--text-dark); }
 
 @media (max-width: 600px) {
-  .detalhe-imagem { height: 220px; }
+  .detalhe-imagem {
+  height: 260px;
+}
+
+.detalhe-miniaturas {
+  padding: 12px;
+  gap: 10px;
+}
+
+.miniatura-foto {
+  flex-basis: 82px;
+  width: 82px;
+  height: 65px;
+}
   .detalhe-corpo { padding: 20px; }
   .detalhe-corpo h1 { font-size: 22px; }
   .detalhe-info { grid-template-columns: 1fr 1fr; }
@@ -679,4 +751,8 @@ footer .logo span {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+.miniatura-foto.selecionada {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }

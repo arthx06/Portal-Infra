@@ -12,12 +12,15 @@ public record ReclamacaoResponse(
     String descricao,
     String endereco,
     String bairro,
+    Double latitude,
+    Double longitude,
     String gravidade,
     String fotoUrl,
     List<String> fotos,
     String status,
     LocalDateTime dataCriacao,
     Long usuarioId
+    
 ) {
     public static ReclamacaoResponse de(Reclamacao r) {
         return new ReclamacaoResponse(
@@ -27,6 +30,8 @@ public record ReclamacaoResponse(
             r.getDescricao(),
             r.getEndereco(),
             r.getBairro(),
+            r.getLatitude(),
+            r.getLongitude(),
             r.getGravidade(),
             r.getFotoUrl(),
             r.getFotos().stream()

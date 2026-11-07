@@ -128,11 +128,9 @@ carregarRecentes();
 let map;
 
 async function carregarGoogleMaps() {
-
     try {
-
         const resposta = await fetch(
-            "https://portal-infra-backend.onrender.com/usuarios/config/maps"
+            `${API_BASE}/usuarios/config/maps`
         );
 
         if (!resposta.ok) {
@@ -147,19 +145,152 @@ async function carregarGoogleMaps() {
             `https://maps.googleapis.com/maps/api/js?key=${configuracao.apiKey}&loading=async&callback=initMap`;
 
         script.async = true;
-
         document.head.appendChild(script);
 
     } catch (erro) {
-
         console.error("Erro ao carregar Google Maps:", erro);
-
     }
 }
 
 
-function initMap() {
+// Normaliza o texto para facilitar a comparação das categorias
+function normalizarTexto(texto) {
+    return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
 
+
+// Define a cor de cada reclamação
+function definirCorMarcador(reclamacao) {
+    const categoria = normalizarTexto(reclamacao.categoria);
+    const status = normalizarTexto(reclamacao.status);
+
+    if (status.startsWith("resolvid")) {
+        return "#64748b"; // Cinza
+    }
+
+    if (categoria === "arvore caída" || categoria === "arvore") {
+        return "#16a34a"; // Verde
+    }
+
+    if (
+        categoria.includes("buraco") ||
+        categoria.includes("sem asfalto")
+    ) {
+        return "#dc2626"; // Vermelho
+    }
+
+    return "#eab308"; // Amarelo para outras pendentes
+}
+
+
+// Busca todas as reclamações no backend
+async function carregarReclamacoesMapa() {
+    try {
+        const primeiraResposta = await fetch(
+            `${API_BASE}/reclamacoes?page=0&size=100`
+        );
+
+        if (!primeiraResposta.ok) {
+            throw new Error("Erro ao buscar reclamações.");
+        }
+
+        const primeiraPagina = await primeiraResposta.json();
+
+        let reclamacoes = [...primeiraPagina.content];
+
+        // Busca outras páginas, caso existam
+        for (let pagina = 1; pagina < primeiraPagina.totalPages; pagina++) {
+            const resposta = await fetch(
+                `${API_BASE}/reclamacoes?page=${pagina}&size=100`
+            );
+
+            if (!resposta.ok) {
+                throw new Error("Erro ao buscar outras reclamações.");
+            }
+
+            const dados = await resposta.json();
+            reclamacoes.push(...dados.content);
+        }
+
+        adicionarMarcadores(reclamacoes);
+
+    } catch (erro) {
+        console.error("Erro ao carregar reclamações no mapa:", erro);
+    }
+}
+
+
+// Cria os marcadores no Google Maps
+function adicionarMarcadores(reclamacoes) {
+    const janelaInfo = new google.maps.InfoWindow();
+
+    reclamacoes.forEach(reclamacao => {
+        if (
+            reclamacao.latitude == null ||
+            reclamacao.longitude == null
+        ) {
+            return;
+        }
+
+        const latitude = Number(reclamacao.latitude);
+        const longitude = Number(reclamacao.longitude);
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            return;
+        }
+
+        const marcador = new google.maps.Marker({
+            position: {
+                lat: latitude,
+                lng: longitude
+            },
+            map: map,
+            title: reclamacao.titulo,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: definirCorMarcador(reclamacao),
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 2,
+                scale: 9
+            }
+        });
+
+        marcador.addListener("click", function () {
+            const conteudo = `
+                <div style="max-width: 230px; padding: 5px;">
+                    <strong>${esc(reclamacao.titulo)}</strong>
+                    <p style="margin: 6px 0;">
+                        ${esc(reclamacao.categoria)}
+                    </p>
+                    <p style="margin: 6px 0;">
+                        ${esc(reclamacao.bairro || "")}
+                    </p>
+                    <p style="margin: 6px 0;">
+                        Status: ${esc(reclamacao.status)}
+                    </p>
+                    <a href="detalhe-reclamacao.html?id=${encodeURIComponent(reclamacao.id)}">
+                        Ver reclamação
+                    </a>
+                </div>
+            `;
+
+            janelaInfo.setContent(conteudo);
+            janelaInfo.open({
+                anchor: marcador,
+                map: map
+            });
+        });
+    });
+}
+
+
+// Inicialização do mapa
+function initMap() {
     const saoPaulo = {
         lat: -23.5505,
         lng: -46.6333
@@ -172,6 +303,8 @@ function initMap() {
             zoom: 12
         }
     );
+
+    carregarReclamacoesMapa();
 }
 
 
