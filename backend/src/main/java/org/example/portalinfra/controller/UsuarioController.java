@@ -338,13 +338,25 @@ public class UsuarioController {
         }
         }
         
+     
         @GetMapping("/sessao")
         public ResponseEntity<?> verificarSessao(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof Long id) {
-                return ResponseEntity.ok(Map.of("autenticado", true, "id", id));
+
+                Usuario usuario = usuarioService.buscarPorId(id);
+
+                return ResponseEntity.ok(Map.of(
+                "autenticado", true,
+                "id", usuario.getId(),
+                "nome", usuario.getNome(),
+                "email", usuario.getEmail(),
+                "tipo", usuario.getTipo()
+                ));
         }
+
         return ResponseEntity.ok(Map.of("autenticado", false));
         }
+
 
         @PostMapping("/logout")
         public ResponseEntity<?> logout() {

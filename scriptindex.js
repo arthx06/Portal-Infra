@@ -254,11 +254,7 @@ function adicionarMarcadores(reclamacoes) {
     const janelaInfo = new google.maps.InfoWindow();
 
     reclamacoes.forEach(reclamacao => {
-        console.log(
-            reclamacao.categoria,
-            normalizarTexto(reclamacao.categoria),
-            definirCorMarcador(reclamacao)
-        );
+     
         if (
             reclamacao.latitude == null ||
             reclamacao.longitude == null
