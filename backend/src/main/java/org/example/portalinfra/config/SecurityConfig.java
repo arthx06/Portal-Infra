@@ -1,6 +1,5 @@
 
 package org.example.portalinfra.config;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -76,21 +75,28 @@ public class SecurityConfig {
                     HttpMethod.OPTIONS, "/**"
                 ).permitAll()
 
-                .requestMatchers(HttpMethod.GET,
-                        "/reclamacoes", "/reclamacoes/contagem",
-                        "/comentarios/reclamacao/**"
-                ).permitAll()
-                // Todo o restante exige autenticação
-                .anyRequest().authenticated()
-            )
-            .exceptionHandling(e -> e.authenticationEntryPoint(
-            (req, res, ex) -> res.sendError(401, "Não autenticado")))
-            // Valida o cookie JWT antes da autenticação padrão
-            .addFilterBefore(
-                jwtCookieFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
-            
+                        // Preflight CORS
+                        .requestMatchers(
+                                HttpMethod.OPTIONS, "/**"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/reclamacoes", "/reclamacoes/contagem",
+                                "/reclamacoes/{id:\\d+}",
+                                "/comentarios/reclamacao/**"
+                        ).permitAll()
+
+                        // Todo o restante exige autenticação
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        (req, res, ex) -> res.sendError(401, "Não autenticado")
+                ))
+                // Valida o cookie JWT antes da autenticação padrão
+                .addFilterBefore(
+                        jwtCookieFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

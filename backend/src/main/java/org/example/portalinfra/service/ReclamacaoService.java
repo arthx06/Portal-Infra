@@ -434,6 +434,13 @@ public class ReclamacaoService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public ReclamacaoResponse buscarPorId(Long id) {
+        return reclamacaoRepository.findById(id)
+                .map(ReclamacaoResponse::de)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+    }
 
     @Transactional
     public void deletarReclamacaoPeloAdmin(Long id, Long adminId) {

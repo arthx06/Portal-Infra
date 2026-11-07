@@ -109,5 +109,9 @@ public class ReclamacaoController {
         return ResponseEntity.ok(reclamacaoService.editarReclamacao(
             id, SessaoUtil.idLogado(auth), request, novaFoto));
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ReclamacaoResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(reclamacaoService.buscarPorId(id));
+    }
 
 }

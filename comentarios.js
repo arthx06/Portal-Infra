@@ -55,10 +55,10 @@ const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function criarCard(r) {
-  const classe = { pendente: 'pending', resolvida: 'resolved' }[(r.status || '').toLowerCase()] || '';
-  const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
-  return `
-    <div class="complaint-card">
+    const classe = { pendente: 'pending', resolvida: 'resolved' }[(r.status || '').toLowerCase()] || '';
+    const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+    return `
+    <div class="complaint-card" data-id="${Number(r.id)}">
       <div class="image-container">
         <img src="${esc(r.fotoUrl)}" alt="${esc(r.titulo)}" />
         <span class="category">${esc(r.categoria)}</span>
@@ -70,7 +70,7 @@ function criarCard(r) {
         <p class="description">${esc(r.descricao)}</p>
         <div class="card-footer">
           <span>${data}</span>
-          <button onclick="abrirComentarios(${Number(r.id)})">Ver detalhes</button>
+          <button onclick="abrirComentarios(${Number(r.id)})">Comentários</button>
         </div>
       </div>
     </div>`;
@@ -109,9 +109,29 @@ async function carregarReclamacoes() {
 
 const btnMais = document.getElementById('btn-mais');
 if (btnMais) btnMais.addEventListener('click', carregarReclamacoes);
+
+document.getElementById('lista-reclamacoes')?.addEventListener('click', (e) => {
+    if (e.target.closest('.card-footer button')) return; // botão de comentários segue o fluxo dele
+    const card = e.target.closest('.complaint-card');
+    if (card?.dataset.id) window.location.href = `detalhe-reclamacao.html?id=${card.dataset.id}`;
+});
+
+// INICIALIZA A PÁGINA PÚBLICA
+carregarTotal();
 carregarReclamacoes();
 
-// Carrega e desenha os comentários de uma reclamação
+
+// =====================================================
+// COMENTÁRIOS E THREADS
+// =====================================================
+async function estaLogado() {
+    try {
+        const res = await apiFetch('/usuarios/sessao');
+        return res.ok && (await res.json()).autenticado === true;
+    } catch (e) {
+        return false;
+    }
+}
 async function carregarComentarios(reclamacaoId) {
     const container = document.getElementById("lista-comentarios");
     if (!container) return;
@@ -146,13 +166,12 @@ function criarElementoComentario(comentario, reclamacaoId) {
 
     div.innerHTML = `
         <div class="comentario-header">
-            <span class="comentario-autor">${comentario.usuarioNome || 'Usuário'}</span>
+            <span class="comentario-autor">${esc(comentario.usuarioNome || 'Usuário')}</span>
             <span class="comentario-data" style="color: #888; font-size: 11px; margin-left: 8px;">${dataFormatada}</span>
         </div>
-        <div class="comentario-texto">${comentario.texto}</div>
+        <div class="comentario-texto">${esc(comentario.texto)}</div>
         <button class="btn-responder" onclick="mostrarFormularioResposta(${comentario.id}, ${reclamacaoId})">Responder</button>
-        <div id="caixa-resposta-${comentario.id}" style="display: none; margin-top: 8px;"></div>
-        <div class="respostas-container" id="respostas-${comentario.id}"></div>
+        ...
     `;
 
     // Se tiver respostas aninhadas (thread estilo Twitter)
@@ -188,8 +207,7 @@ function mostrarFormularioResposta(comentarioId, reclamacaoId) {
 
 // Envia a resposta do comentário para o backend
 async function enviarResposta(comentarioPaiId, reclamacaoId) {
-    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
-    if (!usuario.id) {
+   if (!(await estaLogado())) {
         alert("Você precisa estar logado para comentar!");
         return;
     }
