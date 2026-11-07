@@ -15,10 +15,9 @@ async function carregarContagem() {
 carregarContagem();
 
 
+
 document.addEventListener("DOMContentLoaded", async function () {
 
-
- 
     const botaoEntrar = document.getElementById("btn-entrar");
     const menuUsuario = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
@@ -26,62 +25,89 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dropdown = document.getElementById("user-dropdown");
     const botaoSair = document.getElementById("btn-sair");
 
-    function mostrarEstado(logado) {
-        if (logado) {
-            if (botaoEntrar) botaoEntrar.style.display = "none";
-            if (menuUsuario) menuUsuario.style.display = "block";
+    // Consulta os dados atualizados da sessão
+    const usuario = await obterDadosSessao();
 
-            const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
-            if (nomeUsuario) nomeUsuario.textContent = usuario.nome || "Minha conta";
-        } else {
-            localStorage.removeItem("usuario");
-            if (menuUsuario) menuUsuario.style.display = "none";
-            if (botaoEntrar) botaoEntrar.style.display = "";
-        }
-    }
+    const logado = usuario !== null;
+    const isAdmin = logado && usuario.tipo === "ADMIN";
 
-    mostrarEstado(!!localStorage.getItem("usuario"));
+    // Disponibiliza os dados do usuário para outros scripts
+    window.usuarioAtual = usuario;
 
-    // 2) Confirma com o servidor e corrige se precisar
-    const logado = await sessaoAtiva();
-    mostrarEstado(logado);
+    // Atualiza o menu de usuário
     if (logado) {
+
         if (botaoEntrar) botaoEntrar.style.display = "none";
         if (menuUsuario) menuUsuario.style.display = "block";
 
-        const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
-        if (nomeUsuario) nomeUsuario.textContent = usuario.nome || "Minha conta";
+        if (nomeUsuario) {
+            nomeUsuario.textContent = usuario.nome || "Minha conta";
+        }
+
     } else {
-        localStorage.removeItem("usuario");
+
         if (menuUsuario) menuUsuario.style.display = "none";
         if (botaoEntrar) botaoEntrar.style.display = "";
+
     }
+
+    // Controla elementos exclusivos do administrador
+    document.querySelectorAll("[data-admin-only]").forEach(elemento => {
+        elemento.hidden = !isAdmin;
+    });
+
+    // Identifica o tipo de usuário na página
+    document.body.classList.toggle("usuario-admin", isAdmin);
+
+    console.log("Usuário autenticado:", usuario);
+    console.log("Administrador:", isAdmin);
+
     // Abre e fecha o menu
     if (botaoMenu && dropdown) {
+
         botaoMenu.addEventListener("click", function () {
+
             const aberto = !dropdown.hidden;
+
             dropdown.hidden = aberto;
             botaoMenu.setAttribute("aria-expanded", String(!aberto));
+
         });
 
-        // Fecha o menu ao clicar fora dele
+        // Fecha o menu ao clicar fora
         document.addEventListener("click", function (event) {
-            if (!menuUsuario.contains(event.target)) {
+
+            if (menuUsuario && !menuUsuario.contains(event.target)) {
+
                 dropdown.hidden = true;
                 botaoMenu.setAttribute("aria-expanded", "false");
+
             }
+
         });
+
     }
 
     // Encerra a sessão
     if (botaoSair) {
+
         botaoSair.addEventListener("click", async () => {
-            await apiFetch("/usuarios/logout", { method: "POST" });
+
+            try {
+                await apiFetch("/usuarios/logout", { method: "POST" });
+            } catch (error) {
+                console.error("Erro ao encerrar sessão:", error);
+            }
+
             localStorage.removeItem("usuario");
             window.location.href = "index.html";
+
         });
+
     }
+
 });
+
 
 // se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
@@ -169,21 +195,20 @@ function definirCorMarcador(reclamacao) {
     const status = normalizarTexto(reclamacao.status);
 
     if (status.startsWith("resolvid")) {
-        return "#64748b"; // Cinza
+        return "#64748b";
     }
 
-    if (categoria === "arvore caída" || categoria === "arvore") {
-        return "#16a34a"; // Verde
-    }
+    const cores = {
+        "arvore caida": "#16a34a",
+        "buraco na rua": "#dc2626",
+        "rua sem asfalto": "#dc2626",
+        "poste danificado": "#eab308",
+        "poste sem iluminacao": "#eab308",
+        "calcada danificada": "#2563eb",
+        "alagamento": "#9333ea"
+    };
 
-    if (
-        categoria.includes("buraco") ||
-        categoria.includes("sem asfalto")
-    ) {
-        return "#dc2626"; // Vermelho
-    }
-
-    return "#eab308"; // Amarelo para outras pendentes
+    return cores[categoria] || "#64748b";
 }
 
 
@@ -229,6 +254,11 @@ function adicionarMarcadores(reclamacoes) {
     const janelaInfo = new google.maps.InfoWindow();
 
     reclamacoes.forEach(reclamacao => {
+        console.log(
+            reclamacao.categoria,
+            normalizarTexto(reclamacao.categoria),
+            definirCorMarcador(reclamacao)
+        );
         if (
             reclamacao.latitude == null ||
             reclamacao.longitude == null

@@ -63,6 +63,50 @@
 
           return data;
       }
+      
+      // =====================================================
+      // CONSULTAR SESSÃO E TIPO DO USUÁRIO
+      // =====================================================
+
+      async function obterDadosSessao() {
+
+          try {
+
+              const response = await fetch(API_BASE + "/usuarios/sessao", {
+                  method: "GET",
+                  credentials: "include"
+              });
+
+              if (!response.ok) {
+                  throw new Error("Erro ao consultar sessão.");
+              }
+
+              const dados = await response.json();
+
+              if (!dados.autenticado) {
+                  localStorage.removeItem("usuario");
+                  return null;
+              }
+
+              const usuario = {
+                  id: dados.id,
+                  nome: dados.nome,
+                  email: dados.email,
+                  tipo: dados.tipo
+              };
+
+              localStorage.setItem("usuario", JSON.stringify(usuario));
+
+              return usuario;
+
+          } catch (error) {
+
+              console.error("Erro ao consultar sessão:", error);
+              return null;
+
+          }
+      }
+
 
 
 
@@ -120,15 +164,6 @@
           window.location.href = "index.html";
 
 
-          console.log("Login realizado:", data);
-
-
-            window.location.href = "index.html";
-
-          // Depois podemos colocar aqui a página
-          // para onde o usuário será enviado.
-          //
-          // window.location.href = "index.html";
 
 
         } catch (error) {
