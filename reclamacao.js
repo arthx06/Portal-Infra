@@ -1,76 +1,95 @@
-// =====================================================
-// PROTEÇÃO DA PÁGINA (Renderização Instantânea)
-// =====================================================
-function protegerPaginaNovaReclamacao() {
-    const usuarioStr = localStorage.getItem("usuario");
+const formulario = document.getElementById("form-reclamacao");
+const mensagem = document.getElementById("mensagem-formulario");
+const campoFoto = document.getElementById("foto");
+const previewFotos = document.getElementById("preview-fotos");
 
-    if (!usuarioStr) {
-        window.location.replace("login.html");
+document.getElementById("btnVoltar")?.addEventListener("click", function () {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+campoFoto.addEventListener("change", function () {
+    previewFotos.innerHTML = "";
+
+    const fotos = Array.from(campoFoto.files);
+
+    if (fotos.length > 3) {
+        mensagem.textContent = "Selecione no máximo 3 fotos.";
+        campoFoto.value = "";
         return;
     }
 
-    try {
-        const usuario = JSON.parse(usuarioStr);
-        if (!usuario.id) {
-            throw new Error("Sessão inválida");
-        }
+    mensagem.textContent = "";
 
-        // Libera a tela instantaneamente (sem esperar rede)
-        document.body.classList.add("autorizado");
-    } catch (e) {
-        localStorage.removeItem("usuario");
+    fotos.forEach(foto => {
+        const imagem = document.createElement("img");
+        imagem.src = URL.createObjectURL(foto);
+        imagem.alt = "Prévia da foto selecionada";
+
+        previewFotos.appendChild(imagem);
+    });
+});
+async function verificarSessao() {
+    if (!(await sessaoAtiva())) {
         window.location.replace("login.html");
     }
 }
 
-// Executa a verificação imediatamente
-protegerPaginaNovaReclamacao();
-
-
-// =====================================================
-// LÓGICA DO FORMULÁRIO
-// =====================================================
-const formulario = document.getElementById("form-reclamacao");
-const mensagem = document.getElementById("mensagem-formulario");
-const campoFoto = document.getElementById("foto");
+verificarSessao();
 
 formulario.addEventListener("submit", async function (event) {
     event.preventDefault();
+
     mensagem.textContent = "";
-    mensagem.style.color = ""; // Reseta a cor
 
-    const botao = formulario.querySelector('button[type="submit"]');
-    const foto = campoFoto.files[0];
+    const botao = formulario.querySelector(
+        'button[type="submit"]'
+    );
 
-    // Validação da foto obrigatória.
-    if (!foto) {
-        mensagem.textContent = "Selecione uma foto do problema.";
-        mensagem.style.color = "#ef4444"; // Vermelho erro
+    const fotos = Array.from(campoFoto.files);
+
+    // Validação da quantidade de fotos.
+    if (fotos.length === 0) {
+        mensagem.textContent = "Selecione pelo menos uma foto do problema.";
         campoFoto.focus();
         return;
     }
 
+    if (fotos.length > 3) {
+        mensagem.textContent = "Selecione no máximo 3 fotos.";
+        campoFoto.value = "";
+        return;
+    }
+
     const formatosValidos = ["image/jpeg", "image/png"];
-    if (!formatosValidos.includes(foto.type)) {
-        mensagem.textContent = "Envie uma foto JPG ou PNG.";
-        mensagem.style.color = "#ef4444";
-        campoFoto.value = "";
-        return;
+    const tamanhoMaximo = 5 * 1024 * 1024;
+
+    // Valida cada imagem individualmente.
+    for (const foto of fotos) {
+        if (!formatosValidos.includes(foto.type)) {
+            mensagem.textContent = "Todas as fotos devem estar no formato JPG ou PNG.";
+            campoFoto.value = "";
+            return;
+        }
+
+        if (foto.size > tamanhoMaximo) {
+            mensagem.textContent = "Cada foto deve ter no máximo 5 MB.";
+            campoFoto.value = "";
+            return;
+        }
     }
 
-    // Validação de tamanho (5MB máximo)
-    if (foto.size > 5 * 1024 * 1024) {
-        mensagem.textContent = "A foto deve ter no máximo 5 MB.";
-        mensagem.style.color = "#ef4444";
-        campoFoto.value = "";
-        return;
-    }
+    // Recupera o usuário salvo no navegador.
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario") || "{}"
+    );
 
-    // Recupera o usuário salvo no navegador
-    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
     if (!usuario.id) {
-        mensagem.textContent = "Não foi possível identificar sua conta. Entre novamente.";
-        mensagem.style.color = "#ef4444";
+        mensagem.textContent =
+            "Não foi possível identificar sua conta. Entre novamente.";
         return;
     }
 
@@ -85,14 +104,19 @@ formulario.addEventListener("submit", async function (event) {
 
     const formData = new FormData();
 
-    // Parte JSON com os dados da reclamação.
+    // Dados da reclamação.
     formData.append(
         "dados",
-        new Blob([JSON.stringify(dados)], { type: "application/json" })
+        new Blob(
+            [JSON.stringify(dados)],
+            { type: "application/json" }
+        )
     );
 
-    // Parte com o arquivo de imagem.
-    formData.append("foto", foto);
+    // Adiciona todas as fotos com o mesmo nome de campo.
+    fotos.forEach(foto => {
+        formData.append("fotos", foto);
+    });
 
     botao.disabled = true;
     botao.textContent = "Enviando...";
@@ -105,19 +129,24 @@ formulario.addEventListener("submit", async function (event) {
 
         if (!resposta.ok) {
             const erro = await resposta.text();
-            throw new Error(erro || `Erro ao cadastrar (${resposta.status}).`);
+            throw new Error(
+                erro || `Erro ao cadastrar (${resposta.status}).`
+            );
         }
 
         const reclamacao = await resposta.json();
 
-        mensagem.textContent = `Reclamação #${reclamacao.id} cadastrada com sucesso!`;
-        mensagem.style.color = "#10b981"; // Verde sucesso
+        mensagem.textContent =
+            `Reclamação #${reclamacao.id} cadastrada com sucesso!`;
+
         formulario.reset();
+        previewFotos.innerHTML = "";
 
     } catch (erro) {
         console.error("Erro ao enviar reclamação:", erro);
-        mensagem.textContent = "Não foi possível enviar a reclamação. Verifique a conexão e tente novamente.";
-        mensagem.style.color = "#ef4444"; // Vermelho erro
+
+        mensagem.textContent =
+            "Não foi possível enviar a reclamação. Verifique a conexão e tente novamente.";
 
     } finally {
         botao.disabled = false;

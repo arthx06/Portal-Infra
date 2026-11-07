@@ -563,3 +563,263 @@ footer .logo span {
   border-color: #cbd5e1;
   transform: translateY(0);
 }
+/* =========================
+   PÁGINA: DETALHES DA RECLAMAÇÃO
+========================= */
+.complaint-card { cursor: pointer; }
+
+.detalhe-voltar {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.detalhe-voltar:hover { color: var(--primary); }
+
+.detalhe-erro {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.detalhe-pagina {
+  max-width: 820px;
+  margin: 0 auto;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* =========================
+   GALERIA DE FOTOS DA RECLAMAÇÃO
+========================= */
+
+.detalhe-galeria {
+  width: 100%;
+  background: var(--white);
+}
+
+.detalhe-imagem {
+  width: 100%;
+  height: 420px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.detalhe-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+/* Miniaturas */
+.detalhe-miniaturas {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  overflow-x: auto;
+  background: #fff;
+}
+
+.miniatura-foto {
+  flex: 0 0 100px;
+  width: 100px;
+  height: 76px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f1f5f9;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.miniatura-foto img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.miniatura-foto:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.miniatura-foto:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+.detalhe-corpo { padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+
+.detalhe-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.detalhe-tags .status { margin-bottom: 0; }
+.detalhe-categoria {
+  background: #f1f5f9;
+  color: var(--text-dark);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detalhe-corpo h1 { font-size: 26px; font-weight: 800; line-height: 1.3; }
+.detalhe-local { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+.detalhe-descricao {
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.detalhe-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  border-top: 1px solid var(--border-light);
+  padding-top: 18px;
+}
+.detalhe-info dt { font-size: 12px; color: #94a3b8; font-weight: 500; }
+.detalhe-info dd { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+
+@media (max-width: 600px) {
+  .detalhe-imagem {
+  height: 260px;
+}
+
+.detalhe-miniaturas {
+  padding: 12px;
+  gap: 10px;
+}
+
+.miniatura-foto {
+  flex-basis: 82px;
+  width: 82px;
+  height: 65px;
+}
+  .detalhe-corpo { padding: 20px; }
+  .detalhe-corpo h1 { font-size: 22px; }
+  .detalhe-info { grid-template-columns: 1fr 1fr; }
+}
+.detalhe-comentarios {
+  max-width: 820px;
+  margin: 24px auto 0;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+.detalhe-comentarios h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.detalhe-comentar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.detalhe-comentar textarea {
+  flex: 1;
+  min-width: 250px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  background: #f8fafc;
+}
+.detalhe-comentar textarea:focus {
+  border-color: var(--primary);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+.detalhe-comentar button {
+  height: 50px;
+  padding: 0 20px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.miniatura-foto.selecionada {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+/* =========================
+   AÇÕES DO PROPRIETÁRIO
+========================= */
+
+.acoes-reclamacao {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+}
+
+.acoes-reclamacao button {
+  flex: 1;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* Botão Editar */
+.botao-editar-reclamacao {
+  background: #eff6ff;
+  color: var(--primary);
+  border: 1px solid #bfdbfe;
+}
+
+.botao-editar-reclamacao:hover {
+  background: #dbeafe;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Botão Excluir */
+.botao-excluir-reclamacao {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.botao-excluir-reclamacao:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Estado durante a exclusão */
+.acoes-reclamacao button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ajuste para celular */
+@media (max-width: 600px) {
+  .acoes-reclamacao {
+    gap: 8px;
+  }
+
+  .acoes-reclamacao button {
+    min-height: 40px;
+  }
+}

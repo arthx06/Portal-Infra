@@ -15,209 +15,209 @@
 
 </head>
 
-<body data-protegida="true">
+<body>
 
-<!-- =========================
-     HEADER
-========================== -->
-<header class="header">
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="header">
 
-    <a href="index.html" class="logo">
-        <span>Portal</span>
-        Infra
-    </a>
+        <a href="index.html" class="logo">
+            <span>Portal</span>
+            Infra
+        </a>
 
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="mapa.html">Mapa</a>
-        <a href="reclamacoes.html">Reclamações</a>
-        <a href="sobre.html">Sobre</a>
-    </nav>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="mapa.html">Mapa</a>
+            <a href="reclamacoes.html">Reclamações</a>
+            <a href="sobre.html">Sobre</a>
+        </nav>
 
-    <a href="index.html"><button class="btn-secondary">Voltar</button></a>
+          <a href="index.html"><button class="btn-secondary" id="btnVoltar">Voltar</button></a>
 
-</header>
+    </header>
 
 
-<!-- =========================
-     CONTEÚDO
-========================== -->
-<main class="pagina-perfil">
+    <!-- =========================
+         CONTEÚDO
+    ========================== -->
+    <main class="pagina-perfil">
 
-    <!-- CARD DO PERFIL -->
-    <section class="card-perfil">
+        <!-- CARD DO PERFIL -->
+        <section class="card-perfil">
 
-        <div class="cabecalho-perfil">
+            <div class="cabecalho-perfil">
 
-            <div class="avatar">
+                <div class="avatar">
+                    
+                </div>
+
+                <div>
+                    <span class="small-title">MINHA CONTA</span>
+                    <h1>Meu perfil</h1>
+                    <p>Visualize e altere seus dados pessoais.</p>
+                </div>
 
             </div>
 
-            <div>
-                <span class="small-title">MINHA CONTA</span>
-                <h1>Meu perfil</h1>
-                <p>Visualize e altere seus dados pessoais.</p>
-            </div>
 
-        </div>
+            
+            <form id="formularioPerfil">
 
+                <h3 class="titulo-secao">Dados pessoais</h3>
 
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" disabled>
+                    </div>
 
-        <form id="formularioPerfil">
-
-            <h3 class="titulo-secao">Dados pessoais</h3>
-
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="nome">Nome completo</label>
-                    <input type="text" id="nome" disabled>
+                    <div class="grupo-input">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" disabled>
+                    </div>
                 </div>
 
-                <div class="grupo-input">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" disabled>
-                </div>
-            </div>
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" disabled>
+                    </div>
 
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="telefone">Telefone</label>
-                    <input type="tel" id="telefone" disabled>
-                </div>
-
-                <div class="grupo-input">
-                    <label for="dataNascimento">Data de nascimento</label>
-                    <input type="date" id="dataNascimento" disabled>
-                </div>
-            </div>
-
-            <h3 class="titulo-secao">Endereço</h3>
-
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="cep">CEP</label>
-                    <input type="text" id="cep" disabled>
+                    <div class="grupo-input">
+                        <label for="dataNascimento">Data de nascimento</label>
+                        <input type="date" id="dataNascimento" disabled>
+                    </div>
                 </div>
 
-                <div class="grupo-input">
-                    <label for="numero">Número</label>
-                    <input type="text" id="numero" disabled>
-                </div>
-            </div>
+                <h3 class="titulo-secao">Endereço</h3>
 
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="logradouro">Logradouro</label>
-                    <input type="text" id="logradouro" disabled>
-                </div>
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="cep">CEP</label>
+                        <input type="text" id="cep" disabled>
+                    </div>
 
-                <div class="grupo-input">
-                    <label for="complemento">Complemento</label>
-                    <input type="text" id="complemento" disabled>
-                </div>
-            </div>
-
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="bairro">Bairro</label>
-                    <input type="text" id="bairro" disabled>
+                    <div class="grupo-input">
+                        <label for="numero">Número</label>
+                        <input type="text" id="numero" disabled>
+                    </div>
                 </div>
 
-                <div class="grupo-input">
-                    <label for="cidade">Cidade</label>
-                    <input type="text" id="cidade" disabled>
-                </div>
-            </div>
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="logradouro">Logradouro</label>
+                        <input type="text" id="logradouro" disabled>
+                    </div>
 
-            <div class="linha-formulario">
-                <div class="grupo-input">
-                    <label for="estado">Estado (UF)</label>
-                    <input
+                    <div class="grupo-input">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" disabled>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="bairro">Bairro</label>
+                        <input type="text" id="bairro" disabled>
+                    </div>
+
+                    <div class="grupo-input">
+                        <label for="cidade">Cidade</label>
+                        <input type="text" id="cidade" disabled>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="grupo-input">
+                        <label for="estado">Estado (UF)</label>
+                        <input
                             type="text"
                             id="estado"
                             maxlength="2"
                             disabled
-                    >
+                        >
+                    </div>
                 </div>
-            </div>
 
-            <div class="acoes-perfil">
-                <button
+                <div class="acoes-perfil">
+                    <button
                         type="button"
                         id="botaoAlterar"
                         class="btn-secundario">
-                    Alterar informações
-                </button>
+                        Alterar informações
+                    </button>
 
-                <button
+                    <button
                         type="submit"
                         id="botaoSalvar"
                         class="btn-principal"
                         style="display: none;">
-                    Salvar alterações
-                </button>
+                        Salvar alterações
+                    </button>
 
-                <button
+                    <button
                         type="button"
                         id="botaoCancelar"
                         class="btn-secundario"
                         style="display: none;">
-                    Cancelar
-                </button>
-            </div>
+                        Cancelar
+                    </button>
+                </div>
 
-        </form>
+            </form>
 
 
+         
+            <!-- ALTERAÇÃO DE SENHA -->
+            <section class="senha-area" aria-labelledby="tituloSenha">
 
-        <!-- ALTERAÇÃO DE SENHA -->
-        <section class="senha-area" aria-labelledby="tituloSenha">
+                <div class="senha-descricao">
+                    <h3 id="tituloSenha">Segurança da conta</h3>
+                    <p>
+                        Altere sua senha para manter sua conta protegida.
+                        Você precisará informar sua senha atual.
+                    </p>
+                </div>
 
-            <div class="senha-descricao">
-                <h3 id="tituloSenha">Segurança da conta</h3>
-                <p>
-                    Altere sua senha para manter sua conta protegida.
-                    Você precisará informar sua senha atual.
-                </p>
-            </div>
-
-            <button
+                <button
                     type="button"
                     class="btn-secundario"
                     id="botaoAlterarSenha"
                     aria-expanded="false"
                     aria-controls="formularioSenha">
-                Alterar senha
-            </button>
+                    Alterar senha
+                </button>
 
-            <form id="formularioSenha" class="formulario-senha" hidden>
+                <form id="formularioSenha" class="formulario-senha" hidden>
 
-                <div class="grupo-senha">
-                    <label for="senhaAtual">Senha atual</label>
+                    <div class="grupo-senha">
+                        <label for="senhaAtual">Senha atual</label>
 
-                    <div class="campo-senha">
-                        <input
+                        <div class="campo-senha">
+                            <input
                                 type="password"
                                 id="senhaAtual"
                                 name="senhaAtual"
                                 autocomplete="current-password"
                                 required>
 
-                        <button
+                            <button
                                 type="button"
                                 class="botao-visualizar-senha"
                                 data-campo-senha="senhaAtual"
                                 aria-label="Mostrar senha atual">
-                            Mostrar
-                        </button>
+                                Mostrar
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="grupo-senha">
-                    <label for="novaSenha">Nova senha</label>
+                    <div class="grupo-senha">
+                        <label for="novaSenha">Nova senha</label>
 
-                    <div class="campo-senha">
-                        <input
+                        <div class="campo-senha">
+                            <input
                                 type="password"
                                 id="novaSenha"
                                 name="novaSenha"
@@ -226,23 +226,23 @@
                                 aria-describedby="dicaSenha"
                                 required>
 
-                        <button
+                            <button
                                 type="button"
                                 class="botao-visualizar-senha"
                                 data-campo-senha="novaSenha"
                                 aria-label="Mostrar nova senha">
-                            Mostrar
-                        </button>
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <small id="dicaSenha">Use pelo menos 6 caracteres.</small>
                     </div>
 
-                    <small id="dicaSenha">Use pelo menos 6 caracteres.</small>
-                </div>
+                    <div class="grupo-senha">
+                        <label for="confirmarSenha">Confirmar nova senha</label>
 
-                <div class="grupo-senha">
-                    <label for="confirmarSenha">Confirmar nova senha</label>
-
-                    <div class="campo-senha">
-                        <input
+                        <div class="campo-senha">
+                            <input
                                 type="password"
                                 id="confirmarSenha"
                                 name="confirmarSenha"
@@ -250,45 +250,45 @@
                                 autocomplete="new-password"
                                 required>
 
-                        <button
+                            <button
                                 type="button"
                                 class="botao-visualizar-senha"
                                 data-campo-senha="confirmarSenha"
                                 aria-label="Mostrar confirmação da senha">
-                            Mostrar
-                        </button>
+                                Mostrar
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <p
+                    <p
                         id="mensagemSenha"
                         class="mensagem-senha"
                         role="status"
                         aria-live="polite"
                         hidden>
-                </p>
+                    </p>
 
-                <div class="acoes-senha">
-                    <button
+                    <div class="acoes-senha">
+                        <button
                             type="button"
                             id="botaoCancelarSenha"
                             class="btn-secundario">
-                        Cancelar
-                    </button>
+                            Cancelar
+                        </button>
 
-                    <button
+                        <button
                             type="submit"
                             id="botaoSalvarSenha"
                             class="btn-principal">
-                        Salvar nova senha
-                    </button>
-                </div>
+                            Salvar nova senha
+                        </button>
+                    </div>
 
-            </form>
-        </section>
+                </form>
+            </section>
 
-
-
+            
+            
         <div class="area-excluir-conta">
             <div>
                 <h3>Desativar minha conta</h3>
@@ -299,80 +299,82 @@
             </div>
 
             <button
-                    type="button"
-                    id="botaoExcluirConta"
-                    class="btn-excluir-conta">
+                type="button"
+                id="botaoExcluirConta"
+                class="btn-excluir-conta">
                 Desativar minha conta
             </button>
         </div>
 
 
-    </section>
+        </section>
+         
 
 
+        <!-- =========================
+             MINHAS RECLAMAÇÕES
+        ========================== -->
+        
+        <section class="card-reclamacoes">
 
-    <!-- =========================
-         MINHAS RECLAMAÇÕES
-    ========================== -->
+            <div class="cabecalho-secao">
+                <div>
+                    <span class="small-title">MINHAS OCORRÊNCIAS</span>
+                    <h2>Minhas reclamações</h2>
+                    <p>Acompanhe as reclamações que você registrou.</p>
+                </div>
 
-    <section class="card-reclamacoes">
-
-        <div class="cabecalho-secao">
-            <div>
-                <span class="small-title">MINHAS OCORRÊNCIAS</span>
-                <h2>Minhas reclamações</h2>
-                <p>Acompanhe as reclamações que você registrou.</p>
-            </div>
-
-            <span class="contador" id="contadorReclamacoes">
+                <span class="contador" id="contadorReclamacoes">
                     0 reclamações
                 </span>
-        </div>
+            </div>
 
-        <div
+            <div
                 class="lista-reclamacoes"
                 id="listaReclamacoes"
                 aria-live="polite">
 
-            <p>Carregando suas reclamações...</p>
+                <p>Carregando suas reclamações...</p>
 
-        </div>
+            </div>
 
-        <p
+            <p
                 id="mensagemReclamacoes"
                 role="status"
                 aria-live="polite"
                 hidden>
-        </p>
+            </p>
 
-        <div class="rodape-reclamacoes">
-            <a href="reclamacoes.html">
-                Ver todas as reclamações →
-            </a>
-        </div>
+            <div class="rodape-reclamacoes">
+                <a href="reclamacoes.html">
+                    Ver todas as reclamações →
+                </a>
+            </div>
 
-    </section>
-
-
-</main>
+        </section>
 
 
-<!-- =========================
-     FOOTER
-========================== -->
-<footer>
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer>
 
         <span>
             Projeto acadêmico de monitoramento da infraestrutura urbana.
         </span>
 
-    <span>
+        <span>
             © 2026 SP em Foco
         </span>
 
-</footer>
+    </footer>
 
 
+  
 </body>
 
 </html>
+

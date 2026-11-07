@@ -1,5 +1,4 @@
 package org.example.portalinfra.config;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,11 +12,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtCookieFilter jwtCookieFilter;
@@ -37,39 +38,43 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable())
 
-                .cors(cors ->
-                        cors.configurationSource(corsConfigurationSource())
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
+
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
                 )
+            )
 
-                .sessionManagement(sm ->
-                        sm.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
+            .authorizeHttpRequests(auth -> auth
 
-                .authorizeHttpRequests(auth -> auth
+                // Documentação
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
 
-                        // Documentação
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                // Endpoints públicos de autenticação
+             .requestMatchers(
+                "/usuarios/login",
+                "/usuarios/registration",
+                "/usuarios/enviar-codigo",
+                "/usuarios/recuperar-senha",
+                "/usuarios/redefinir-senha",
+                "/usuarios/config/maps",
+                "/usuarios/sessao",
+                "/usuarios/logout"
+            ).permitAll()
 
-                        // Endpoints públicos de autenticação e Ping
-                        .requestMatchers(
-                                "/usuarios/login",
-                                "/usuarios/cadastro",
-                                "/usuarios/enviar-codigo",
-                                "/usuarios/recuperar-senha",
-                                "/usuarios/redefinir-senha",
-                                "/usuarios/config/maps",
-                                "/usuarios/sessao",
-                                "/usuarios/logout",
-                                "/usuarios/ping"
-                        ).permitAll()
+                // Preflight CORS
+                .requestMatchers(
+                    HttpMethod.OPTIONS, "/**"
+                ).permitAll()
 
                         // Preflight CORS
                         .requestMatchers(
@@ -78,6 +83,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET,
                                 "/reclamacoes", "/reclamacoes/contagem",
+                                "/reclamacoes/{id:\\d+}",
                                 "/comentarios/reclamacao/**"
                         ).permitAll()
 

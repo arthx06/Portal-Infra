@@ -1,91 +1,95 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reclamações | Portal-Infra</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reclamações | Portal-Infra</title>
 
-  <!-- Adicionando a fonte moderna Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-  />
-
-  <link rel="stylesheet" href="reclamacoes.css" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="api.js" defer></script>
-  <script src="comentarios.js" defer></script>
-
-</head>
-<body>
-<header class="header">
-  <div class="logo"><span>Portal</span> Infra</div>
-
-  <nav>
-    <a href="index.html">Início</a>
-    <a href="#">Mapa</a>
-    <a href="reclamacoes.html" class="active">Reclamações</a>
-    <a href="#">Sobre</a>
-  </nav>
-
-  <a href="index.html"><button class="btn-secondary">Voltar</button></a>
-</header>
-
-<main class="container">
-  <section class="filters">
-    <input
-            type="text"
-            id="filtro-busca"
-            placeholder="Pesquisar reclamação..."
-            class="search"
+    <!-- Adicionando a fonte moderna Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
     />
 
-    <select id="filtro-categoria">
-      <option value="">Todos os problemas</option>
-      <option>Buraco na rua</option>
-      <option>Rua sem asfalto</option>
-      <option>Poste sem iluminação</option>
-      <option>Poste danificado</option>
-      <option>Árvore caída</option>
-      <option>Calçada danificada</option>
-      <option>Alagamento</option>
-      <option>Outro</option>
-    </select>
+    <link rel="stylesheet" href="reclamacoes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="api.js" defer></script>
+    <script src="comentarios.js" defer></script>
 
-    <select id="filtro-bairro">
-      <option value="">Todos os bairros</option>
-      <option>Tatuapé</option>
-      <option>Itaquera</option>
-      <option>Mooca</option>
-      <option>Vila Mariana</option>
-      <option>São Mateus</option>
-    </select>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo"><span>Portal</span> Infra</div>
 
-    <select id="filtro-status">
-      <option value="">Todos os status</option>
-      <option>Pendente</option>
-      <option>Resolvido</option>
-    </select>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="#">Mapa</a>
+        <a href="reclamacoes.html" class="active">Reclamações</a>
+        <a href="#">Sobre</a>
+      </nav>
+     
 
-    <button class="btn-filter" id="btn-filtrar">Filtrar</button>
-  </section>
+      <button type="button" class="btn-secondary" id="btnVoltar">
+        Voltar
+      </button>
+    </header>
 
-  <div class="results">
-    <strong id="count-resultados">-</strong>
-    <span>Mais recentes</span>
-  </div>
+    <main class="container">
+      <section class="filters">
+        <input
+          type="text"
+          id="filtro-busca"
+          placeholder="Pesquisar reclamação..."
+          class="search"
+        />
 
-  <section class="complaints-grid">
-    <div id="lista-reclamacoes"></div>
-    <button id="btn-mais" hidden>Carregar mais</button>
-  </section>
+        <select id="filtro-categoria">
+          <option value="">Todos os problemas</option>
+          <option>Buraco na rua</option>
+          <option>Rua sem asfalto</option>
+          <option>Poste sem iluminação</option>
+          <option>Poste danificado</option>
+          <option>Árvore caída</option>
+          <option>Calçada danificada</option>
+          <option>Alagamento</option>
+          <option>Outro</option>
+        </select>
 
-  <!-- MODAL DE COMENTÁRIOS -->
-  <div
-          id="modal-comentarios"
-          style="
+        <select id="filtro-bairro">
+          <option value="">Todos os bairros</option>
+          <option>Tatuapé</option>
+          <option>Itaquera</option>
+          <option>Mooca</option>
+          <option>Vila Mariana</option>
+          <option>São Mateus</option>
+        </select>
+
+        <select id="filtro-status">
+          <option value="">Todos os status</option>
+          <option>Pendente</option>
+          <option>Resolvido</option>
+        </select>
+
+        <button class="btn-filter" id="btn-filtrar">Filtrar</button>
+      </section>
+
+      <div class="results">
+        <strong id="count-resultados">-</strong>
+        <span>Mais recentes</span>
+      </div>
+
+      <section class="complaints-grid">
+        <div id="lista-reclamacoes">
+
+        </div>
+        <button id="btn-mais" hidden>Carregar mais</button>
+
+      <!-- MODAL DE COMENTÁRIOS -->
+      <div
+        id="modal-comentarios"
+        style="
           display: none;
           position: fixed;
           top: 0;
@@ -98,9 +102,9 @@
           align-items: center;
           backdrop-filter: blur(4px);
         "
-  >
-    <div
-            style="
+      >
+        <div
+          style="
             background: white;
             width: 90%;
             max-width: 550px;
@@ -113,22 +117,22 @@
             gap: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
           "
-    >
-      <div
-              style="
+        >
+          <div
+            style="
               display: flex;
               justify-content: space-between;
               align-items: center;
               border-bottom: 1px solid #e2e8f0;
               padding-bottom: 12px;
             "
-      >
-        <h3 style="font-size: 20px; font-weight: 700; color: #0f172a">
-          Comentários
-        </h3>
-        <button
-                onclick="fecharModalComentarios()"
-                style="
+          >
+            <h3 style="font-size: 20px; font-weight: 700; color: #0f172a">
+              Comentários
+            </h3>
+            <button
+              onclick="fecharModalComentarios()"
+              style="
                 background: none;
                 border: none;
                 font-size: 24px;
@@ -136,17 +140,17 @@
                 color: #64748b;
                 transition: 0.2s;
               "
-        >
-          &times;
-        </button>
-      </div>
+            >
+              &times;
+            </button>
+          </div>
 
-      <!-- Campo para criar comentário principal -->
-      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <!-- Campo para criar comentário principal -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
             <textarea
-                    id="novo-comentario-texto"
-                    placeholder="Comente algo sobre esta reclamação..."
-                    style="
+              id="novo-comentario-texto"
+              placeholder="Comente algo sobre esta reclamação..."
+              style="
                 flex: 1;
                 min-width: 250px;
                 border-radius: 8px;
@@ -161,9 +165,9 @@
                 transition: 0.2s;
               "
             ></textarea>
-        <button
-                onclick="enviarComentarioPrincipal()"
-                style="
+            <button
+              onclick="enviarComentarioPrincipal()"
+              style="
                 background: #2563eb;
                 color: white;
                 border: none;
@@ -174,21 +178,23 @@
                 cursor: pointer;
                 transition: 0.2s;
               "
-        >
-          Publicar
-        </button>
+            >
+              Publicar
+            </button>
+          </div>
+
+          <!-- Lista encadeada de comentários -->
+          <div id="lista-comentarios" style="margin-top: 10px"></div>
+        </div>
       </div>
+    </main>
 
-      <!-- Lista encadeada de comentários -->
-      <div id="lista-comentarios" style="margin-top: 10px"></div>
-    </div>
-  </div>
-</main>
+    <footer>
+      <div class="logo"><span>Portal</span> Infra</div>
+      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+      <span>© 2026 SP em Foco</span>
+    </footer>
 
-<footer>
-  <div class="logo"><span>Portal</span> Infra</div>
-  <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
-  <span>© 2026 SP em Foco</span>
-</footer>
-</body>
+
+  </body>
 </html>

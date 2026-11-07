@@ -888,17 +888,7 @@ footer .logo span {
   border-color: #cbd5e1;
   transform: translateY(0);
 }
-
-/* =====================================================
-   PROTEÇÃO DE TELA (Evita piscar conteúdo restrito na pagina registrar reclamação)
-   ===================================================== */
-body[data-protegida="true"] {
-  opacity: 0;
-  visibility: hidden;
-}
-
-body[data-protegida="true"].autorizado {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.3s ease;
+.header .btn-secondary {
+    font-family: inherit;
+    cursor: pointer;
 }

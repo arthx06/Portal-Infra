@@ -31,3 +31,34 @@ async function sessaoAtiva() {
         return false;
     }
 }
+
+async function obterDadosSessao() {
+    try {
+        const r = await apiFetch("/usuarios/sessao");
+
+        if (!r.ok) {
+            return null;
+        }
+
+        const dados = await r.json();
+
+        if (!dados.autenticado) {
+            return null;
+        }
+
+        const usuario = {
+            id: dados.id,
+            nome: dados.nome,
+            email: dados.email,
+            tipo: dados.tipo
+        };
+
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
+        return usuario;
+
+    } catch (erro) {
+        console.error("Erro ao obter dados da sessão:", erro);
+        return null;
+    }
+}

@@ -22,6 +22,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.server.ResponseStatusException;
 import org.example.portalinfra.config.SessaoUtil;
 import org.springframework.security.core.Authentication;
+import java.util.List;
 
 
 @RestController
@@ -48,11 +49,16 @@ public class ReclamacaoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReclamacaoResponse> criar(
             @Valid @RequestPart("dados") ReclamacaoRequest dados,
-            @RequestPart("foto") MultipartFile foto,
+            @RequestPart("fotos") List<MultipartFile> fotos,
             Authentication auth) {
 
         ReclamacaoResponse resposta =
-            reclamacaoService.criar(dados, foto, SessaoUtil.idLogado(auth));
+                reclamacaoService.criar(
+                        dados,
+                        fotos,
+                        SessaoUtil.idLogado(auth)
+                );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
@@ -110,4 +116,38 @@ public class ReclamacaoController {
             id, SessaoUtil.idLogado(auth), request, novaFoto));
     }
 
+    @PatchMapping(
+        value = "/{reclamacaoId}/fotos/{fotoId}",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ReclamacaoResponse> substituirFoto(
+        @PathVariable Long reclamacaoId,
+        @PathVariable Long fotoId,
+        Authentication auth,
+        @RequestPart("foto") MultipartFile novaFoto) {
+            return ResponseEntity.ok(
+            reclamacaoService.substituirFoto(
+                reclamacaoId,
+                fotoId,
+                SessaoUtil.idLogado(auth),
+                novaFoto
+            )
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReclamacaoResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(reclamacaoService.buscarPorId(id));
+    }
+
+    @PostMapping("/admin/geocodificar-pendentes")
+    public ResponseEntity<java.util.Map<String, Integer>> geocodificarPendentes(
+            Authentication auth) {
+
+        return ResponseEntity.ok(
+                reclamacaoService.geocodificarReclamacoesPendentes(
+                        SessaoUtil.idLogado(auth)
+                )
+        );
+    }
 }
