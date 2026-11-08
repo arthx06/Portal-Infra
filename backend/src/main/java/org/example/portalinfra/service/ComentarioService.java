@@ -222,6 +222,11 @@ public class ComentarioService {
     }
 
 
+    // ==========================================
+    // EDITAR COMENTÁRIO (USUÁRIO E ADMIN)
+    // ==========================================
+
+
     @Transactional
     public ComentarioResponse editarComentario(Long id, Long usuarioId, String novoTexto, Boolean isResolucao, org.springframework.web.multipart.MultipartFile novaFoto, boolean removerFoto) {
         Comentario comentario = comentarioRepository.findById(id)
@@ -231,10 +236,28 @@ public class ComentarioService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você só pode editar seus próprios comentários.");
         }
 
+        return processarEdicaoComentario(comentario, novoTexto, isResolucao, novaFoto, removerFoto);
+    }
+
+    @Transactional
+    public ComentarioResponse editarComentarioPeloAdmin(Long id, Long adminId, String novoTexto, Boolean isResolucao, org.springframework.web.multipart.MultipartFile novaFoto, boolean removerFoto) {
+        Comentario comentario = comentarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comentário não encontrado."));
+
+        Usuario admin = usuarioRepository.findById(adminId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado. Apenas administradores podem realizar esta ação.");
+        }
+
+        return processarEdicaoComentario(comentario, novoTexto, isResolucao, novaFoto, removerFoto);
+    }
+
+    private ComentarioResponse processarEdicaoComentario(Comentario comentario, String novoTexto, Boolean isResolucao, org.springframework.web.multipart.MultipartFile novaFoto, boolean removerFoto) {
         boolean enviouNovaFoto = novaFoto != null && !novaFoto.isEmpty();
         boolean seraResolucao = isResolucao != null ? isResolucao : comentario.isResolucao();
 
-        // Validação estrita para resoluções
         if (seraResolucao) {
             boolean teraFotoNoFinal = (!removerFoto && comentario.getFotoUrl() != null) || enviouNovaFoto;
             if (!teraFotoNoFinal) {
@@ -247,7 +270,7 @@ public class ComentarioService {
 
         if (enviouNovaFoto) {
             validarArquivoImagem(novaFoto);
-            apagarDoCloudinary(comentario.getFotoUrl()); // Limpa a antiga
+            apagarDoCloudinary(comentario.getFotoUrl());
 
             try {
                 var resultado = cloudinary.uploader().upload(

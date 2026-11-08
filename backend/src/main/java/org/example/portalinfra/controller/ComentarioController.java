@@ -1,20 +1,20 @@
 package org.example.portalinfra.controller;
 
-import jakarta.validation.Valid;
 import org.example.portalinfra.dto.ComentarioRequest;
 import org.example.portalinfra.dto.ComentarioResponse;
 import org.example.portalinfra.service.ComentarioService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import org.example.portalinfra.config.SessaoUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/comentarios")
-@Validated
 public class ComentarioController {
 
     private final ComentarioService comentarioService;
@@ -23,16 +23,15 @@ public class ComentarioController {
         this.comentarioService = comentarioService;
     }
 
-    @PostMapping(consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ComentarioResponse> criar(
             Authentication auth,
-            @RequestParam Long reclamacaoId,
-            @Valid @ModelAttribute ComentarioRequest request,
-            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile foto) {
+            @RequestPart("dados") ComentarioRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
-        ComentarioResponse resposta = comentarioService.criar(
-            SessaoUtil.idLogado(auth), reclamacaoId, request, foto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
+        Long usuarioId = SessaoUtil.idLogado(auth);
+        ComentarioResponse response = comentarioService.criar(request, foto, usuarioId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/reclamacao/{reclamacaoId}")
@@ -40,35 +39,53 @@ public class ComentarioController {
         return ResponseEntity.ok(comentarioService.listarPorReclamacao(reclamacaoId));
     }
 
+    // ==========================================
+    // EDITAR COMENTÁRIO (USUÁRIO E ADMIN)
+    // ==========================================
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarPeloUsuario(
-            @PathVariable Long id, Authentication auth) {
-        comentarioService.deletarPeloUsuario(id, SessaoUtil.idLogado(auth));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deletarPeloAdmin(
-            @PathVariable Long id, Authentication auth) {
-        comentarioService.deletarComentarioPeloAdmin(id, SessaoUtil.idLogado(auth));
-        return ResponseEntity.noContent().build();
-    }
-
-
-
-    @PatchMapping(value = "/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ComentarioResponse> editarComentario(
             @PathVariable Long id,
             Authentication auth,
             @RequestParam("texto") String novoTexto,
             @RequestParam(value = "isResolucao", required = false) Boolean isResolucao,
             @RequestParam(value = "removerFoto", defaultValue = "false") boolean removerFoto,
-            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile novaFoto) {
+            @RequestPart(value = "foto", required = false) MultipartFile novaFoto) {
 
+        Long usuarioId = SessaoUtil.idLogado(auth);
         return ResponseEntity.ok(comentarioService.editarComentario(
-            id, SessaoUtil.idLogado(auth), novoTexto, isResolucao, novaFoto, removerFoto));
+                id, usuarioId, novoTexto, isResolucao, novaFoto, removerFoto));
     }
 
+    @PatchMapping(value = "/admin/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ComentarioResponse> editarComentarioPeloAdmin(
+            @PathVariable Long id,
+            Authentication auth,
+            @RequestParam("texto") String novoTexto,
+            @RequestParam(value = "isResolucao", required = false) Boolean isResolucao,
+            @RequestParam(value = "removerFoto", defaultValue = "false") boolean removerFoto,
+            @RequestPart(value = "foto", required = false) MultipartFile novaFoto) {
 
+        Long adminId = SessaoUtil.idLogado(auth);
+        return ResponseEntity.ok(comentarioService.editarComentarioPeloAdmin(
+                id, adminId, novoTexto, isResolucao, novaFoto, removerFoto));
+    }
+
+    // ==========================================
+    // EXCLUIR COMENTÁRIO (USUÁRIO E ADMIN)
+    // ==========================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarPeloUsuario(@PathVariable Long id, Authentication auth) {
+        Long usuarioId = SessaoUtil.idLogado(auth);
+        comentarioService.deletarPeloUsuario(id, usuarioId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<Void> deletarComentarioPeloAdmin(@PathVariable Long id, Authentication auth) {
+        Long adminId = SessaoUtil.idLogado(auth);
+        comentarioService.deletarComentarioPeloAdmin(id, adminId);
+        return ResponseEntity.noContent().build();
+    }
 }
