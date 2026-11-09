@@ -484,9 +484,6 @@ footer .logo span {
   .header {
     padding: 0 5%;
   }
-  nav {
-    display: none;
-  }
 
   .container {
     width: 92%;
@@ -555,6 +552,9 @@ footer .logo span {
   transition: 0.2s ease;
   display: flex;
   align-items: center;
+  width: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .header .btn-secondary:hover {

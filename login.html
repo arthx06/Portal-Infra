@@ -22,15 +22,31 @@
   <body>
     <!-- CABEÇALHO -->
     <header class="header">
-      <div class="logo"><span>Portal</span> Infra</div>
-      <nav>
+      <a href="index.html" class="logo"><span>Portal</span> Infra</a>
+      <nav id="nav-menu">
         <a href="index.html">Início</a>
         <a href="#">Mapa</a>
         <a href="reclamacoes.html">Reclamações</a>
         <a href="#">Sobre</a>
       </nav>
-      <!-- Botão Voltar (estilizado via CSS) -->
-      <a href="index.html"><button class="btn-secondary">Voltar</button></a>
+
+      <div class="header-actions">
+        <!-- Botão Voltar (estilizado via CSS) -->
+        <a href="index.html"><button class="btn-secondary" type="button">Voltar</button></a>
+
+        <!-- Botão Menu Mobile (Hambúrguer) -->
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Abrir menu de navegação"
+          aria-expanded="false"
+        >
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
     </header>
 
     <!-- CONTEÚDO DE AUTENTICAÇÃO -->
@@ -323,7 +339,7 @@
 
     <!-- RODAPÉ -->
     <footer>
-      <div class="logo"><span>Portal</span> Infra</div>
+      <a href="index.html" class="logo"><span>Portal</span> Infra</a>
       <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
       <span>© 2026 SP em Foco</span>
     </footer>

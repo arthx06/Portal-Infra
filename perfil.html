@@ -27,14 +27,29 @@
             Infra
         </a>
 
-        <nav>
+        <nav id="nav-menu">
             <a href="index.html">Início</a>
             <a href="mapa.html">Mapa</a>
             <a href="reclamacoes.html">Reclamações</a>
             <a href="sobre.html">Sobre</a>
         </nav>
 
-          <a href="index.html"><button class="btn-secondary" id="btnVoltar">Voltar</button></a>
+        <div class="header-actions">
+            <a href="index.html"><button class="btn-secondary" id="btnVoltar" type="button">Voltar</button></a>
+
+            <!-- Botão Menu Mobile (Hambúrguer) -->
+            <button
+                class="menu-toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Abrir menu de navegação"
+                aria-expanded="false"
+            >
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+        </div>
 
     </header>
 

@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="nova-reclamacao.css" />
     <script src="api.js" defer></script>
-    <script src="reclamacao.js" defer></script>]
+    <script src="reclamacao.js" defer></script>
     
 
   </head>
@@ -26,16 +26,31 @@
     <header class="header">
       <a href="index.html" class="logo"> <span>Portal</span> Infra </a>
 
-      <nav>
+      <nav id="nav-menu">
         <a href="index.html">Início</a>
         <a href="#">Mapa</a>
         <a href="reclamacoes.html" class="active">Reclamações</a>
         <a href="#">Sobre</a>
       </nav>
 
-      <a href="reclamacoes.html">
-        <button type="button" class="btn-secondary" id="btnVoltar">Voltar</button>
-      </a>
+      <div class="header-actions">
+        <a href="reclamacoes.html">
+          <button type="button" class="btn-secondary" id="btnVoltar">Voltar</button>
+        </a>
+
+        <!-- Botão Menu Mobile (Hambúrguer) -->
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Abrir menu de navegação"
+          aria-expanded="false"
+        >
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
     </header>
 
     <main class="nova-reclamacao">

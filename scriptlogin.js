@@ -325,3 +325,45 @@
             alert(error.message);
           }
         });
+
+
+// ==========================================
+// Menu Mobile Hambúrguer
+// ==========================================
+function initMenuMobileLogin() {
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (menuToggle && navMenu && !menuToggle.dataset.menuIniciado) {
+        menuToggle.dataset.menuIniciado = "true";
+
+        menuToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const aberto = navMenu.classList.toggle("aberto");
+            menuToggle.classList.toggle("aberto", aberto);
+            menuToggle.setAttribute("aria-expanded", String(aberto));
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        navMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMenuMobileLogin);
+} else {
+    initMenuMobileLogin();
+}

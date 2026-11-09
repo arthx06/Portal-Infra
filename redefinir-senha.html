@@ -25,16 +25,31 @@
         <span>Portal</span> Infra
     </div>
 
-    <nav>
+    <nav id="nav-menu">
         <a href="index.html">Início</a>
         <a href="#">Mapa</a>
         <a href="reclamacoes.html">Reclamações</a>
         <a href="#">Sobre</a>
     </nav>
 
-    <a href="login.html">
-        <button class="btn-secondary">Voltar</button>
-    </a>
+    <div class="header-actions">
+        <a href="login.html">
+            <button class="btn-secondary" type="button">Voltar</button>
+        </a>
+
+        <!-- Botão Menu Mobile (Hambúrguer) -->
+        <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Abrir menu de navegação"
+            aria-expanded="false"
+        >
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+        </button>
+    </div>
 
 </header>
 

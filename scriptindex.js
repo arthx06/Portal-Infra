@@ -62,6 +62,43 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log("Usuário autenticado:", usuario);
     console.log("Administrador:", isAdmin);
 
+    // Controle do menu mobile (hambúrguer)
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const aberto = navMenu.classList.toggle("aberto");
+            menuToggle.classList.toggle("aberto", aberto);
+            menuToggle.setAttribute("aria-expanded", String(aberto));
+
+            // Fecha o dropdown do usuário se estiver aberto
+            if (dropdown && !dropdown.hidden) {
+                dropdown.hidden = true;
+                if (botaoMenu) botaoMenu.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // Fecha o menu mobile ao clicar fora
+        document.addEventListener("click", function (event) {
+            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // Fecha ao clicar em um dos links
+        navMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+
     // Abre e fecha o menu
     if (botaoMenu && dropdown) {
 

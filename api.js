@@ -62,3 +62,46 @@ async function obterDadosSessao() {
         return null;
     }
 }
+
+
+// ==========================================
+// Menu Mobile Hambúrguer (Global)
+// ==========================================
+document.addEventListener("DOMContentLoaded", function () {
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (menuToggle && navMenu && !menuToggle.dataset.menuIniciado) {
+        menuToggle.dataset.menuIniciado = "true";
+
+        menuToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const aberto = navMenu.classList.toggle("aberto");
+            menuToggle.classList.toggle("aberto", aberto);
+            menuToggle.setAttribute("aria-expanded", String(aberto));
+
+            const dropdown = document.getElementById("user-dropdown");
+            const botaoMenu = document.getElementById("user-menu-btn");
+            if (dropdown && !dropdown.hidden) {
+                dropdown.hidden = true;
+                if (botaoMenu) botaoMenu.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        navMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                navMenu.classList.remove("aberto");
+                menuToggle.classList.remove("aberto");
+                menuToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+});

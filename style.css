@@ -124,6 +124,55 @@ nav .active::after {
   box-shadow: var(--shadow-md);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* =========================
+   MENU HAMBÚRGUER (MOBILE)
+========================= */
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.menu-toggle:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.hamburger-bar {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: var(--text-dark);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.menu-toggle.aberto .hamburger-bar:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.menu-toggle.aberto .hamburger-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.aberto .hamburger-bar:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 /* =========================
    HERO
 ========================= */
@@ -744,8 +793,79 @@ footer .logo span {
   /* Header & Hero */
   .header {
     padding: 0 5%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .logo span {
+    font-size: 16px;
+    padding: 4px 8px;
+  }
+
+  .btn-login {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .user-menu-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
   nav {
+    display: none;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background: var(--white);
+    flex-direction: column;
+    padding: 16px 6%;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-lg);
+    box-sizing: border-box;
+    z-index: 99;
+  }
+
+  nav.aberto {
+    display: flex;
+    animation: fadeInMenu 0.2s ease forwards;
+  }
+
+  @keyframes fadeInMenu {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  nav a {
+    font-size: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    width: 100%;
+    display: block;
+  }
+
+  nav a:last-child {
+    border-bottom: none;
+  }
+
+  nav .active::after {
     display: none;
   }
 
@@ -768,10 +888,16 @@ footer .logo span {
     flex-direction: column;
     width: 100%;
   }
-  .btn-primary,
-  .btn-secondary {
+  .hero-buttons .btn-primary,
+  .hero-buttons .btn-secondary {
     width: 100%;
     text-align: center;
+  }
+
+  .header .btn-secondary {
+    width: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   /* CARDS: Ajuste das laterais e empilhamento */
