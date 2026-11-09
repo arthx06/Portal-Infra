@@ -67,7 +67,7 @@ async function obterDadosSessao() {
 // ==========================================
 // Menu Mobile Hambúrguer (Global)
 // ==========================================
-document.addEventListener("DOMContentLoaded", function () {
+function initMenuMobileGlobal() {
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
@@ -104,4 +104,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMenuMobileGlobal);
+} else {
+    initMenuMobileGlobal();
+}
