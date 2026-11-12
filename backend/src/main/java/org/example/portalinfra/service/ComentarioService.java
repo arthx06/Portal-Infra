@@ -107,7 +107,7 @@ public class ComentarioService {
     }
 
     @Transactional(readOnly = true)
-    public List> listarSugestoesResolucaoParaAdmin(Long adminId) {
+    public List<Map<String, Object>> listarSugestoesResolucaoParaAdmin(Long adminId) {
         Usuario admin = usuarioRepository.findById(adminId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
 

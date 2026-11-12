@@ -56,7 +56,7 @@ public class ComentarioController {
     }
 
     @GetMapping("/admin/resolucoes")
-    public ResponseEntity<List>> listarSugestoesResolucao(Authentication auth) {
+    public ResponseEntity<List<Map<String, Object>>> listarSugestoesResolucao(Authentication auth) {
         Long adminId = SessaoUtil.idLogado(auth);
         return ResponseEntity.ok(comentarioService.listarSugestoesResolucaoParaAdmin(adminId));
     }

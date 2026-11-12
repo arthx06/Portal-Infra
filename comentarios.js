@@ -391,8 +391,13 @@ async function enviarResposta(comentarioPaiId, reclamacaoId) {
 
     try {
         const form = new FormData();
-        form.append("texto", texto);
-        form.append("comentarioPaiId", comentarioPaiId);
+        form.append(
+            "dados",
+            new Blob(
+                [JSON.stringify({ texto, comentarioPaiId })],
+                { type: "application/json" }
+            )
+        );
 
         const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoId}`, {
             method: "POST",
@@ -434,7 +439,13 @@ async function enviarComentarioPrincipal() {
 
     try {
         const form = new FormData();
-        form.append("texto", texto);   // comentário raiz: não envie comentarioPaiId
+        form.append(
+            "dados",
+            new Blob(
+                [JSON.stringify({ texto })],
+                { type: "application/json" }
+            )
+        );
 
         const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoAtualId}`, {
             method: "POST",
