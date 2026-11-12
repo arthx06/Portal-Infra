@@ -119,6 +119,15 @@ function criarCard(r) {
         </div>
     ` : '';
 
+    const botaoDenunciarReclamacao = ehDono ? '' : `
+        <button
+            type="button"
+            class="botao-denunciar-reclamacao"
+            onclick="abrirModalDenunciaReclamacao(${Number(r.id)})">
+            🚩 Denunciar
+        </button>
+    `;
+
     return `
     <div class="complaint-card" data-id="${Number(r.id)}">
         <div class="image-container">
@@ -139,6 +148,7 @@ function criarCard(r) {
                     onclick="abrirComentarios(${Number(r.id)})">
                     Comentários
                 </button>
+                ${botaoDenunciarReclamacao}
             </div>
 
             ${botoesProprietario}
@@ -694,5 +704,122 @@ async function enviarDenunciaComentario(event) {
 window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
         fecharModalDenunciaComentario();
+        fecharModalDenunciaReclamacao();
     }
 });
+
+function garantirModalDenunciaReclamacaoExiste() {
+    if (document.getElementById("modal-denuncia-reclamacao")) return;
+
+    document.body.insertAdjacentHTML("beforeend", `
+    <div id="modal-denuncia-reclamacao" class="modal-denuncia" style="display: none;">
+      <div class="modal-denuncia-overlay" onclick="fecharModalDenunciaReclamacao()"></div>
+      <div class="modal-denuncia-card" role="dialog" aria-modal="true" aria-labelledby="modal-denuncia-reclamacao-titulo">
+        <div class="modal-denuncia-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🚩</span>
+            <h3 id="modal-denuncia-reclamacao-titulo">Denunciar Reclamação</h3>
+          </div>
+          <button type="button" class="btn-fechar-modal-denuncia" onclick="fecharModalDenunciaReclamacao()" aria-label="Fechar">&times;</button>
+        </div>
+        <form id="form-denuncia-reclamacao" onsubmit="enviarDenunciaReclamacao(event)">
+          <input type="hidden" id="denuncia-reclamacao-id" />
+          <p class="modal-denuncia-instrucao">Selecione o motivo da denúncia:</p>
+          <div class="modal-denuncia-opcoes">
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="CONTEUDO_SEXUAL" required /><div><strong>Conteúdo sexual</strong><small>Nudez, pornografia ou atos sexuais explícitos.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="DISCURSO_DE_ODIO" /><div><strong>Discurso de ódio</strong><small>Ataques, intolerância ou discriminação.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="PALAVRAS_DE_BAIXO_CALAO" /><div><strong>Palavras de baixo calão</strong><small>Ofensas, ameaças ou agressões verbais.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="CONTEUDO_FALSO" /><div><strong>Conteúdo falso</strong><small>Informações falsas ou enganosas.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="SPAM" /><div><strong>Spam</strong><small>Publicações repetitivas ou irrelevantes.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="VENDA_OU_SERVICOS" /><div><strong>Venda ou serviços</strong><small>Divulgação comercial não autorizada.</small></div></label>
+            <label class="modal-denuncia-opcao"><input type="radio" name="tipoDenunciaReclamacao" value="OUTROS" /><div><strong>Outros</strong><small>Outra infração às diretrizes da comunidade.</small></div></label>
+          </div>
+          <div class="modal-denuncia-campo">
+            <label for="denuncia-reclamacao-descricao">Detalhes adicionais (opcional):</label>
+            <textarea id="denuncia-reclamacao-descricao" rows="3" placeholder="Descreva o problema ocorrido..."></textarea>
+          </div>
+          <div id="denuncia-reclamacao-feedback" class="modal-denuncia-erro" style="display: none;"></div>
+          <div class="modal-denuncia-acoes">
+            <button type="button" class="btn-cancelar-denuncia" onclick="fecharModalDenunciaReclamacao()">Cancelar</button>
+            <button type="submit" class="btn-confirmar-denuncia" id="btn-enviar-denuncia-reclamacao">Enviar denúncia</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    `);
+}
+
+async function abrirModalDenunciaReclamacao(reclamacaoId) {
+    if (!(await estaLogado())) {
+        alert("Você precisa estar logado para denunciar uma reclamação!");
+        return;
+    }
+
+    garantirModalDenunciaReclamacaoExiste();
+    document.getElementById("denuncia-reclamacao-id").value = reclamacaoId;
+    document.getElementById("denuncia-reclamacao-descricao").value = "";
+    document.getElementById("denuncia-reclamacao-feedback").style.display = "none";
+    document.querySelectorAll('input[name="tipoDenunciaReclamacao"]').forEach(radio => {
+        radio.checked = false;
+    });
+    document.getElementById("modal-denuncia-reclamacao").style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function fecharModalDenunciaReclamacao() {
+    const modal = document.getElementById("modal-denuncia-reclamacao");
+    if (modal) modal.style.display = "none";
+    if (!document.getElementById("modal-denuncia-comentario") ||
+        document.getElementById("modal-denuncia-comentario").style.display === "none") {
+        document.body.style.overflow = "";
+    }
+}
+
+async function enviarDenunciaReclamacao(event) {
+    event.preventDefault();
+
+    const reclamacaoId = Number(document.getElementById("denuncia-reclamacao-id").value);
+    const tipo = document.querySelector('input[name="tipoDenunciaReclamacao"]:checked')?.value;
+    const descricao = document.getElementById("denuncia-reclamacao-descricao").value.trim();
+    const feedback = document.getElementById("denuncia-reclamacao-feedback");
+    const botao = document.getElementById("btn-enviar-denuncia-reclamacao");
+
+    if (!tipo) {
+        feedback.textContent = "Selecione um tipo de denúncia.";
+        feedback.style.display = "block";
+        return;
+    }
+
+    botao.disabled = true;
+    botao.textContent = "Enviando...";
+    try {
+        const resposta = await apiFetch("/denuncias", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reclamacaoId, tipo, descricao: descricao || null })
+        });
+
+        if (resposta.ok) {
+            alert("Denúncia enviada com sucesso! Nossa equipe irá analisar a reclamação.");
+            fecharModalDenunciaReclamacao();
+            return;
+        }
+
+        let mensagem = "Não foi possível enviar a denúncia.";
+        try {
+            const erro = await resposta.json();
+            mensagem = erro.message || erro.erro || mensagem;
+        } catch (_) {}
+        if (resposta.status === 409) mensagem = "Você já denunciou esta reclamação anteriormente.";
+        if (resposta.status === 401) mensagem = "Você precisa estar logado para denunciar uma reclamação.";
+        feedback.textContent = mensagem;
+        feedback.style.display = "block";
+    } catch (erro) {
+        console.error("Erro ao denunciar reclamação:", erro);
+        feedback.textContent = "Erro de comunicação com o servidor. Tente novamente.";
+        feedback.style.display = "block";
+    } finally {
+        botao.disabled = false;
+        botao.textContent = "Enviar denúncia";
+    }
+}

@@ -807,6 +807,20 @@ footer .logo span {
 
 .botao-excluir-reclamacao:hover {
   background: #fee2e2;
+}
+
+.botao-denunciar-reclamacao {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.botao-denunciar-reclamacao:hover {
+  background: #fee2e2;
   border-color: #dc2626;
   transform: translateY(-1px);
 }

@@ -98,6 +98,13 @@ document.getElementById("btnVoltar")?.addEventListener("click", function () {
         $("detalhe-data").textContent = formatarData(r.dataCriacao);
         $("detalhe-id").textContent = "#" + r.id;
         $("detalhe").hidden = false;
+        const botaoDenuncia = $("btn-denunciar-reclamacao-detalhe");
+        const ehDono = usuarioLogadoId != null &&
+            String(usuarioLogadoId) === String(r.usuarioId);
+        if (botaoDenuncia) {
+            botaoDenuncia.hidden = ehDono;
+            botaoDenuncia.onclick = () => abrirModalDenunciaReclamacao(r.id);
+        }
         $("comentarios").hidden = false;
         reclamacaoAtualId = r.id;      // variável global do comentarios.js
         carregarComentarios(r.id);
@@ -109,6 +116,7 @@ document.getElementById("btnVoltar")?.addEventListener("click", function () {
             return;
         }
         try {
+            await carregarUsuarioSessao();
             const resposta = await apiFetch("/reclamacoes/" + id);
             if (resposta.status === 404) {
                 mostrarErro("Reclamação não encontrada.");
