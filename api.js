@@ -1,20 +1,59 @@
 // api.js
 const API_BASE = "https://portal-infra-backend.onrender.com";
 
-async function apiFetch(path, options = {}) {
-  const resp = await fetch(API_BASE + path, {
-    credentials: "include",          // envia o cookie JWT
-    ...options,
-  });
-  if (resp.status === 401 || resp.status === 403) {
-    localStorage.removeItem("usuario");
-    // só redireciona se a página exigir login
-    if (document.body.dataset.protegida === "true") {
-      window.location.replace("login.html");
+function obterUsuarioCache() {
+    try {
+        const raw = localStorage.getItem("usuario");
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        localStorage.removeItem("usuario");
+        return null;
     }
-  }
-  return resp;
 }
+
+function aplicarEstadoHeader(usuario) {
+    const btnEntrar = document.getElementById("btn-entrar");
+    const userMenu = document.getElementById("user-menu");
+    const nomeUsuario = document.getElementById("nome-usuario");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (usuario && usuario.nome) {
+        if (btnEntrar) btnEntrar.style.display = "none";
+        if (userMenu) userMenu.style.display = "block";
+        if (nomeUsuario) nomeUsuario.textContent = usuario.nome;
+
+        if (navMenu && usuario.tipo === "ADMIN" && !document.getElementById("link-moderacao")) {
+            const linkMod = document.createElement("a");
+            linkMod.id = "link-moderacao";
+            linkMod.href = "moderacao.html";
+            linkMod.textContent = "Moderação";
+            navMenu.appendChild(linkMod);
+        }
+    } else {
+        if (btnEntrar) btnEntrar.style.display = "";
+        if (userMenu) userMenu.style.display = "none";
+
+        const linkMod = document.getElementById("link-moderacao");
+        if (linkMod) linkMod.remove();
+    }
+}
+
+async function apiFetch(path, options = {}) {
+    const resp = await fetch(API_BASE + path, {
+        credentials: "include", // envia o cookie JWT
+        ...options,
+    });
+    if (resp.status === 401 || resp.status === 403) {
+        localStorage.removeItem("usuario");
+        aplicarEstadoHeader(null);
+        // só redireciona se a página exigir login
+        if (document.body.dataset.protegida === "true") {
+            window.location.replace("login.html");
+        }
+    }
+    return resp;
+}
+
 async function sessaoAtiva() {
     try {
         const r = await apiFetch("/usuarios/sessao");
@@ -37,12 +76,16 @@ async function obterDadosSessao() {
         const r = await apiFetch("/usuarios/sessao");
 
         if (!r.ok) {
+            localStorage.removeItem("usuario");
+            aplicarEstadoHeader(null);
             return null;
         }
 
         const dados = await r.json();
 
         if (!dados.autenticado) {
+            localStorage.removeItem("usuario");
+            aplicarEstadoHeader(null);
             return null;
         }
 
@@ -54,6 +97,7 @@ async function obterDadosSessao() {
         };
 
         localStorage.setItem("usuario", JSON.stringify(usuario));
+        aplicarEstadoHeader(usuario);
 
         return usuario;
 
@@ -63,11 +107,12 @@ async function obterDadosSessao() {
     }
 }
 
-
 // ==========================================
-// Menu Mobile Hambúrguer (Global)
+// Menu Mobile Hambúrguer e Header (Global)
 // ==========================================
 function initMenuMobileGlobal() {
+    aplicarEstadoHeader(obterUsuarioCache());
+
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 

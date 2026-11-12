@@ -66,6 +66,26 @@
   </div>
 </header>
 
+<script>
+  // Renderização instantânea do cabeçalho antes da resposta do servidor
+  (function () {
+    try {
+      const salvo = JSON.parse(localStorage.getItem("usuario") || "null");
+      if (salvo && salvo.nome) {
+        const btnEntrar = document.getElementById("btn-entrar");
+        const userMenu = document.getElementById("user-menu");
+        const nomeUsuario = document.getElementById("nome-usuario");
+
+        if (btnEntrar) btnEntrar.style.display = "none";
+        if (userMenu) userMenu.style.display = "block";
+        if (nomeUsuario) nomeUsuario.textContent = salvo.nome;
+      }
+    } catch (e) {
+      localStorage.removeItem("usuario");
+    }
+  })();
+</script>
+
 <!-- CONTEÚDO PRINCIPAL -->
 <main>
   <!-- HERO -->
