@@ -67,7 +67,7 @@
 </header>
 
 <script>
-  // Renderização instantânea do cabeçalho antes da resposta do servidor
+  // Renderização instantânea do cabeçalho e da opção de admin antes da resposta do servidor
   (function () {
     try {
       const salvo = JSON.parse(localStorage.getItem("usuario") || "null");
@@ -75,10 +75,24 @@
         const btnEntrar = document.getElementById("btn-entrar");
         const userMenu = document.getElementById("user-menu");
         const nomeUsuario = document.getElementById("nome-usuario");
+        const dropdown = document.getElementById("user-dropdown");
+        const btnSair = document.getElementById("btn-sair");
 
         if (btnEntrar) btnEntrar.style.display = "none";
         if (userMenu) userMenu.style.display = "block";
         if (nomeUsuario) nomeUsuario.textContent = salvo.nome;
+
+        if (salvo.tipo === "ADMIN" && dropdown && !document.getElementById("link-moderacao")) {
+          const linkMod = document.createElement("a");
+          linkMod.id = "link-moderacao";
+          linkMod.href = "moderacao.html";
+          linkMod.textContent = "Painel de Moderação";
+          if (btnSair) {
+            dropdown.insertBefore(linkMod, btnSair);
+          } else {
+            dropdown.appendChild(linkMod);
+          }
+        }
       }
     } catch (e) {
       localStorage.removeItem("usuario");

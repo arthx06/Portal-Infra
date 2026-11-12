@@ -15,19 +15,29 @@ function aplicarEstadoHeader(usuario) {
     const btnEntrar = document.getElementById("btn-entrar");
     const userMenu = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
-    const navMenu = document.getElementById("nav-menu");
+    const userDropdown = document.getElementById("user-dropdown");
+    const btnSair = document.getElementById("btn-sair");
 
     if (usuario && usuario.nome) {
         if (btnEntrar) btnEntrar.style.display = "none";
         if (userMenu) userMenu.style.display = "block";
         if (nomeUsuario) nomeUsuario.textContent = usuario.nome;
 
-        if (navMenu && usuario.tipo === "ADMIN" && !document.getElementById("link-moderacao")) {
-            const linkMod = document.createElement("a");
-            linkMod.id = "link-moderacao";
-            linkMod.href = "moderacao.html";
-            linkMod.textContent = "Moderação";
-            navMenu.appendChild(linkMod);
+        if (usuario.tipo === "ADMIN") {
+            if (userDropdown && !document.getElementById("link-moderacao")) {
+                const linkMod = document.createElement("a");
+                linkMod.id = "link-moderacao";
+                linkMod.href = "moderacao.html";
+                linkMod.textContent = "Painel de Moderação";
+                if (btnSair) {
+                    userDropdown.insertBefore(linkMod, btnSair);
+                } else {
+                    userDropdown.appendChild(linkMod);
+                }
+            }
+        } else {
+            const linkMod = document.getElementById("link-moderacao");
+            if (linkMod) linkMod.remove();
         }
     } else {
         if (btnEntrar) btnEntrar.style.display = "";
