@@ -1,0 +1,715 @@
+/* =========================
+   HERO DA MODERAÇÃO
+========================= */
+.mod-hero {
+    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    padding: 48px 8% 76px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mod-hero-inner {
+    max-width: 720px;
+}
+
+.mod-hero h1 {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 10px 0 12px;
+    line-height: 1.2;
+}
+
+.mod-hero p {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.mod-stats {
+    margin-bottom: 32px;
+}
+
+/* =========================
+   WORKSPACE & ABAS
+========================= */
+.mod-workspace {
+    padding: 0 8% 80px;
+}
+
+.mod-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 24px;
+}
+
+.mod-tab {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.mod-tab:hover {
+    color: var(--text-dark);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.mod-tab.active {
+    color: var(--primary);
+    background: var(--white);
+}
+
+.mod-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.tab-badge {
+    background: #e2e8f0;
+    color: var(--text-dark);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+    transition: 0.2s ease;
+}
+
+.mod-tab.active .tab-badge {
+    background: #dbeafe;
+    color: var(--primary);
+}
+
+/* =========================
+   BARRA DE PESQUISA E FILTROS
+========================= */
+.mod-toolbar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.mod-search-box {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.mod-search-box input {
+    width: 100%;
+    padding: 13px 42px 13px 44px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mod-search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.btn-clear-search {
+    position: absolute;
+    right: 12px;
+    background: #f1f5f9;
+    color: var(--text-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-clear-search:hover {
+    background: #e2e8f0;
+    color: var(--text-dark);
+}
+
+.mod-filters select {
+    padding: 13px 18px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.mod-filters select:focus {
+    border-color: var(--primary);
+}
+
+/* =========================
+   CARDS DE DENÚNCIA (HOVER FLUTUANTE)
+========================= */
+.mod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mod-card {
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition:
+            transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
+    position: relative;
+}
+
+.mod-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: #cbd5e1;
+}
+
+.mod-card:active {
+    transform: translateY(-1px);
+}
+
+.mod-card-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.mod-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.mod-id-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    background: #eff6ff;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.mod-motivo-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: #b45309;
+    background: #fef3c7;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.mod-count-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.mod-date {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.mod-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mod-card-excerpt {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.mod-card-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.mod-card-user strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.mod-card-audit {
+    font-size: 12px;
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.mod-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.btn-analisar {
+    background: #f8fafc;
+    color: var(--primary);
+    border: 1px solid var(--border-light);
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.mod-card:hover .btn-analisar {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+/* Feedback vazio / carregando */
+.mod-feedback {
+    background: var(--white);
+    border: 1px dashed #cbd5e1;
+    border-radius: var(--radius-md);
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.mod-load-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+/* =========================
+   GAVETA LATERAL (DRAWER)
+========================= */
+.drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 900;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.drawer-overlay.open {
+    opacity: 1;
+}
+
+.mod-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 540px;
+    height: 100vh;
+    background: var(--white);
+    box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
+    z-index: 950;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mod-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    background: #f8fafc;
+}
+
+.drawer-id {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--primary);
+}
+
+.drawer-header h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-top: 4px;
+}
+
+.drawer-close {
+    background: var(--white);
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drawer-close:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.drawer-auditoria {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.drawer-section h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.drawer-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.drawer-section-header h3 {
+    margin-bottom: 0;
+}
+
+.drawer-ext-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.drawer-ext-link:hover {
+    text-decoration: underline;
+}
+
+/* Card de Usuário na Gaveta */
+.drawer-user-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f8fafc;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+}
+
+.drawer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.drawer-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.drawer-user-info strong {
+    font-size: 15px;
+    color: var(--text-dark);
+}
+
+.drawer-user-info span {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.drawer-user-info small {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Motivo na Gaveta */
+.drawer-motivo-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.motivo-tag {
+    display: inline-block;
+    background: #fef3c7;
+    color: #b45309;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.drawer-motivo-box p {
+    font-size: 14px;
+    color: var(--text-dark);
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.drawer-motivo-box small {
+    font-size: 12px;
+    color: #92400e;
+}
+
+/* Conteúdo Denunciado na Gaveta */
+.drawer-content-box {
+    background: #f8fafc;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 18px;
+}
+
+.drawer-content-box h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.drawer-content-box p {
+    font-size: 14px;
+    color: var(--text-dark);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.drawer-item-meta {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-light);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Formulário de Edição na Gaveta */
+.drawer-edit-form {
+    background: #f8fafc;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.drawer-edit-form textarea {
+    width: 100%;
+    font-family: inherit;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--text-dark);
+    resize: vertical;
+    outline: none;
+}
+
+.drawer-edit-form textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.drawer-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-sm {
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+/* Rodapé de Ações da Gaveta */
+.drawer-footer {
+    padding: 18px 24px;
+    border-top: 1px solid var(--border-light);
+    background: #f8fafc;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.drawer-footer button {
+    flex: 1;
+    min-width: 130px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.btn-mod-ignore {
+    background: var(--white);
+    color: var(--text-dark);
+    border: 1px solid var(--border-light);
+}
+
+.btn-mod-ignore:hover {
+    background: #f1f5f9;
+}
+
+.btn-mod-edit {
+    background: #eff6ff;
+    color: var(--primary);
+    border: 1px solid #bfdbfe;
+}
+
+.btn-mod-edit:hover {
+    background: #dbeafe;
+}
+
+.btn-mod-delete {
+    background: #dc2626;
+    color: var(--white);
+}
+
+.btn-mod-delete:hover {
+    background: #b91c1c;
+}
+
+.drawer-footer button:disabled,
+.drawer-edit-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+@media (max-width: 850px) {
+    .mod-hero {
+        padding: 36px 5% 56px;
+    }
+
+    .mod-hero h1 {
+        font-size: 28px;
+    }
+
+    .mod-workspace {
+        padding: 0 5% 60px;
+    }
+
+    .mod-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mod-card-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-analisar {
+        width: 100%;
+        text-align: center;
+    }
+
+    .mod-drawer {
+        max-width: 100%;
+    }
+}

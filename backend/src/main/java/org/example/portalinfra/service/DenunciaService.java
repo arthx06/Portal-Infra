@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 public class DenunciaService {
@@ -25,10 +25,7 @@ public class DenunciaService {
     private final UsuarioRepository usuarioRepository;
     private final ReclamacaoRepository reclamacaoRepository;
     private final ComentarioRepository comentarioRepository;
-    private final ReclamacaoService reclamacaoService;
-    private final ComentarioService comentarioService;
 
-    // A lista das categorias de denuncia permitidas
     private static final List<String> TIPOS_VALIDOS = List.of(
             "CONTEUDO_SEXUAL",
             "DISCURSO_DE_ODIO",
@@ -42,15 +39,11 @@ public class DenunciaService {
     public DenunciaService(DenunciaRepository denunciaRepository,
                            UsuarioRepository usuarioRepository,
                            ReclamacaoRepository reclamacaoRepository,
-                           ComentarioRepository comentarioRepository,
-                           ReclamacaoService reclamacaoService,
-                           ComentarioService comentarioService) {
+                           ComentarioRepository comentarioRepository) {
         this.denunciaRepository = denunciaRepository;
         this.usuarioRepository = usuarioRepository;
         this.reclamacaoRepository = reclamacaoRepository;
         this.comentarioRepository = comentarioRepository;
-        this.reclamacaoService = reclamacaoService;
-        this.comentarioService = comentarioService;
     }
 
     @Transactional
@@ -76,6 +69,7 @@ public class DenunciaService {
         denuncia.setUsuario(usuario);
         denuncia.setTipo(request.tipo());
         denuncia.setDescricao(request.descricao());
+        denuncia.setStatus("PENDENTE");
 
         if (temReclamacao) {
             Reclamacao reclamacao = reclamacaoRepository.findById(request.reclamacaoId())
@@ -105,21 +99,26 @@ public class DenunciaService {
         return DenunciaResponse.de(salva);
     }
 
-
     // ==========================================
     // LEITURAS PARA O ADMIN (FILAS SEPARADAS)
     // ==========================================
 
+    @Transactional(readOnly = true)
     public List<DenunciaResponse> listarDenunciasDeReclamacoes(Long adminId) {
         verificarAdmin(adminId);
-        return denunciaRepository.findByReclamacaoIsNotNullAndStatusOrderByDataCriacaoAsc("PENDENTE")
-                .stream().map(DenunciaResponse::de).toList();
+        return denunciaRepository.findByReclamacaoIsNotNullOrderByDataCriacaoDesc()
+                .stream()
+                .map(DenunciaResponse::de)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<DenunciaResponse> listarDenunciasDeComentarios(Long adminId) {
         verificarAdmin(adminId);
-        return denunciaRepository.findByComentarioIsNotNullAndStatusOrderByDataCriacaoAsc("PENDENTE")
-                .stream().map(DenunciaResponse::de).toList();
+        return denunciaRepository.findByComentarioIsNotNullOrderByDataCriacaoDesc()
+                .stream()
+                .map(DenunciaResponse::de)
+                .toList();
     }
 
     // ==========================================
@@ -128,50 +127,40 @@ public class DenunciaService {
 
     @Transactional
     public DenunciaResponse resolverDenuncia(Long denunciaId, Long adminId, boolean aceitar) {
-        verificarAdmin(adminId);
+        Usuario admin = verificarAdmin(adminId);
 
         Denuncia denuncia = denunciaRepository.findById(denunciaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Denúncia não encontrada."));
 
-        if (!"PENDENTE".equals(denuncia.getStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Esta denúncia já foi resolvida.");
+        if (!"PENDENTE".equalsIgnoreCase(denuncia.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Esta denúncia já foi concluída.");
         }
+
+        denuncia.setStatus("CONCLUIDA");
+        denuncia.setResolvidoPor(admin);
+        denuncia.setDataResolucao(LocalDateTime.now());
 
         if (aceitar) {
-            denuncia.setStatus("ACEITA");
-
-            // Se o admin aceitou a denúncia, o conteúdo é inválido e deve ser deletado.
-            // Precisamos desvincular a Foreign Key para manter o histórico da denúncia no banco.
-            if (denuncia.getReclamacao() != null) {
-                Long idAlvo = denuncia.getReclamacao().getId();
-                denuncia.setReclamacao(null);
-                denunciaRepository.save(denuncia); // Salva sem a trava de Foreign Key
-
-                reclamacaoService.deletarReclamacaoPeloAdmin(idAlvo, adminId);
-            }
-            else if (denuncia.getComentario() != null) {
-                Long idAlvo = denuncia.getComentario().getId();
-                denuncia.setComentario(null);
-                denunciaRepository.save(denuncia); // Salva sem a trava de Foreign Key
-
-                comentarioService.deletarComentarioPeloAdmin(idAlvo, adminId);
-            }
+            boolean conteudoFoiRemovido = denuncia.getReclamacao() == null && denuncia.getComentario() == null;
+            denuncia.setAcaoTomada(
+                    conteudoFoiRemovido
+                            ? "Conteúdo apagado pelo administrador"
+                            : "Conteúdo editado pelo administrador"
+            );
         } else {
-            // Se a denúncia for falsa/exagerada, apenas a rejeitamos e o conteúdo original fica intacto.
-            denuncia.setStatus("REJEITADA");
-            denunciaRepository.save(denuncia);
+            denuncia.setAcaoTomada("Denúncia improcedente (conteúdo mantido)");
         }
 
-        return DenunciaResponse.de(denuncia);
+        Denuncia salva = denunciaRepository.save(denuncia);
+        return DenunciaResponse.de(salva);
     }
 
-    // Helper method de segurança
-    private void verificarAdmin(Long adminId) {
+    private Usuario verificarAdmin(Long adminId) {
         Usuario admin = usuarioRepository.findById(adminId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
         if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado. Área restrita à moderação.");
         }
+        return admin;
     }
-
 }

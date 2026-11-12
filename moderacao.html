@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel de Moderação - Portal Infra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="moderacao.css" />
+    <script src="api.js" defer></script>
+    <script src="moderacao.js" defer></script>
+</head>
+<body>
+<!-- CABEÇALHO -->
+<header class="header">
+    <a href="index.html" class="logo"><span>Portal</span> Infra</a>
+
+    <nav id="nav-menu">
+        <a href="index.html">Início</a>
+        <a href="reclamacoes.html">Reclamações</a>
+        <a href="moderacao.html" class="active">Moderação</a>
+    </nav>
+
+    <div class="header-actions">
+        <div class="user-menu" id="user-menu" style="display: none">
+            <button
+                    class="user-menu-btn"
+                    id="user-menu-btn"
+                    type="button"
+                    aria-expanded="false"
+            >
+                <span id="nome-usuario">Admin</span>
+                <span class="seta-menu">▼</span>
+            </button>
+
+            <div class="user-dropdown" id="user-dropdown" hidden>
+                <a href="perfil.html">Meu perfil</a>
+                <a href="reclamacoes.html">Reclamações</a>
+                <button type="button" id="btn-sair">Sair</button>
+            </div>
+        </div>
+
+        <button
+                class="menu-toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Abrir menu de navegação"
+                aria-expanded="false"
+        >
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+        </button>
+    </div>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL (oculto até validar ADMIN) -->
+<main id="conteudo-moderacao" style="visibility: hidden">
+    <!-- CABEÇALHO DA PÁGINA -->
+    <section class="mod-hero">
+        <div class="mod-hero-inner">
+            <span class="tag">ADMINISTRAÇÃO & AUDITORIA</span>
+            <h1>Painel de Moderação</h1>
+            <p>
+                Analise denúncias da comunidade, edite conteúdos inadequados ou
+                remova publicações que violem as diretrizes do Portal Infra.
+            </p>
+        </div>
+    </section>
+
+    <!-- CARDS DE RESUMO -->
+    <section class="stats mod-stats">
+        <div class="stat-card">
+            <div class="analise-yel">!</div>
+            <div>
+                <span>Pendentes de análise</span>
+                <h2 id="stat-pendentes">-</h2>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="red-recl">R</div>
+            <div>
+                <span>Reclamações denunciadas</span>
+                <h2 id="stat-reclamacoes">-</h2>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="resolvidas-gre">C</div>
+            <div>
+                <span>Comentários denunciados</span>
+                <h2 id="stat-comentarios">-</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- ÁREA PRINCIPAL DE TRIAGEM -->
+    <section class="mod-workspace">
+        <!-- ABAS -->
+        <div class="mod-tabs" role="tablist">
+            <button
+                    type="button"
+                    class="mod-tab active"
+                    data-tipo="RECLAMACAO"
+                    role="tab"
+                    aria-selected="true"
+            >
+                Reclamações
+                <span class="tab-badge" id="badge-tab-reclamacao">0</span>
+            </button>
+
+            <button
+                    type="button"
+                    class="mod-tab"
+                    data-tipo="COMENTARIO"
+                    role="tab"
+                    aria-selected="false"
+            >
+                Comentários
+                <span class="tab-badge" id="badge-tab-comentario">0</span>
+            </button>
+        </div>
+
+        <!-- BARRA DE PESQUISA E FILTROS -->
+        <div class="mod-toolbar">
+            <div class="mod-search-box">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input
+                        type="text"
+                        id="input-busca"
+                        placeholder="Buscar por ID da denúncia, nome ou e-mail do usuário..."
+                        autocomplete="off"
+                />
+                <button
+                        type="button"
+                        id="btn-limpar-busca"
+                        class="btn-clear-search"
+                        hidden
+                        aria-label="Limpar busca"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div class="mod-filters">
+                <select id="filtro-status" aria-label="Filtrar por status">
+                    <option value="PENDENTE" selected>Status: Pendentes</option>
+                    <option value="CONCLUIDA">Status: Concluídas</option>
+                    <option value="TODAS">Status: Todas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- FEEDBACK DE CARREGAMENTO / LISTA DE CARDS -->
+        <div id="mod-feedback" class="mod-feedback" hidden></div>
+
+        <div id="lista-denuncias" class="mod-list"></div>
+
+        <!-- BOTÃO CARREGAR MAIS -->
+        <div class="mod-load-more-wrap" id="wrap-carregar-mais" hidden>
+            <button type="button" id="btn-carregar-mais" class="btn-secondary">
+                Carregar mais denúncias
+            </button>
+        </div>
+    </section>
+</main>
+
+<!-- OVERLAY E GAVETA LATERAL (DRAWER) DE DETALHES -->
+<div id="drawer-overlay" class="drawer-overlay" hidden></div>
+
+<aside
+        id="mod-drawer"
+        class="mod-drawer"
+        aria-hidden="true"
+        aria-labelledby="drawer-titulo"
+>
+    <div class="drawer-header">
+        <div>
+            <span class="drawer-id" id="drawer-id">Denúncia #0</span>
+            <h2 id="drawer-titulo">Detalhes da Denúncia</h2>
+        </div>
+        <button
+                type="button"
+                id="btn-fechar-drawer"
+                class="drawer-close"
+                aria-label="Fechar painel lateral"
+        >
+            ✕
+        </button>
+    </div>
+
+    <div class="drawer-body" id="drawer-body">
+        <!-- Status e Auditoria (quando concluída) -->
+        <div id="drawer-auditoria-box" class="drawer-auditoria" hidden></div>
+
+        <!-- Dados da Pessoa Denunciada -->
+        <div class="drawer-section">
+            <h3>Usuário Denunciado</h3>
+            <div class="drawer-user-card">
+                <div class="drawer-avatar" id="drawer-user-avatar">U</div>
+                <div class="drawer-user-info">
+                    <strong id="drawer-user-nome">-</strong>
+                    <span id="drawer-user-email">-</span>
+                    <small id="drawer-user-id">ID do Usuário: -</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivo da Denúncia -->
+        <div class="drawer-section">
+            <h3>Motivo da Denúncia</h3>
+            <div class="drawer-motivo-box">
+                <span class="motivo-tag" id="drawer-motivo-categoria">-</span>
+                <p id="drawer-motivo-descricao">-</p>
+                <small id="drawer-denunciante-info">-</small>
+            </div>
+        </div>
+
+        <!-- Conteúdo Denunciado (Visualização e Edição) -->
+        <div class="drawer-section">
+            <div class="drawer-section-header">
+                <h3 id="drawer-conteudo-label">Conteúdo Denunciado</h3>
+                <a
+                        id="drawer-link-original"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="drawer-ext-link"
+                >
+                    Ver na página ↗
+                </a>
+            </div>
+
+            <!-- Modo Leitura -->
+            <div id="drawer-view-mode" class="drawer-content-box">
+                <h4 id="drawer-item-titulo" hidden></h4>
+                <p id="drawer-item-texto">-</p>
+                <div id="drawer-item-meta" class="drawer-item-meta"></div>
+            </div>
+
+            <!-- Modo Edição -->
+            <form id="drawer-edit-form" class="drawer-edit-form" hidden>
+                <div class="input-group" id="grupo-edit-titulo" hidden>
+                    <label for="edit-titulo">Título da Reclamação</label>
+                    <input type="text" id="edit-titulo" maxlength="150" />
+                </div>
+
+                <div class="input-group">
+                    <label for="edit-texto" id="label-edit-texto">Texto do Conteúdo</label>
+                    <textarea id="edit-texto" rows="5" required></textarea>
+                </div>
+
+                <div class="drawer-edit-actions">
+                    <button
+                            type="button"
+                            id="btn-cancelar-edicao"
+                            class="btn-secondary btn-sm"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                            type="submit"
+                            id="btn-salvar-edicao"
+                            class="btn-primary btn-sm"
+                    >
+                        Salvar edição e concluir
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rodapé de Ações do Administrador -->
+    <div class="drawer-footer" id="drawer-footer">
+        <button
+                type="button"
+                id="btn-ignorar-denuncia"
+                class="btn-mod-ignore"
+        >
+            Ignorar denúncia
+        </button>
+
+        <button
+                type="button"
+                id="btn-ativar-edicao"
+                class="btn-mod-edit"
+        >
+            Editar conteúdo
+        </button>
+
+        <button
+                type="button"
+                id="btn-excluir-conteudo"
+                class="btn-mod-delete"
+        >
+            Apagar por completo
+        </button>
+    </div>
+</aside>
+
+<!-- RODAPÉ -->
+<footer>
+    <div class="logo"><span>Portal</span> Infra</div>
+    <p>Painel Administrativo — Moderação de Conteúdo Urbano.</p>
+    <span>© 2026 SP em Foco</span>
+</footer>
+</body>
+</html>
