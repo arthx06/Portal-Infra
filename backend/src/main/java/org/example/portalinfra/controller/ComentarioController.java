@@ -1,9 +1,9 @@
 package org.example.portalinfra.controller;
 
+import org.example.portalinfra.config.SessaoUtil;
 import org.example.portalinfra.dto.ComentarioRequest;
 import org.example.portalinfra.dto.ComentarioResponse;
 import org.example.portalinfra.service.ComentarioService;
-import org.example.portalinfra.config.SessaoUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +23,29 @@ public class ComentarioController {
         this.comentarioService = comentarioService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ComentarioResponse> criar(
+    // Rota 1: caso o front envie o ID na URL (/comentarios/reclamacao/{reclamacaoId})
+    @PostMapping(value = "/reclamacao/{reclamacaoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ComentarioResponse> criarNaReclamacao(
+            @PathVariable Long reclamacaoId,
             Authentication auth,
             @RequestPart("dados") ComentarioRequest request,
             @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
         Long usuarioId = SessaoUtil.idLogado(auth);
-        ComentarioResponse response = comentarioService.criar(request, foto, usuarioId);
+        ComentarioResponse response = comentarioService.criar(usuarioId, reclamacaoId, request, foto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Rota 2: caso o front envie o reclamacaoId como parâmetro no FormData (/comentarios)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ComentarioResponse> criar(
+            @RequestParam("reclamacaoId") Long reclamacaoId,
+            Authentication auth,
+            @RequestPart("dados") ComentarioRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+
+        Long usuarioId = SessaoUtil.idLogado(auth);
+        ComentarioResponse response = comentarioService.criar(usuarioId, reclamacaoId, request, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -39,7 +39,7 @@ public class ReclamacaoController {
     // ==========================================
 
     @GetMapping("/contagem")
-    public ResponseEntity> contagem() {
+    public ResponseEntity<?> contagem() {
         return ResponseEntity.ok(Map.of(
                 "total", reclamacaoRepository.count(),
                 "pendentes", reclamacaoRepository.countByStatusIgnoreCase("Pendente"),
@@ -158,7 +158,7 @@ public class ReclamacaoController {
     }
 
     @PostMapping("/admin/geocodificar-pendentes")
-    public ResponseEntity> geocodificarPendentes(Authentication auth) {
+    public ResponseEntity<?> geocodificarPendentes(Authentication auth) {
         return ResponseEntity.ok(reclamacaoService.geocodificarReclamacoesPendentes(
                 SessaoUtil.idLogado(auth)
         ));
