@@ -6,6 +6,12 @@
 
     <title>Nova Reclamação | Portal Infra</title>
 
+    <script>
+      if (!localStorage.getItem("token")) {
+        window.location.replace("login.html?redirect=nova-reclamacao.html");
+      }
+    </script>
+
     <!-- Adicionando a fonte Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

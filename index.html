@@ -1,181 +1,181 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portal Infra</title>
-    <!-- Adicionando a fonte Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <script src="api.js" defer></script>
-    <script src="scriptindex.js" defer></script>
-  </head>
-  <body>
-    <!-- CABEÇALHO -->
-    <header class="header">
-      <div class="logo"><span>Portal</span> Infra</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Infra</title>
+  <!-- Adicionando a fonte Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+  <script src="api.js" defer></script>
+  <script src="scriptindex.js" defer></script>
+</head>
+<body>
+<!-- CABEÇALHO -->
+<header class="header">
+  <div class="logo"><span>Portal</span> Infra</div>
 
-      <nav id="nav-menu">
-        <a href="#" class="active">Início</a>
-        <a href="#">Mapa</a>
+  <nav id="nav-menu">
+    <a href="#" class="active">Início</a>
+    <a href="#">Mapa</a>
+    <a href="reclamacoes.html">Reclamações</a>
+    <a href="#">Sobre</a>
+  </nav>
+
+  <div class="header-actions">
+    <!-- Área do usuário -->
+    <div class="user-menu" id="user-menu" style="display: none">
+      <button
+              class="user-menu-btn"
+              id="user-menu-btn"
+              type="button"
+              aria-expanded="false"
+      >
+        <span id="nome-usuario">Usuário</span>
+        <span class="seta-menu">▼</span>
+      </button>
+
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="perfil.html">Meu perfil</a>
         <a href="reclamacoes.html">Reclamações</a>
-        <a href="#">Sobre</a>
-      </nav>
-
-      <div class="header-actions">
-        <!-- Área do usuário -->
-        <div class="user-menu" id="user-menu" style="display: none">
-          <button
-            class="user-menu-btn"
-            id="user-menu-btn"
-            type="button"
-            aria-expanded="false"
-          >
-            <span id="nome-usuario">Usuário</span>
-            <span class="seta-menu">▼</span>
-          </button>
-
-          <div class="user-dropdown" id="user-dropdown" hidden>
-            <a href="perfil.html">Meu perfil</a>
-            <a href="reclamacoes.html">Reclamações</a>
-            <button type="button" id="btn-sair">Sair</button>
-          </div>
-        </div>
-      
-        <a href="login.html" id="btn-entrar">
-          <button class="btn-login" type="button">Entrar</button>
-        </a>
-
-        <!-- Botão Menu Mobile (Hambúrguer) -->
-        <button
-          class="menu-toggle"
-          id="menu-toggle"
-          type="button"
-          aria-label="Abrir menu de navegação"
-          aria-expanded="false"
-        >
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-        </button>
+        <button type="button" id="btn-sair">Sair</button>
       </div>
-    </header>
+    </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main>
-      <!-- HERO -->
-      <section class="hero">
-        <div class="hero-text">
-          <span class="tag">INFRAESTRUTURA DE SÃO PAULO</span>
-          <h1>
-            Ajude a melhorar
-            <strong>São Paulo</strong>
-          </h1>
-          <p>
-            Encontre problemas de infraestrutura na cidade ou registre uma nova
-            reclamação.
-          </p>
+    <a href="login.html" id="btn-entrar">
+      <button class="btn-login" type="button">Entrar</button>
+    </a>
 
-          <div class="hero-buttons">
-            <a href="nova-reclamacao.html">
-              <button class="btn-primary">+ Registrar problema</button>
-            </a>
-            <button class="btn-secondary">Ver mapa</button>
-          </div>
-        </div>
-      </section>
+    <!-- Botão Menu Mobile (Hambúrguer) -->
+    <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Abrir menu de navegação"
+            aria-expanded="false"
+    >
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+  </div>
+</header>
 
-      <!-- ESTATÍSTICAS -->
-      <section class="stats">
-        <div class="stat-card">
-          <div class="red-recl">!</div>
-          <div>
-            <span>Total de reclamações</span>
-            <h2 id="count-total">-</h2>
-          </div>
-        </div>
+<!-- CONTEÚDO PRINCIPAL -->
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="tag">INFRAESTRUTURA DE SÃO PAULO</span>
+      <h1>
+        Ajude a melhorar
+        <strong>São Paulo</strong>
+      </h1>
+      <p>
+        Encontre problemas de infraestrutura na cidade ou registre uma nova
+        reclamação.
+      </p>
 
-        <div class="stat-card">
-          <div class="analise-yel">?</div>
-          <div>
-            <span>Pendentes</span>
-            <h2 id="count-pendentes">-</h2>
-          </div>
-        </div>
+      <div class="hero-buttons">
+        <a href="nova-reclamacao.html" data-acao="nova-reclamacao">
+          <button class="btn-primary" type="button">+ Registrar problema</button>
+        </a>
+        <button class="btn-secondary" type="button">Ver mapa</button>
+      </div>
+    </div>
+  </section>
 
-        <div class="stat-card">
-          <div class="resolvidas-gre">OK</div>
-          <div>
-            <span>Resolvidas</span>
-            <h2 id="count-resolvidas">-</h2>
-          </div>
-        </div>
-      </section>
+  <!-- ESTATÍSTICAS -->
+  <section class="stats">
+    <div class="stat-card">
+      <div class="red-recl">!</div>
+      <div>
+        <span>Total de reclamações</span>
+        <h2 id="count-total">-</h2>
+      </div>
+    </div>
 
-      <!-- MAPA -->
-      <section class="map-section">
-        <div class="section-title">
-          <div>
-            <span class="small-title">LOCALIZAÇÃO</span>
-            <h2>Problemas pela cidade</h2>
-          </div>
-          <button class="see-map">Ver mapa completo</button>
-        </div>
+    <div class="stat-card">
+      <div class="analise-yel">?</div>
+      <div>
+        <span>Pendentes</span>
+        <h2 id="count-pendentes">-</h2>
+      </div>
+    </div>
 
-        <div class="map" id="map">
-          <!-- Conteúdo do mapa inserido pelo JS -->
-        </div>
+    <div class="stat-card">
+      <div class="resolvidas-gre">OK</div>
+      <div>
+        <span>Resolvidas</span>
+        <h2 id="count-resolvidas">-</h2>
+      </div>
+    </div>
+  </section>
 
-        <!-- LEGENDA -->
-        <div class="legend">
-          <div><span class="legend-dot red-dot"></span> Buraco / asfalto</div>
-          <div><span class="legend-dot yellow-dot"></span> Iluminação</div>
-          <div><span class="legend-dot green-dot"></span> Árvores</div>
-          <div><span class="legend-dot blue-dot"></span> Outros</div>
-        </div>
-      </section>
+  <!-- MAPA -->
+  <section class="map-section">
+    <div class="section-title">
+      <div>
+        <span class="small-title">LOCALIZAÇÃO</span>
+        <h2>Problemas pela cidade</h2>
+      </div>
+      <button class="see-map" type="button">Ver mapa completo</button>
+    </div>
 
-      <!-- RECLAMAÇÕES RECENTES -->
-      <section class="complaints">
-        <div class="section-title">
-          <div>
-            <span class="small-title">RECENTES</span>
-            <h2>Últimas reclamações</h2>
-          </div>
-          <button class="see-map">Ver todas</button>
-        </div>
+    <div class="map" id="map">
+      <!-- Conteúdo do mapa inserido pelo JS -->
+    </div>
 
-        <div class="complaint-list">
-          <!-- Conteúdo das reclamações inserido pelo JS -->
-           <div class="complaint-list" id="lista-recentes"></div>
-        </div>
-      </section>
+    <!-- LEGENDA -->
+    <div class="legend">
+      <div><span class="legend-dot red-dot"></span> Buraco / asfalto</div>
+      <div><span class="legend-dot yellow-dot"></span> Iluminação</div>
+      <div><span class="legend-dot green-dot"></span> Árvores</div>
+      <div><span class="legend-dot blue-dot"></span> Outros</div>
+    </div>
+  </section>
 
-      <!-- CTA -->
-      <section class="cta">
-        <div>
-          <h2>Encontrou um problema?</h2>
-          <p>
-            Registre uma reclamação e ajude a identificar problemas de
-            infraestrutura na cidade.
-          </p>
-        </div>
-        <button class="btn-primary cta-btn">Registrar problema</button>
-      </section>
-    </main>
+  <!-- RECLAMAÇÕES RECENTES -->
+  <section class="complaints">
+    <div class="section-title">
+      <div>
+        <span class="small-title">RECENTES</span>
+        <h2>Últimas reclamações</h2>
+      </div>
+      <button class="see-map" type="button">Ver todas</button>
+    </div>
 
-    <!-- RODAPÉ -->
-    <footer>
-      <div class="logo"><span>Portal</span> Infra</div>
-      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
-      <span>© 2026 SP em Foco</span>
-    </footer>
+    <div class="complaint-list">
+      <!-- Conteúdo das reclamações inserido pelo JS -->
+      <div class="complaint-list" id="lista-recentes"></div>
+    </div>
+  </section>
 
+  <!-- CTA -->
+  <section class="cta">
+    <div>
+      <h2>Encontrou um problema?</h2>
+      <p>
+        Registre uma reclamação e ajude a identificar problemas de
+        infraestrutura na cidade.
+      </p>
+    </div>
+    <button class="btn-primary cta-btn" type="button" data-acao="nova-reclamacao">
+      Registrar problema
+    </button>
+  </section>
+</main>
 
-  </body>
+<!-- RODAPÉ -->
+<footer>
+  <div class="logo"><span>Portal</span> Infra</div>
+  <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+  <span>© 2026 SP em Foco</span>
+</footer>
+</body>
 </html>

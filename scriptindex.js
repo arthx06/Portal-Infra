@@ -1,20 +1,17 @@
-
 async function carregarContagem() {
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
-    if (!res.ok) return;
-    const d = await res.json();
-    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('count-total', d.total);
-    set('count-pendentes', d.pendentes);
-    set('count-resolvidas', d.resolvidas);
-  } catch (e) {
-    console.error('Erro ao carregar contagem', e);
-  }
+    try {
+        const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
+        if (!res.ok) return;
+        const d = await res.json();
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('count-total', d.total);
+        set('count-pendentes', d.pendentes);
+        set('count-resolvidas', d.resolvidas);
+    } catch (e) {
+        console.error('Erro ao carregar contagem', e);
+    }
 }
 carregarContagem();
-
-
 
 document.addEventListener("DOMContentLoaded", async function () {
 
@@ -25,8 +22,43 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dropdown = document.getElementById("user-dropdown");
     const botaoSair = document.getElementById("btn-sair");
 
+    let sessaoVerificada = false;
+    const promessaSessao = obterDadosSessao();
+
+    // Intercepta todos os botões/links de "Registrar problema" (Hero e CTA)
+    document.querySelectorAll('[data-acao="nova-reclamacao"], a[href="nova-reclamacao.html"]').forEach((elemento) => {
+        elemento.addEventListener("click", async function (event) {
+            event.preventDefault();
+
+            let usuario = window.usuarioAtual;
+
+            if (!sessaoVerificada) {
+                const botao = elemento.tagName === "BUTTON" ? elemento : elemento.querySelector("button");
+                const textoOriginal = botao ? botao.textContent : "";
+                if (botao) {
+                    botao.disabled = true;
+                    botao.textContent = "Verificando...";
+                }
+
+                usuario = await promessaSessao;
+
+                if (botao) {
+                    botao.disabled = false;
+                    botao.textContent = textoOriginal;
+                }
+            }
+
+            if (usuario) {
+                window.location.href = "nova-reclamacao.html";
+            } else {
+                window.location.href = "login.html?redirect=nova-reclamacao.html";
+            }
+        });
+    });
+
     // Consulta os dados atualizados da sessão
-    const usuario = await obterDadosSessao();
+    const usuario = await promessaSessao;
+    sessaoVerificada = true;
 
     const logado = usuario !== null;
     const isAdmin = logado && usuario.tipo === "ADMIN";
@@ -61,8 +93,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("Usuário autenticado:", usuario);
     console.log("Administrador:", isAdmin);
-
-
 
     // Abre e fecha o menu
     if (botaoMenu && dropdown) {
@@ -109,6 +139,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 console.error("Erro ao encerrar sessão:", error);
             }
 
+            window.usuarioAtual = null;
             localStorage.removeItem("usuario");
             window.location.href = "index.html";
 
@@ -118,20 +149,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 });
 
-
-// se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function criarItemRecente(r) {
-  const resolvida = (r.status || '').toLowerCase().startsWith('resolvid');
-  const icone = resolvida
-    ? '<div class="resolvidas-gre">OK</div>'
-    : '<div class="red-recl">!</div>';
-  const classe = resolvida ? 'resolved' : 'pending';
-  const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+    const resolvida = (r.status || '').toLowerCase().startsWith('resolvid');
+    const icone = resolvida
+        ? '<div class="resolvidas-gre">OK</div>'
+        : '<div class="red-recl">!</div>';
+    const classe = resolvida ? 'resolved' : 'pending';
+    const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
 
-  return `
+    return `
     <article class="complaint">
       ${icone}
       <div class="complaint-info">
@@ -152,33 +181,33 @@ function criarItemRecente(r) {
 }
 
 async function carregarRecentes() {
-  const lista = document.getElementById('lista-recentes');
-  if (!lista) return;
+    const lista = document.getElementById('lista-recentes');
+    if (!lista) return;
 
-  lista.addEventListener("click", function (event) {
-    const botao = event.target.closest(".arrow");
+    lista.addEventListener("click", function (event) {
+        const botao = event.target.closest(".arrow");
 
-    if (!botao) return;
+        if (!botao) return;
 
-    const id = botao.dataset.id;
+        const id = botao.dataset.id;
 
-    if (id) {
-        window.location.href =
-            `detalhe-reclamacao.html?id=${id}&origem=index.html`;
+        if (id) {
+            window.location.href =
+                `detalhe-reclamacao.html?id=${id}&origem=index.html`;
+        }
+    });
+
+    try {
+        const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
+        if (!res.ok) return;
+        const pagina = await res.json();
+
+        lista.innerHTML = pagina.content.length === 0
+            ? '<p>Nenhuma reclamação registrada ainda.</p>'
+            : pagina.content.map(criarItemRecente).join('');
+    } catch (e) {
+        console.error('Erro ao carregar últimas reclamações', e);
     }
-});
-
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
-    if (!res.ok) return;
-    const pagina = await res.json();
-
-    lista.innerHTML = pagina.content.length === 0
-      ? '<p>Nenhuma reclamação registrada ainda.</p>'
-      : pagina.content.map(criarItemRecente).join('');
-  } catch (e) {
-    console.error('Erro ao carregar últimas reclamações', e);
-  }
 }
 carregarRecentes();
 
@@ -209,7 +238,6 @@ async function carregarGoogleMaps() {
     }
 }
 
-
 // Normaliza o texto para facilitar a comparação das categorias
 function normalizarTexto(texto) {
     return String(texto || "")
@@ -218,7 +246,6 @@ function normalizarTexto(texto) {
         .toLowerCase()
         .trim();
 }
-
 
 // Define a cor de cada reclamação
 function definirCorMarcador(reclamacao) {
@@ -241,7 +268,6 @@ function definirCorMarcador(reclamacao) {
 
     return cores[categoria] || "#64748b";
 }
-
 
 // Busca todas as reclamações no backend
 async function carregarReclamacoesMapa() {
@@ -279,13 +305,12 @@ async function carregarReclamacoesMapa() {
     }
 }
 
-
 // Cria os marcadores no Google Maps
 function adicionarMarcadores(reclamacoes) {
     const janelaInfo = new google.maps.InfoWindow();
 
     reclamacoes.forEach(reclamacao => {
-     
+
         if (
             reclamacao.latitude == null ||
             reclamacao.longitude == null
@@ -345,7 +370,6 @@ function adicionarMarcadores(reclamacoes) {
     });
 }
 
-
 // Inicialização do mapa
 function initMap() {
     const saoPaulo = {
@@ -363,6 +387,5 @@ function initMap() {
 
     carregarReclamacoesMapa();
 }
-
 
 carregarGoogleMaps();
