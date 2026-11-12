@@ -5,8 +5,6 @@ document.getElementById("btnVoltar")?.addEventListener("click", function () {
         window.location.href = "index.html";
     }
 });
- 
-
 
 function mostrarTotal(total) {
   const el = document.getElementById('count-resultados');
@@ -29,7 +27,6 @@ async function carregarTotal() {
     console.error('Erro ao carregar total', e);
   }
 }
-
 
 let filtroAtual = new URLSearchParams();
 
@@ -60,7 +57,9 @@ document.getElementById('filtro-busca')?.addEventListener('keydown', (e) => {
 
 let paginaAtual = 0;
 
-let usuarioLogadoId = null;
+let usuarioLogadoId = (typeof obterUsuarioCache === 'function' && obterUsuarioCache()?.id)
+    ? obterUsuarioCache().id
+    : null;
 
 async function carregarUsuarioSessao() {
     try {
@@ -215,9 +214,6 @@ async function carregarReclamacoes() {
       lista.insertAdjacentHTML('beforeend', pagina.content.map(criarCard).join(''));
     }
 
-    // opcional: mostra no .results quantas bateram com o filtro
-    // mostrarTotal(pagina.totalElements ?? 0);
-
     if (btn) btn.hidden = pagina.content.length < TAMANHO_PAGINA;
     paginaAtual++;
   } catch (e) {
@@ -285,9 +281,14 @@ async function estaLogado() {
         return false;
     }
 }
+
 async function carregarComentarios(reclamacaoId) {
     const container = document.getElementById("lista-comentarios");
     if (!container) return;
+
+    if (usuarioLogadoId == null) {
+        await carregarUsuarioSessao();
+    }
 
     try {
         const resposta = await fetch(`${API_BASE}/comentarios/reclamacao/${reclamacaoId}`);
@@ -314,8 +315,23 @@ async function carregarComentarios(reclamacaoId) {
 function criarElementoComentario(comentario, reclamacaoId) {
     const div = document.createElement("div");
     div.className = "comentario-item";
+    div.id = `comentario-${comentario.id}`;
 
     const dataFormatada = comentario.dataCriacao ? new Date(comentario.dataCriacao).toLocaleDateString("pt-BR") : "";
+
+    const ehDono = usuarioLogadoId != null &&
+        comentario.usuarioId != null &&
+        String(usuarioLogadoId) === String(comentario.usuarioId);
+
+    const botaoDenunciar = ehDono ? '' : `
+        <button
+            type="button"
+            class="btn-denunciar-comentario"
+            title="Denunciar este comentário"
+            onclick="abrirModalDenunciaComentario(${comentario.id})">
+            🚩 Denunciar
+        </button>
+    `;
 
     div.innerHTML = `
         <div class="comentario-header">
@@ -323,7 +339,10 @@ function criarElementoComentario(comentario, reclamacaoId) {
             <span class="comentario-data" style="color: #888; font-size: 11px; margin-left: 8px;">${dataFormatada}</span>
         </div>
         <div class="comentario-texto">${esc(comentario.texto)}</div>
-        <button class="btn-responder" onclick="mostrarFormularioResposta(${comentario.id}, ${reclamacaoId})">Responder</button>
+        <div class="comentario-acoes">
+            <button class="btn-responder" type="button" onclick="mostrarFormularioResposta(${comentario.id}, ${reclamacaoId})">Responder</button>
+            ${botaoDenunciar}
+        </div>
         <div id="caixa-resposta-${comentario.id}" style="display: none; margin-top: 8px;"></div>
         <div class="respostas-container" id="respostas-${comentario.id}"></div>
     `;
@@ -404,7 +423,7 @@ function fecharModalComentarios() {
 }
 
 async function enviarComentarioPrincipal() {
-      if (!(await estaLogado())) {
+    if (!(await estaLogado())) {
         alert("Você precisa estar logado para comentar!");
         return;
     }
@@ -431,3 +450,238 @@ async function enviarComentarioPrincipal() {
         alert("Erro ao publicar comentário.");
     }
 }
+
+// =====================================================
+// SISTEMA DE DENÚNCIA DE COMENTÁRIOS (DenunciaService.java)
+// Opções: CONTEUDO_SEXUAL, DISCURSO_DE_ODIO, PALAVRAS_DE_BAIXO_CALAO,
+// CONTEUDO_FALSO, SPAM, VENDA_OU_SERVICOS, OUTROS
+// =====================================================
+
+function garantirModalDenunciaExiste() {
+    if (document.getElementById("modal-denuncia-comentario")) return;
+
+    const modalHtml = `
+    <div id="modal-denuncia-comentario" class="modal-denuncia" style="display: none;">
+      <div class="modal-denuncia-overlay" onclick="fecharModalDenunciaComentario()"></div>
+      <div class="modal-denuncia-card" role="dialog" aria-modal="true" aria-labelledby="modal-denuncia-titulo">
+        <div class="modal-denuncia-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🚩</span>
+            <h3 id="modal-denuncia-titulo">Denunciar Comentário</h3>
+          </div>
+          <button type="button" class="btn-fechar-modal-denuncia" onclick="fecharModalDenunciaComentario()" aria-label="Fechar">&times;</button>
+        </div>
+
+        <form id="form-denuncia-comentario" onsubmit="enviarDenunciaComentario(event)">
+          <input type="hidden" id="denuncia-comentario-id" value="" />
+
+          <p class="modal-denuncia-instrucao">
+            Por favor, selecione a categoria que melhor descreve o motivo da denúncia:
+          </p>
+
+          <div class="modal-denuncia-opcoes">
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="CONTEUDO_SEXUAL" required />
+              <div>
+                <strong>Conteúdo sexual</strong>
+                <small>Nudez, pornografia ou atos sexuais explícitos.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="DISCURSO_DE_ODIO" />
+              <div>
+                <strong>Discurso de ódio</strong>
+                <small>Ataques, intolerância ou discriminação por qualquer motivo.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="PALAVRAS_DE_BAIXO_CALAO" />
+              <div>
+                <strong>Palavras de baixo calão</strong>
+                <small>Ofensas, xingamentos, ameaças ou agressões verbais.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="CONTEUDO_FALSO" />
+              <div>
+                <strong>Conteúdo falso</strong>
+                <small>Desinformação deliberada, mentiras ou boatos.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="SPAM" />
+              <div>
+                <strong>Spam</strong>
+                <small>Publicações repetitivas, links suspeitos ou irrelevantes.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="VENDA_OU_SERVICOS" />
+              <div>
+                <strong>Venda ou serviços</strong>
+                <small>Divulgação comercial, autopromoção ou comércio não autorizado.</small>
+              </div>
+            </label>
+
+            <label class="modal-denuncia-opcao">
+              <input type="radio" name="tipoDenuncia" value="OUTROS" />
+              <div>
+                <strong>Outros</strong>
+                <small>Outras infrações às diretrizes da comunidade.</small>
+              </div>
+            </label>
+          </div>
+
+          <div class="modal-denuncia-campo">
+            <label for="denuncia-descricao">Detalhes adicionais (opcional):</label>
+            <textarea
+              id="denuncia-descricao"
+              placeholder="Descreva com mais detalhes o problema ocorrido..."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div id="denuncia-feedback-erro" class="modal-denuncia-erro" style="display: none;"></div>
+
+          <div class="modal-denuncia-acoes">
+            <button type="button" class="btn-cancelar-denuncia" onclick="fecharModalDenunciaComentario()">Cancelar</button>
+            <button type="submit" class="btn-confirmar-denuncia" id="btn-enviar-denuncia">Enviar denúncia</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
+}
+
+async function abrirModalDenunciaComentario(comentarioId) {
+    if (!(await estaLogado())) {
+        alert("Você precisa estar logado para denunciar um comentário!");
+        return;
+    }
+
+    garantirModalDenunciaExiste();
+
+    const inputId = document.getElementById("denuncia-comentario-id");
+    const campoDescricao = document.getElementById("denuncia-descricao");
+    const erroEl = document.getElementById("denuncia-feedback-erro");
+    const radios = document.getElementsByName("tipoDenuncia");
+
+    if (inputId) inputId.value = comentarioId;
+    if (campoDescricao) campoDescricao.value = "";
+    if (erroEl) {
+        erroEl.style.display = "none";
+        erroEl.textContent = "";
+    }
+    radios.forEach(r => (r.checked = false));
+
+    const modal = document.getElementById("modal-denuncia-comentario");
+    if (modal) {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function fecharModalDenunciaComentario() {
+    const modal = document.getElementById("modal-denuncia-comentario");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
+}
+
+async function enviarDenunciaComentario(event) {
+    if (event) event.preventDefault();
+
+    const inputId = document.getElementById("denuncia-comentario-id");
+    const comentarioId = inputId ? inputId.value : null;
+    const radios = document.getElementsByName("tipoDenuncia");
+    let tipoSelecionado = null;
+
+    for (const r of radios) {
+        if (r.checked) {
+            tipoSelecionado = r.value;
+            break;
+        }
+    }
+
+    const erroEl = document.getElementById("denuncia-feedback-erro");
+    const mostrarErro = (msg) => {
+        if (erroEl) {
+            erroEl.textContent = msg;
+            erroEl.style.display = "block";
+        } else {
+            alert(msg);
+        }
+    };
+
+    if (!tipoSelecionado) {
+        mostrarErro("Selecione um tipo de denúncia.");
+        return;
+    }
+
+    const campoDescricao = document.getElementById("denuncia-descricao");
+    const descricao = campoDescricao ? campoDescricao.value.trim() : "";
+
+    const btnEnviar = document.getElementById("btn-enviar-denuncia");
+    if (btnEnviar) {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = "Enviando...";
+    }
+
+    try {
+        const resposta = await apiFetch("/denuncias", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                comentarioId: Number(comentarioId),
+                tipo: tipoSelecionado,
+                descricao: descricao || null
+            })
+        });
+
+        if (resposta.ok) {
+            alert("Denúncia enviada com sucesso! Nossa equipe de moderação irá analisar o comentário.");
+            fecharModalDenunciaComentario();
+            return;
+        }
+
+        let mensagem = "Não foi possível enviar a denúncia.";
+        try {
+            const dadosErro = await resposta.json();
+            mensagem = dadosErro.message || dadosErro.erro || mensagem;
+        } catch (_) {}
+
+        if (resposta.status === 409) {
+            mensagem = "Você já denunciou este comentário anteriormente.";
+        } else if (resposta.status === 401) {
+            mensagem = "Você precisa estar logado para denunciar um comentário.";
+        } else if (resposta.status === 400 && mensagem.includes("próprio")) {
+            mensagem = "Você não pode denunciar o seu próprio comentário.";
+        }
+
+        mostrarErro(mensagem);
+    } catch (err) {
+        console.error("Erro ao enviar denúncia:", err);
+        mostrarErro("Erro de comunicação com o servidor. Tente novamente.");
+    } finally {
+        if (btnEnviar) {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = "Enviar denúncia";
+        }
+    }
+}
+
+window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        fecharModalDenunciaComentario();
+    }
+});

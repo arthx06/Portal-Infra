@@ -411,6 +411,11 @@ nav .active::after {
   border-bottom: none;
 }
 
+.comentario-header {
+  display: flex;
+  align-items: center;
+}
+
 .comentario-autor {
   font-weight: 700;
   font-size: 14px;
@@ -822,4 +827,263 @@ footer .logo span {
   .acoes-reclamacao button {
     min-height: 40px;
   }
+}
+
+/* =====================================================
+   BOTÃO E MODAL DE DENÚNCIA DE COMENTÁRIOS
+   ===================================================== */
+.comentario-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.btn-denunciar-comentario {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-denunciar-comentario:hover {
+  color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.modal-denuncia {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modal-denuncia-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.modal-denuncia-card {
+  position: relative;
+  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  border-radius: 16px;
+  padding: 24px;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 2001;
+  box-sizing: border-box;
+  animation: modalDenunciaFadeIn 0.2s ease-out;
+}
+
+@keyframes modalDenunciaFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-denuncia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.modal-denuncia-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.btn-fechar-modal-denuncia {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: 0.15s;
+}
+
+.btn-fechar-modal-denuncia:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.modal-denuncia-instrucao {
+  font-size: 13px;
+  color: #475569;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.modal-denuncia-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.modal-denuncia-opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f8fafc;
+}
+
+.modal-denuncia-opcao:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.modal-denuncia-opcao input[type="radio"] {
+  margin-top: 3px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.modal-denuncia-opcao strong {
+  display: block;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.modal-denuncia-opcao small {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.modal-denuncia-campo {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-denuncia-campo label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.modal-denuncia-campo textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-denuncia-campo textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.modal-denuncia-erro {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  border: 1px solid #fecaca;
+  margin-top: 8px;
+}
+
+.modal-denuncia-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancelar-denuncia {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+  font-family: inherit;
+}
+
+.btn-cancelar-denuncia:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.btn-confirmar-denuncia {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s;
+  font-family: inherit;
+}
+
+.btn-confirmar-denuncia:hover {
+  background: #b91c1c;
+}
+
+.btn-confirmar-denuncia:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
