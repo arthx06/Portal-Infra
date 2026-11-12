@@ -10,6 +10,16 @@ const estadoModeracao = {
     denunciaSelecionada: null,
 };
 
+const LABELS_TIPO_DENUNCIA = {
+    CONTEUDO_SEXUAL: "Conteúdo sexual",
+    DISCURSO_DE_ODIO: "Discurso de ódio",
+    PALAVRAS_DE_BAIXO_CALAO: "Palavras de baixo calão",
+    CONTEUDO_FALSO: "Conteúdo falso",
+    SPAM: "Spam",
+    VENDA_OU_SERVICOS: "Venda ou serviços",
+    OUTROS: "Outros",
+};
+
 const esc = (texto) =>
     String(texto ?? "").replace(/[&<>"']/g, (c) =>
         ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
@@ -26,81 +36,50 @@ function formatarDataHora(iso) {
     });
 }
 
-/**
- * Normaliza o DTO DenunciaResponse vindo do Spring Boot para um formato único na UI,
- * tolerando variações de nomes de campos até atualizarmos a entidade Denuncia.
- */
-function normalizarDenuncia(raw, tipo) {
+function formatarTipoDenuncia(tipoRaw) {
+    if (!tipoRaw) return "Denúncia";
+    const chave = String(tipoRaw).toUpperCase().trim();
+    return LABELS_TIPO_DENUNCIA[chave] || tipoRaw;
+}
+
+function normalizarDenuncia(raw, alvoTipo) {
     const statusBruto = String(raw.status || "PENDENTE").toUpperCase();
-    const concluida =
-        statusBruto === "CONCLUIDA" ||
-        statusBruto === "RESOLVIDA" ||
-        statusBruto === "ACEITA" ||
-        statusBruto === "REJEITADA" ||
-        raw.resolvida === true;
+    const concluida = statusBruto === "CONCLUIDA";
+    const isReclamacao = alvoTipo === "RECLAMACAO";
 
-    const usuarioDenunciado = raw.usuarioDenunciado || {};
-    const reclamacaoObj = raw.reclamacao || {};
-    const comentarioObj = raw.comentario || {};
-
-    const isReclamacao = tipo === "RECLAMACAO";
-    const conteudoId = isReclamacao
-        ? raw.reclamacaoId ?? reclamacaoObj.id ?? raw.alvoId
-        : raw.comentarioId ?? comentarioObj.id ?? raw.alvoId;
-
-    const reclamacaoOrigemId = isReclamacao
-        ? conteudoId
-        : raw.reclamacaoId ?? comentarioObj.reclamacaoId ?? reclamacaoObj.id;
+    const conteudoId = isReclamacao ? raw.reclamacaoId : raw.comentarioId;
 
     return {
         id: raw.id,
-        tipo,
+        tipo: alvoTipo,
         status: concluida ? "CONCLUIDA" : "PENDENTE",
         statusOriginal: statusBruto,
-        motivoCategoria: raw.motivo || raw.motivoCategoria || raw.categoria || "Denúncia",
-        motivoDescricao: raw.descricao || raw.motivoDescricao || raw.justificativa || "",
-        quantidadeDenuncias: raw.quantidadeDenuncias ?? raw.totalDenuncias ?? 1,
-        dataDenuncia: raw.dataCriacao || raw.dataDenuncia || raw.criadoEm || null,
-        denuncianteNome:
-            raw.denuncianteNome || raw.autorDenunciaNome || raw.denunciante?.nome || "Usuário",
+        motivoCategoria: formatarTipoDenuncia(raw.tipo),
+        motivoDescricao: raw.descricao || "",
+        quantidadeDenuncias: 1,
+        dataDenuncia: raw.dataCriacao || null,
+        denuncianteNome: raw.denuncianteNome || "Usuário",
 
-        // Campos de auditoria (quando adicionarmos no back)
-        moderadorNome: raw.moderadorNome || raw.moderador?.nome || null,
+        // Campos de auditoria do DenunciaResponse
+        moderadorNome: raw.moderadorNome || null,
         dataModeracao: raw.dataModeracao || null,
         acaoTomada: raw.acaoTomada || null,
 
         usuarioDenunciado: {
-            id:
-                raw.usuarioDenunciadoId ??
-                usuarioDenunciado.id ??
-                (isReclamacao ? reclamacaoObj.usuarioId : comentarioObj.usuarioId) ??
-                "-",
-            nome:
-                raw.usuarioDenunciadoNome ||
-                usuarioDenunciado.nome ||
-                (isReclamacao ? reclamacaoObj.usuarioNome : comentarioObj.usuarioNome) ||
-                "Usuário",
-            email:
-                raw.usuarioDenunciadoEmail ||
-                usuarioDenunciado.email ||
-                (isReclamacao ? reclamacaoObj.usuarioEmail : comentarioObj.usuarioEmail) ||
-                "-",
+            id: raw.usuarioDenunciadoId ?? "-",
+            nome: raw.usuarioDenunciadoNome || "Usuário",
+            email: raw.usuarioDenunciadoEmail || "-",
         },
 
         conteudo: {
             id: conteudoId,
-            reclamacaoId: reclamacaoOrigemId,
-            titulo: isReclamacao
-                ? raw.reclamacaoTitulo || reclamacaoObj.titulo || raw.titulo || ""
-                : null,
+            reclamacaoId: raw.reclamacaoId ?? null,
+            titulo: isReclamacao ? raw.reclamacaoTitulo || "" : null,
             texto: isReclamacao
-                ? raw.reclamacaoDescricao || reclamacaoObj.descricao || raw.conteudoTexto || ""
-                : raw.comentarioTexto || comentarioObj.texto || raw.conteudoTexto || "",
-            bairro: reclamacaoObj.bairro || raw.bairro || null,
-            dataCriacao:
-                (isReclamacao ? reclamacaoObj.dataCriacao : comentarioObj.dataCriacao) ||
-                raw.dataConteudo ||
-                null,
+                ? raw.reclamacaoDescricao || ""
+                : raw.comentarioTexto || "",
+            bairro: null,
+            dataCriacao: null,
         },
     };
 }
@@ -167,7 +146,6 @@ function configurarHeaderUsuario(usuario) {
    EVENTOS DE ABAS, BUSCA E GAVETA
 ========================= */
 function configurarEventosInterface() {
-    // Troca de abas (Reclamações / Comentários)
     document.querySelectorAll(".mod-tab").forEach((aba) => {
         aba.addEventListener("click", () => {
             const novoTipo = aba.dataset.tipo;
@@ -186,7 +164,6 @@ function configurarEventosInterface() {
         });
     });
 
-    // Pesquisa por ID, nome ou e-mail com debounce
     const inputBusca = document.getElementById("input-busca");
     const btnLimpar = document.getElementById("btn-limpar-busca");
     let timerDebounce = null;
@@ -212,20 +189,17 @@ function configurarEventosInterface() {
         inputBusca.focus();
     });
 
-    // Filtro de status
     document.getElementById("filtro-status").addEventListener("change", (e) => {
         estadoModeracao.statusFiltro = e.target.value;
         estadoModeracao.quantidadeVisivel = estadoModeracao.incrementoPagina;
         renderizarListaFiltrada();
     });
 
-    // Botão Carregar Mais (exibe +10 por clique)
     document.getElementById("btn-carregar-mais").addEventListener("click", () => {
         estadoModeracao.quantidadeVisivel += estadoModeracao.incrementoPagina;
         renderizarListaFiltrada();
     });
 
-    // Clique nos cards da lista
     document.getElementById("lista-denuncias").addEventListener("click", (event) => {
         const card = event.target.closest(".mod-card");
         if (!card) return;
@@ -242,7 +216,6 @@ function configurarEventosInterface() {
         }
     });
 
-    // Controles da Gaveta Lateral
     document.getElementById("btn-fechar-drawer").addEventListener("click", fecharGaveta);
     document.getElementById("drawer-overlay").addEventListener("click", fecharGaveta);
 
@@ -252,7 +225,6 @@ function configurarEventosInterface() {
         }
     });
 
-    // Botões de ação na gaveta
     document.getElementById("btn-ativar-edicao").addEventListener("click", ativarModoEdicao);
     document.getElementById("btn-cancelar-edicao").addEventListener("click", desativarModoEdicao);
     document.getElementById("drawer-edit-form").addEventListener("submit", salvarEdicaoConteudo);
@@ -387,11 +359,6 @@ function renderizarCardDenuncia(d) {
         <div class="mod-card-top">
           <span class="mod-id-pill">Denúncia #${esc(d.id)}</span>
           <span class="mod-motivo-pill">${esc(d.motivoCategoria)}</span>
-          ${
-        d.quantidadeDenuncias > 1
-            ? `<span class="mod-count-pill">${d.quantidadeDenuncias} denúncias</span>`
-            : ""
-    }
           <span class="mod-date">${formatarDataHora(d.dataDenuncia)}</span>
         </div>
 
@@ -430,7 +397,6 @@ async function abrirGavetaDenuncia(denuncia) {
     document.getElementById("drawer-titulo").textContent =
         isReclamacao ? "Análise de Reclamação" : "Análise de Comentário";
 
-    // Auditoria (se já concluída)
     const auditoriaBox = document.getElementById("drawer-auditoria-box");
     if (concluida) {
         auditoriaBox.hidden = false;
@@ -449,7 +415,6 @@ async function abrirGavetaDenuncia(denuncia) {
         auditoriaBox.hidden = true;
     }
 
-    // Dados do denunciado
     const nome = denuncia.usuarioDenunciado.nome || "Usuário";
     document.getElementById("drawer-user-avatar").textContent = nome.charAt(0).toUpperCase();
     document.getElementById("drawer-user-nome").textContent = nome;
@@ -457,14 +422,12 @@ async function abrirGavetaDenuncia(denuncia) {
     document.getElementById("drawer-user-id").textContent =
         `ID do Usuário: #${denuncia.usuarioDenunciado.id}`;
 
-    // Motivo
     document.getElementById("drawer-motivo-categoria").textContent = denuncia.motivoCategoria;
     document.getElementById("drawer-motivo-descricao").textContent =
         denuncia.motivoDescricao || "Sem descrição adicional.";
     document.getElementById("drawer-denunciante-info").textContent =
-        `Reportado por ${denuncia.denuncianteNome} • Total de reportes: ${denuncia.quantidadeDenuncias}`;
+        `Reportado por ${denuncia.denuncianteNome}`;
 
-    // Conteúdo denunciado
     document.getElementById("drawer-conteudo-label").textContent =
         isReclamacao ? "Reclamação Denunciada" : "Comentário Denunciado";
 
@@ -492,7 +455,6 @@ async function abrirGavetaDenuncia(denuncia) {
 
     document.getElementById("drawer-footer").hidden = concluida;
 
-    // Abre a gaveta imediatamente
     const overlay = document.getElementById("drawer-overlay");
     const drawer = document.getElementById("mod-drawer");
     overlay.hidden = false;
@@ -502,7 +464,6 @@ async function abrirGavetaDenuncia(denuncia) {
         drawer.setAttribute("aria-hidden", "false");
     });
 
-    // Se o DenunciaResponse não trouxe todos os dados da reclamação, complementa via GET /reclamacoes/{id}
     if (isReclamacao && denuncia.conteudo.id && (!denuncia.conteudo.titulo || !denuncia.conteudo.texto)) {
         try {
             const res = await apiFetch(`/reclamacoes/${denuncia.conteudo.id}`);
@@ -601,7 +562,6 @@ async function salvarEdicaoConteudo(event) {
 
     try {
         if (isReclamacao) {
-            // Busca os dados atuais para montar o ReclamacaoRequest completo exigido pelo @Valid / @RequestPart("dados")
             let recAtual = denuncia.conteudoCompleto;
             if (!recAtual) {
                 const resGet = await apiFetch(`/reclamacoes/${denuncia.conteudo.id}`);
@@ -626,14 +586,12 @@ async function salvarEdicaoConteudo(event) {
                 new Blob([JSON.stringify(dadosAtualizados)], { type: "application/json" })
             );
 
-            // Rota: PATCH /reclamacoes/admin/{id} (multipart/form-data)
             const resRec = await apiFetch(`/reclamacoes/admin/${denuncia.conteudo.id}`, {
                 method: "PATCH",
                 body: formData,
             });
             if (!resRec.ok) throw new Error("Erro ao editar a reclamação pelo admin.");
         } else {
-            // Rota: PATCH /comentarios/admin/{id} (multipart/form-data com @RequestParam("texto"))
             const formData = new FormData();
             formData.append("texto", novoTexto);
 
@@ -644,7 +602,6 @@ async function salvarEdicaoConteudo(event) {
             if (!resCom.ok) throw new Error("Erro ao editar o comentário pelo admin.");
         }
 
-        // Conclui a denúncia no backend: PATCH /denuncias/{id}/resolver?aceitar=true
         await resolverDenunciaNoBack(denuncia.id, true);
 
         fecharGaveta();
@@ -673,7 +630,6 @@ async function excluirConteudoDenunciado() {
     btnExcluir.textContent = "Apagando...";
 
     try {
-        // Rotas: DELETE /reclamacoes/admin/{id} ou DELETE /comentarios/admin/{id}
         const rotaExclusao =
             denuncia.tipo === "RECLAMACAO"
                 ? `/reclamacoes/admin/${denuncia.conteudo.id}`
@@ -682,7 +638,6 @@ async function excluirConteudoDenunciado() {
         const resDel = await apiFetch(rotaExclusao, { method: "DELETE" });
         if (!resDel.ok) throw new Error("Erro ao excluir o conteúdo denunciado.");
 
-        // Conclui a denúncia: PATCH /denuncias/{id}/resolver?aceitar=true
         await resolverDenunciaNoBack(denuncia.id, true);
 
         fecharGaveta();
@@ -705,7 +660,6 @@ async function ignorarDenuncia() {
     btnIgnorar.textContent = "Concluindo...";
 
     try {
-        // Rejeita/ignora a denúncia mantendo o conteúdo: PATCH /denuncias/{id}/resolver?aceitar=false
         await resolverDenunciaNoBack(denuncia.id, false);
 
         fecharGaveta();
