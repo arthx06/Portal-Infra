@@ -64,14 +64,17 @@ async function apiFetch(path, options = {}) {
         credentials: "include", // envia o cookie JWT
         ...options,
     });
-    if (resp.status === 401 || resp.status === 403) {
+
+    // Apenas 401 (não autenticado/token expirado) desloga e redireciona.
+    // 403 (proibido) agora apenas retorna a resposta normalmente sem destruir a sessão.
+    if (resp.status === 401) {
         localStorage.removeItem("usuario");
         aplicarEstadoHeader(null);
-        // só redireciona se a página exigir login
         if (document.body.dataset.protegida === "true") {
             window.location.replace("login.html");
         }
     }
+
     return resp;
 }
 
