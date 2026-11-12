@@ -1,0 +1,686 @@
+/* ==========================================
+   VALIDAÇÃO DE RESOLUÇÕES — ESTILOS DA PÁGINA
+========================================== */
+
+.val-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.25rem 1.5rem 4rem;
+}
+
+.val-header {
+    margin-bottom: 1.75rem;
+}
+
+.val-header h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0.45rem 0 0.4rem;
+}
+
+.val-header p {
+    color: #64748b;
+    font-size: 0.96rem;
+    max-width: 680px;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   CARDS DE ESTATÍSTICAS
+========================================== */
+.val-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.val-stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.15rem 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.val-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.val-stat-icon.amber {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.val-stat-icon.green {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.val-stat-icon.blue {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.val-stat-card span {
+    display: block;
+    font-size: 0.83rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.val-stat-card h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 0.15rem;
+}
+
+/* ==========================================
+   BARRA DE BUSCA E FILTRO
+========================================== */
+.val-toolbar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.val-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+}
+
+.val-search-box input {
+    width: 100%;
+    padding: 0.68rem 2.3rem 0.68rem 0.95rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.val-search-box input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+#btn-limpar-busca {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0.2rem 0.4rem;
+}
+
+.val-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.val-filter-group label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.val-filter-group select {
+    padding: 0.62rem 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+/* ==========================================
+   LISTA E CARDS DE RESOLUÇÃO
+========================================== */
+.val-feedback {
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.val-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+}
+
+.val-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.2rem 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.val-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
+    transform: translateY(-1px);
+}
+
+.val-card-thumb {
+    width: 88px;
+    height: 88px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.val-card-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.val-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
+}
+
+.val-id-pill {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+}
+
+.val-badge-prova {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+}
+
+.val-date {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+
+.val-card-title {
+    font-size: 1.04rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.3rem;
+}
+
+.val-card-excerpt {
+    font-size: 0.9rem;
+    color: #475569;
+    margin-bottom: 0.6rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.val-card-user {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    font-size: 0.81rem;
+    color: #64748b;
+}
+
+.val-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.65rem;
+    flex-shrink: 0;
+}
+
+.status-pill {
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+}
+
+.status-pill.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status-pill.resolved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.btn-analisar {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 0.48rem 0.95rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.val-card:hover .btn-analisar {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.val-load-more {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+/* ==========================================
+   GAVETA LATERAL (DRAWER)
+========================================== */
+.drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(2px);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.drawer-overlay.open {
+    opacity: 1;
+}
+
+.val-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(600px, 100vw);
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -8px 0 30px rgba(15, 23, 42, 0.16);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.val-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.drawer-subtitle {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.2rem;
+}
+
+.drawer-header h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.drawer-close-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.drawer-close-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.4rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.drawer-status-box {
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    color: #166534;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.drawer-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.45rem;
+}
+
+.drawer-block-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 0.45rem;
+}
+
+.drawer-block-header .drawer-block-label {
+    margin-bottom: 0;
+}
+
+.drawer-ext-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.drawer-ext-link:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================
+   COMPARAÇÃO DE FOTOS (ANTES VS DEPOIS)
+========================================== */
+.foto-comparacao-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.foto-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.foto-badge {
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.22rem 0.55rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.foto-badge.antes {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.foto-badge.depois {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.foto-frame {
+    width: 100%;
+    height: 195px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foto-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+}
+
+.foto-vazia {
+    font-size: 0.82rem;
+    color: #64748b;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* ==========================================
+   CARDS INTERNOS DA GAVETA
+========================================== */
+.drawer-content-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.drawer-content-card.destaque-prova {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.drawer-content-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+
+.drawer-content-card p {
+    font-size: 0.91rem;
+    color: #334155;
+    line-height: 1.5;
+    margin-bottom: 0.55rem;
+}
+
+.drawer-meta {
+    display: block;
+    font-size: 0.79rem;
+    color: #64748b;
+}
+
+.drawer-user-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+}
+
+.drawer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.drawer-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.drawer-user-info strong {
+    font-size: 0.93rem;
+    color: #0f172a;
+}
+
+.drawer-user-info span,
+.drawer-user-info small {
+    font-size: 0.81rem;
+    color: #64748b;
+}
+
+/* ==========================================
+   RODAPÉ DA GAVETA (BOTÕES DE DECISÃO)
+========================================== */
+.drawer-footer {
+    padding: 1.1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.btn-danger-outline {
+    background: #ffffff;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 0.68rem 1.1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-danger-outline:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+}
+
+.btn-success {
+    flex: 1;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 0.72rem 1.2rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-success:hover {
+    background: #15803d;
+}
+
+.btn-danger-outline:disabled,
+.btn-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   RESPONSIVIDADE
+========================================== */
+@media (max-width: 768px) {
+    .val-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .val-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .val-card-thumb {
+        width: 100%;
+        height: 160px;
+    }
+
+    .val-card-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .foto-comparacao-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .drawer-footer {
+        flex-direction: column-reverse;
+    }
+
+    .btn-danger-outline,
+    .btn-success {
+        width: 100%;
+    }
+}

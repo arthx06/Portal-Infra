@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/comentarios")
@@ -52,6 +53,12 @@ public class ComentarioController {
     @GetMapping("/reclamacao/{reclamacaoId}")
     public ResponseEntity<List<ComentarioResponse>> listarPorReclamacao(@PathVariable Long reclamacaoId) {
         return ResponseEntity.ok(comentarioService.listarPorReclamacao(reclamacaoId));
+    }
+
+    @GetMapping("/admin/resolucoes")
+    public ResponseEntity<List>> listarSugestoesResolucao(Authentication auth) {
+        Long adminId = SessaoUtil.idLogado(auth);
+        return ResponseEntity.ok(comentarioService.listarSugestoesResolucaoParaAdmin(adminId));
     }
 
     // ==========================================

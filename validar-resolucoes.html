@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Validação de Resoluções — Portal Infra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="validar-resolucoes.css" />
+    <script src="api.js" defer></script>
+    <script src="validar-resolucoes.js" defer></script>
+</head>
+<body data-protegida="true">
+<!-- CABEÇALHO -->
+<header class="header">
+    <a href="index.html" class="logo"><span>Portal</span> Infra</a>
+
+    <nav id="nav-menu">
+        <a href="index.html">Início</a>
+        <a href="#">Mapa</a>
+        <a href="reclamacoes.html">Reclamações</a>
+        <a href="#">Sobre</a>
+    </nav>
+
+    <div class="header-actions">
+        <div class="user-menu" id="user-menu" style="display: none">
+            <button
+                    class="user-menu-btn"
+                    id="user-menu-btn"
+                    type="button"
+                    aria-expanded="false"
+            >
+                <span id="nome-usuario">Administrador</span>
+                <span class="seta-menu">▼</span>
+            </button>
+
+            <div class="user-dropdown" id="user-dropdown" hidden>
+                <a href="perfil.html">Meu perfil</a>
+                <a href="reclamacoes.html">Reclamações</a>
+                <a href="moderacao.html">Painel de Moderação</a>
+                <button type="button" id="btn-sair">Sair</button>
+            </div>
+        </div>
+
+        <button
+                class="menu-toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Abrir menu de navegação"
+                aria-expanded="false"
+        >
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+        </button>
+    </div>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL (OCULTO ATÉ VALIDAR SESSÃO ADMIN) -->
+<main class="val-container" id="conteudo-validacao" style="visibility: hidden">
+    <!-- TOPO DA PÁGINA -->
+    <section class="val-header">
+        <div>
+            <span class="tag">PAINEL ADMINISTRATIVO</span>
+            <h1>Validação de Resoluções</h1>
+            <p>
+                Analise os relatos e fotos de prova enviados pelos cidadãos para confirmar se os problemas foram realmente solucionados.
+            </p>
+        </div>
+    </section>
+
+    <!-- CARDS DE RESUMO -->
+    <section class="val-stats">
+        <div class="val-stat-card">
+            <div class="val-stat-icon amber">!</div>
+            <div>
+                <span>Aguardando validação</span>
+                <h2 id="stat-pendentes">0</h2>
+            </div>
+        </div>
+
+        <div class="val-stat-card">
+            <div class="val-stat-icon green">OK</div>
+            <div>
+                <span>Reclamações resolvidas</span>
+                <h2 id="stat-resolvidas">0</h2>
+            </div>
+        </div>
+
+        <div class="val-stat-card">
+            <div class="val-stat-icon blue">#</div>
+            <div>
+                <span>Total de relatos</span>
+                <h2 id="stat-total">0</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- BARRA DE FILTROS E BUSCA -->
+    <section class="val-toolbar">
+        <div class="val-search-box">
+            <input
+                    type="text"
+                    id="input-busca"
+                    placeholder="Buscar por ID, título da reclamação, bairro, nome ou e-mail..."
+                    autocomplete="off"
+            />
+            <button type="button" id="btn-limpar-busca" title="Limpar busca" hidden>
+                ✕
+            </button>
+        </div>
+
+        <div class="val-filter-group">
+            <label for="filtro-status">Status da reclamação:</label>
+            <select id="filtro-status">
+                <option value="PENDENTE" selected>Pendentes de validação</option>
+                <option value="RESOLVIDA">Já resolvidas</option>
+                <option value="TODAS">Todas</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- LISTA DE SUGESTÕES DE RESOLUÇÃO -->
+    <section class="val-list-section">
+        <div id="val-feedback" class="val-feedback" hidden></div>
+        <div id="lista-resolucoes" class="val-list"></div>
+
+        <div id="wrap-carregar-mais" class="val-load-more" hidden>
+            <button type="button" id="btn-carregar-mais" class="btn-secondary">
+                Carregar mais relatos
+            </button>
+        </div>
+    </section>
+</main>
+
+<!-- OVERLAY E GAVETA LATERAL (DRAWER) -->
+<div id="drawer-overlay" class="drawer-overlay" hidden></div>
+
+<aside
+        id="val-drawer"
+        class="val-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="drawer-titulo"
+>
+    <div class="drawer-header">
+        <div>
+            <span class="drawer-subtitle" id="drawer-id">Relato #0 • Reclamação #0</span>
+            <h2 id="drawer-titulo">Análise de Prova de Resolução</h2>
+        </div>
+        <button
+                type="button"
+                id="btn-fechar-drawer"
+                class="drawer-close-btn"
+                aria-label="Fechar gaveta"
+        >
+            ✕
+        </button>
+    </div>
+
+    <div class="drawer-body">
+        <!-- AVISO CASO JÁ ESTEJA RESOLVIDA -->
+        <div id="drawer-status-box" class="drawer-status-box" hidden></div>
+
+        <!-- COMPARAÇÃO VISUAL: ANTES VS DEPOIS -->
+        <div class="drawer-block">
+            <span class="drawer-block-label">Comparação Visual (Antes e Depois)</span>
+            <div class="foto-comparacao-grid">
+                <div class="foto-card">
+                    <span class="foto-badge antes">Antes • Problema Original</span>
+                    <div class="foto-frame" id="wrap-foto-antes">
+                        <img id="drawer-rec-foto" src="" alt="Foto original da reclamação" />
+                        <span class="foto-vazia" id="sem-foto-antes" hidden>Sem foto original</span>
+                    </div>
+                </div>
+
+                <div class="foto-card">
+                    <span class="foto-badge depois">Depois • Prova do Cidadão</span>
+                    <div class="foto-frame" id="wrap-foto-depois">
+                        <img id="drawer-com-foto" src="" alt="Foto de prova enviada no comentário" />
+                        <span class="foto-vazia" id="sem-foto-depois" hidden>Sem foto anexada</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DADOS DA RECLAMAÇÃO ORIGINAL -->
+        <div class="drawer-block">
+            <div class="drawer-block-header">
+                <span class="drawer-block-label">Reclamação Vinculada</span>
+                <a
+                        id="drawer-link-original"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="drawer-ext-link"
+                >
+                    Abrir publicação ↗
+                </a>
+            </div>
+
+            <div class="drawer-content-card">
+                <h3 id="drawer-rec-titulo">Título da reclamação</h3>
+                <p id="drawer-rec-descricao">Descrição do problema...</p>
+                <span class="drawer-meta" id="drawer-rec-local">Bairro / Endereço</span>
+            </div>
+        </div>
+
+        <!-- RELATO DO CIDADÃO -->
+        <div class="drawer-block">
+            <span class="drawer-block-label">Relato de Resolução do Cidadão</span>
+            <div class="drawer-content-card destaque-prova">
+                <p id="drawer-com-texto">Texto do comentário de resolução...</p>
+                <span class="drawer-meta" id="drawer-com-data">Enviado em -</span>
+            </div>
+        </div>
+
+        <!-- AUTOR DO RELATO -->
+        <div class="drawer-block">
+            <span class="drawer-block-label">Enviado por</span>
+            <div class="drawer-user-card">
+                <div class="drawer-avatar" id="drawer-user-avatar">U</div>
+                <div class="drawer-user-info">
+                    <strong id="drawer-user-nome">Nome do Usuário</strong>
+                    <span id="drawer-user-email">email@exemplo.com</span>
+                    <small id="drawer-user-id">ID do Usuário: #0</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ DE AÇÕES (VISÍVEL ENQUANTO PENDENTE) -->
+    <div class="drawer-footer" id="drawer-footer">
+        <button type="button" id="btn-recusar-prova" class="btn-danger-outline">
+            Recusar prova
+        </button>
+        <button type="button" id="btn-aprovar-resolucao" class="btn-success">
+            Aprovar e marcar como Resolvida
+        </button>
+    </div>
+</aside>
+
+<!-- RODAPÉ -->
+<footer>
+    <div class="logo"><span>Portal</span> Infra</div>
+    <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+    <span>© 2026 SP em Foco</span>
+</footer>
+</body>
+</html>

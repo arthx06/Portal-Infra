@@ -1,6 +1,5 @@
 package org.example.portalinfra.service;
 
-import java.util.ArrayList;
 import com.cloudinary.Cloudinary;
 import org.example.portalinfra.dto.ComentarioRequest;
 import org.example.portalinfra.dto.ComentarioResponse;
@@ -10,23 +9,24 @@ import org.example.portalinfra.model.Usuario;
 import org.example.portalinfra.repository.ComentarioRepository;
 import org.example.portalinfra.repository.ReclamacaoRepository;
 import org.example.portalinfra.repository.UsuarioRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ComentarioService {
     private final ComentarioRepository comentarioRepository;
     private final UsuarioRepository usuarioRepository;
     private final ReclamacaoRepository reclamacaoRepository;
-    private final Cloudinary cloudinary; // Adicionado aqui
+    private final Cloudinary cloudinary;
 
     public ComentarioService(
             ComentarioRepository comentarioRepository,
@@ -106,6 +106,46 @@ public class ComentarioService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List> listarSugestoesResolucaoParaAdmin(Long adminId) {
+        Usuario admin = usuarioRepository.findById(adminId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado. Apenas administradores podem realizar esta ação.");
+        }
+
+        return comentarioRepository.findByResolucaoTrueOrderByDataCriacaoDesc()
+                .stream()
+                .map(c -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("id", c.getId());
+                    item.put("texto", c.getTexto());
+                    item.put("fotoUrl", c.getFotoUrl());
+                    item.put("dataCriacao", c.getDataCriacao());
+                    item.put("isResolucao", c.isResolucao());
+
+                    Usuario autor = c.getUsuario();
+                    if (autor != null) {
+                        item.put("usuarioId", autor.getId());
+                        item.put("usuarioNome", autor.getNome());
+                        item.put("usuarioEmail", autor.getEmail());
+                    }
+
+                    Reclamacao rec = c.getReclamacao();
+                    if (rec != null) {
+                        item.put("reclamacaoId", rec.getId());
+                        item.put("reclamacaoTitulo", rec.getTitulo());
+                        item.put("reclamacaoDescricao", rec.getDescricao());
+                        item.put("reclamacaoBairro", rec.getBairro());
+                        item.put("reclamacaoEndereco", rec.getEndereco());
+                        item.put("reclamacaoStatus", rec.getStatus());
+                    }
+
+                    return item;
+                })
+                .toList();
+    }
 
     // ==========================================
     // DELETAR COMENTÁRIO (USUÁRIO E ADMIN)
@@ -140,48 +180,31 @@ public class ComentarioService {
 
     private void apagarComentarioEImagens(Comentario comentario) {
         apagarImagensRecursivamente(comentario);
-
-        // O CascadeType.ALL remove as respostas no PostgreSQL.
         comentarioRepository.delete(comentario);
     }
 
-        // Remove as imagens do comentário e de todas as suas respostas.
     private void apagarImagensRecursivamente(Comentario comentario) {
-
         if (comentario == null) {
             return;
         }
 
-        // Remove a imagem do comentário atual.
         apagarDoCloudinary(comentario.getFotoUrl());
 
-        // Percorre todas as respostas, inclusive respostas aninhadas.
         if (comentario.getRespostas() != null) {
-
-            List<Comentario> respostas =
-                    new ArrayList<>(comentario.getRespostas());
-
+            List<Comentario> respostas = new ArrayList<>(comentario.getRespostas());
             for (Comentario resposta : respostas) {
                 apagarImagensRecursivamente(resposta);
             }
         }
     }
 
-    // Utilizado quando uma reclamação inteira for excluída.
-    // Remove as imagens dos comentários sem excluir os registros individualmente.
-    public void apagarImagensDosComentariosDaReclamacao(
-            Reclamacao reclamacao) {
-
+    public void apagarImagensDosComentariosDaReclamacao(Reclamacao reclamacao) {
         if (reclamacao == null || reclamacao.getComentarios() == null) {
             return;
         }
 
-        List<Comentario> comentarios =
-                new ArrayList<>(reclamacao.getComentarios());
-
-        // Começa somente pelos comentários principais para evitar duplicidade.
+        List<Comentario> comentarios = new ArrayList<>(reclamacao.getComentarios());
         for (Comentario comentario : comentarios) {
-
             if (comentario.getComentarioPai() == null) {
                 apagarImagensRecursivamente(comentario);
             }
@@ -203,8 +226,6 @@ public class ComentarioService {
         }
     }
 
-
-
     private void validarArquivoImagem(org.springframework.web.multipart.MultipartFile foto) {
         String contentType = foto.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
@@ -221,11 +242,9 @@ public class ComentarioService {
         }
     }
 
-
     // ==========================================
     // EDITAR COMENTÁRIO (USUÁRIO E ADMIN)
     // ==========================================
-
 
     @Transactional
     public ComentarioResponse editarComentario(Long id, Long usuarioId, String novoTexto, Boolean isResolucao, org.springframework.web.multipart.MultipartFile novaFoto, boolean removerFoto) {
@@ -289,5 +308,4 @@ public class ComentarioService {
         Comentario salvo = comentarioRepository.save(comentario);
         return ComentarioResponse.de(salvo);
     }
-
 }
