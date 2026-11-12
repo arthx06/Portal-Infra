@@ -67,7 +67,7 @@
 </header>
 
 <script>
-  // Renderização instantânea do cabeçalho e da opção de admin antes da resposta do servidor
+  // Renderização instantânea do cabeçalho e das opções de admin antes da resposta do servidor
   (function () {
     try {
       const salvo = JSON.parse(localStorage.getItem("usuario") || "null");
@@ -82,16 +82,25 @@
         if (userMenu) userMenu.style.display = "block";
         if (nomeUsuario) nomeUsuario.textContent = salvo.nome;
 
-        if (salvo.tipo === "ADMIN" && dropdown && !document.getElementById("link-moderacao")) {
-          const linkMod = document.createElement("a");
-          linkMod.id = "link-moderacao";
-          linkMod.href = "moderacao.html";
-          linkMod.textContent = "Painel de Moderação";
-          if (btnSair) {
-            dropdown.insertBefore(linkMod, btnSair);
-          } else {
-            dropdown.appendChild(linkMod);
-          }
+        if (salvo.tipo === "ADMIN" && dropdown) {
+          const linksAdmin = [
+            { id: "link-moderacao", href: "moderacao.html", texto: "Painel de Moderação" },
+            { id: "link-validacao-resolucoes", href: "validar-resolucoes.html", texto: "Validar Resoluções" },
+          ];
+
+          linksAdmin.forEach(({ id, href, texto }) => {
+            if (!document.getElementById(id)) {
+              const link = document.createElement("a");
+              link.id = id;
+              link.href = href;
+              link.textContent = texto;
+              if (btnSair) {
+                dropdown.insertBefore(link, btnSair);
+              } else {
+                dropdown.appendChild(link);
+              }
+            }
+          });
         }
       }
     } catch (e) {

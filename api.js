@@ -1,6 +1,11 @@
 // api.js
 const API_BASE = "https://portal-infra-backend.onrender.com";
 
+const LINKS_ADMIN_DROPDOWN = [
+    { id: "link-moderacao", href: "moderacao.html", texto: "Painel de Moderação" },
+    { id: "link-validacao-resolucoes", href: "validar-resolucoes.html", texto: "Validar Resoluções" },
+];
+
 function obterUsuarioCache() {
     try {
         const raw = localStorage.getItem("usuario");
@@ -9,6 +14,13 @@ function obterUsuarioCache() {
         localStorage.removeItem("usuario");
         return null;
     }
+}
+
+function removerLinksAdminDropdown() {
+    LINKS_ADMIN_DROPDOWN.forEach(({ id }) => {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    });
 }
 
 function aplicarEstadoHeader(usuario) {
@@ -23,28 +35,27 @@ function aplicarEstadoHeader(usuario) {
         if (userMenu) userMenu.style.display = "block";
         if (nomeUsuario) nomeUsuario.textContent = usuario.nome;
 
-        if (usuario.tipo === "ADMIN") {
-            if (userDropdown && !document.getElementById("link-moderacao")) {
-                const linkMod = document.createElement("a");
-                linkMod.id = "link-moderacao";
-                linkMod.href = "moderacao.html";
-                linkMod.textContent = "Painel de Moderação";
-                if (btnSair) {
-                    userDropdown.insertBefore(linkMod, btnSair);
-                } else {
-                    userDropdown.appendChild(linkMod);
+        if (usuario.tipo === "ADMIN" && userDropdown) {
+            LINKS_ADMIN_DROPDOWN.forEach(({ id, href, texto }) => {
+                if (!document.getElementById(id)) {
+                    const link = document.createElement("a");
+                    link.id = id;
+                    link.href = href;
+                    link.textContent = texto;
+                    if (btnSair) {
+                        userDropdown.insertBefore(link, btnSair);
+                    } else {
+                        userDropdown.appendChild(link);
+                    }
                 }
-            }
+            });
         } else {
-            const linkMod = document.getElementById("link-moderacao");
-            if (linkMod) linkMod.remove();
+            removerLinksAdminDropdown();
         }
     } else {
         if (btnEntrar) btnEntrar.style.display = "";
         if (userMenu) userMenu.style.display = "none";
-
-        const linkMod = document.getElementById("link-moderacao");
-        if (linkMod) linkMod.remove();
+        removerLinksAdminDropdown();
     }
 }
 
