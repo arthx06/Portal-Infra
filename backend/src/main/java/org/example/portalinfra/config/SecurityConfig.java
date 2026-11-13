@@ -1,5 +1,6 @@
 package org.example.portalinfra.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -48,6 +49,14 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // Redirecionamento interno para /error: sem isso, qualquer
+                        // erro (403, 404, 500) lançado por um controller é
+                        // mascarado como 401 pelo Spring Security.
+                        .dispatcherTypeMatchers(
+                                DispatcherType.ERROR,
+                                DispatcherType.FORWARD
+                        ).permitAll()
 
                         // Documentação
                         .requestMatchers(
@@ -134,3 +143,4 @@ public class SecurityConfig {
         return source;
     }
 }
+ 
