@@ -183,7 +183,6 @@ function configurarEventosInterface() {
         }
     });
 
-    // Permite abrir imagem em tamanho real ao clicar
     ["drawer-rec-foto", "drawer-com-foto"].forEach((imgId) => {
         const img = document.getElementById(imgId);
         if (img) {
@@ -376,11 +375,9 @@ async function abrirGavetaRelato(relato) {
         statusBox.hidden = true;
     }
 
-    // Fotos Antes e Depois
     preencherImagemFrame("drawer-rec-foto", "sem-foto-antes", relato.reclamacao.fotoAntesUrl);
     preencherImagemFrame("drawer-com-foto", "sem-foto-depois", relato.fotoUrl);
 
-    // Dados da reclamação
     const linkOriginal = document.getElementById("drawer-link-original");
     if (relato.reclamacao.id) {
         linkOriginal.href = `detalhe-reclamacao.html?id=${encodeURIComponent(relato.reclamacao.id)}`;
@@ -397,13 +394,11 @@ async function abrirGavetaRelato(relato) {
         [relato.reclamacao.endereco, relato.reclamacao.bairro].filter(Boolean).join(" • ") ||
         "Localização não informada";
 
-    // Dados do relato do cidadão
     document.getElementById("drawer-com-texto").textContent =
         relato.texto || "Sem descrição adicional.";
     document.getElementById("drawer-com-data").textContent =
         `Enviado em ${formatarDataHora(relato.dataCriacao)}`;
 
-    // Autor
     const nome = relato.autor.nome || "Cidadão";
     document.getElementById("drawer-user-avatar").textContent = nome.charAt(0).toUpperCase();
     document.getElementById("drawer-user-nome").textContent = nome;
@@ -412,7 +407,6 @@ async function abrirGavetaRelato(relato) {
 
     document.getElementById("drawer-footer").hidden = isResolvida;
 
-    // Abre gaveta
     const overlay = document.getElementById("drawer-overlay");
     const drawer = document.getElementById("val-drawer");
     overlay.hidden = false;
@@ -422,7 +416,6 @@ async function abrirGavetaRelato(relato) {
         drawer.setAttribute("aria-hidden", "false");
     });
 
-    // Complementa dados e foto original da reclamação via GET /reclamacoes/{id}
     if (
         relato.reclamacao.id &&
         (!relato.reclamacao.fotoAntesUrl || !relato.reclamacao.descricao)
