@@ -12,9 +12,9 @@
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md:
-          0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   --shadow-lg:
-          0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -699,19 +699,19 @@ footer .logo span {
 
 @media (max-width: 600px) {
   .detalhe-imagem {
-    height: 260px;
-  }
+  height: 260px;
+}
 
-  .detalhe-miniaturas {
-    padding: 12px;
-    gap: 10px;
-  }
+.detalhe-miniaturas {
+  padding: 12px;
+  gap: 10px;
+}
 
-  .miniatura-foto {
-    flex-basis: 82px;
-    width: 82px;
-    height: 65px;
-  }
+.miniatura-foto {
+  flex-basis: 82px;
+  width: 82px;
+  height: 65px;
+}
   .detalhe-corpo { padding: 20px; }
   .detalhe-corpo h1 { font-size: 22px; }
   .detalhe-info { grid-template-columns: 1fr 1fr; }
@@ -758,8 +758,8 @@ footer .logo span {
   cursor: pointer;
 }
 .miniatura-foto.selecionada {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 /* =========================
    AÇÕES DO PROPRIETÁRIO
@@ -1100,165 +1100,4 @@ footer .logo span {
 .btn-confirmar-denuncia:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* =====================================================
-   ESTILOS NOVOS: SUGESTÃO DE RESOLUÇÃO E FIXAÇÃO DE COMENTÁRIOS
-   ===================================================== */
-
-/* Contêiner do Toggle de Resolução no formulário */
-.form-group-resolution {
-  margin: 10px 0 14px 0;
-  width: 100%;
-}
-
-.resolution-toggle {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-  user-select: none;
-  transition: color 0.15s ease;
-}
-
-.resolution-toggle:hover {
-  color: #1e293b;
-}
-
-.resolution-toggle input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #cbd5e1;
-  border-radius: 4px;
-  margin-right: 8px;
-  outline: none;
-  cursor: pointer;
-  background-color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.resolution-toggle input[type="checkbox"]:checked {
-  background-color: #16a34a;
-  border-color: #16a34a;
-}
-
-.resolution-toggle input[type="checkbox"]:checked::after {
-  content: "";
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-  margin-bottom: 2px;
-}
-
-/* Caixa destacada do input de foto obrigatório condicional */
-#grupo-foto-resolucao {
-  background: #f0fdf4;
-  border: 1px dashed #4ade80;
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  width: 100%;
-  animation: fadeInFotoResolucao 0.2s ease-out;
-}
-
-@keyframes fadeInFotoResolucao {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-#grupo-foto-resolucao label {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: #15803d;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-#grupo-foto-resolucao input[type="file"] {
-  display: block;
-  width: 100%;
-  font-size: 13px;
-  color: #334155;
-  padding: 6px 0;
-  cursor: pointer;
-}
-
-#grupo-foto-resolucao input[type="file"]::file-selector-button {
-  background: #16a34a;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 12px;
-  transition: background 0.2s;
-}
-
-#grupo-foto-resolucao input[type="file"]::file-selector-button:hover {
-  background: #15803d;
-}
-
-/* Estilização para o Comentário Fixado / Sugestão de Resolução na Lista */
-.comentario-item.comentario-resolucao {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-left: 4px solid #16a34a;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.08);
-}
-
-.badge-resolucao {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #16a34a;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
-}
-
-.comentario-resolucao-foto {
-  margin-top: 10px;
-  max-width: 220px;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid #dcfce7;
-}
-
-.comentario-resolucao-foto img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.comentario-resolucao-foto img:hover {
-  transform: scale(1.03);
 }

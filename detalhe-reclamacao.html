@@ -11,96 +11,81 @@
     <script src="api.js" defer></script>
     <script src="comentarios.js" defer></script>
     <script src="detalhe-reclamacao.js" defer></script>
+
 </head>
 <body>
-<header class="header">
-    <div class="logo"><span>Portal</span> Infra</div>
+  <header class="header">
+      <div class="logo"><span>Portal</span> Infra</div>
 
-    <nav id="nav-menu">
+      <nav id="nav-menu">
         <a href="index.html">Início</a>
         <a href="#">Mapa</a>
         <a href="reclamacoes.html" class="active">Reclamações</a>
         <a href="#">Sobre</a>
-    </nav>
+      </nav>
 
-    <div class="header-actions">
+      <div class="header-actions">
         <button type="button" class="btn-secondary" id="btnVoltar">
             Voltar
         </button>
 
         <!-- Botão Menu Mobile (Hambúrguer) -->
         <button
-                class="menu-toggle"
-                id="menu-toggle"
-                type="button"
-                aria-label="Abrir menu de navegação"
-                aria-expanded="false"
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Abrir menu de navegação"
+          aria-expanded="false"
         >
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
         </button>
-    </div>
-</header>
+      </div>
+    </header>
 
-<main class="container">
+  <main class="container">
+    
+
     <p id="detalhe-erro" class="detalhe-erro" hidden></p>
 
     <article id="detalhe" class="detalhe-pagina" hidden>
-        <div class="detalhe-galeria" id="detalhe-galeria">
-            <div class="detalhe-imagem">
-                <img id="detalhe-foto" alt="Foto da reclamação" />
-            </div>
-
-            <div id="detalhe-miniaturas" class="detalhe-miniaturas"></div>
+      <div class="detalhe-galeria" id="detalhe-galeria">
+        <div class="detalhe-imagem">
+            <img id="detalhe-foto" alt="Foto da reclamação" />
         </div>
 
-        <div class="detalhe-corpo">
-            <div class="detalhe-tags">
-                <span id="detalhe-status" class="status"></span>
-                <span id="detalhe-categoria" class="detalhe-categoria"></span>
-            </div>
-            <h1 id="detalhe-titulo"></h1>
-            <p class="detalhe-local" id="detalhe-local"></p>
-            <p class="detalhe-descricao" id="detalhe-descricao"></p>
-            <dl class="detalhe-info">
-                <div><dt>Gravidade</dt><dd id="detalhe-gravidade"></dd></div>
-                <div><dt>Registrada em</dt><dd id="detalhe-data"></dd></div>
-                <div><dt>Protocolo</dt><dd id="detalhe-id"></dd></div>
-            </dl>
-            <button type="button" id="btn-denunciar-reclamacao-detalhe" class="botao-denunciar-reclamacao" hidden>
-                🚩 Denunciar reclamação
-            </button>
+        <div id="detalhe-miniaturas" class="detalhe-miniaturas"></div>
+      </div>
+
+      <div class="detalhe-corpo">
+        <div class="detalhe-tags">
+          <span id="detalhe-status" class="status"></span>
+          <span id="detalhe-categoria" class="detalhe-categoria"></span>
         </div>
+        <h1 id="detalhe-titulo"></h1>
+        <p class="detalhe-local" id="detalhe-local"></p>
+        <p class="detalhe-descricao" id="detalhe-descricao"></p>
+        <dl class="detalhe-info">
+          <div><dt>Gravidade</dt><dd id="detalhe-gravidade"></dd></div>
+          <div><dt>Registrada em</dt><dd id="detalhe-data"></dd></div>
+          <div><dt>Protocolo</dt><dd id="detalhe-id"></dd></div>
+        </dl>
+        <button type="button" id="btn-denunciar-reclamacao-detalhe" class="botao-denunciar-reclamacao" hidden>
+          🚩 Denunciar reclamação
+        </button>
+      </div>
     </article>
-
     <section id="comentarios" class="detalhe-comentarios" hidden>
-        <h2>Comentários</h2>
-
-        <div class="detalhe-comentar">
-            <textarea id="novo-comentario-texto" placeholder="Comente algo sobre esta reclamação..." required></textarea>
-
-            <!-- Botão / Toggle para Marcar como Sugestão de Resolução -->
-            <div class="form-group-resolution" style="margin: 12px 0;">
-                <label class="resolution-toggle" style="display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 500; color: #333;">
-                    <input type="checkbox" id="check-resolucao" onchange="toggleResolucaoCampos()" style="margin-right: 8px; width: 16px; height: 16px; accent-color: #2e7d32;">
-                    <span>Sugerir que esta reclamação foi resolvida</span>
-                </label>
-            </div>
-
-            <!-- Campo de foto que se torna obrigatório apenas se a resolução for marcada -->
-            <div class="form-group" id="grupo-foto-resolucao" style="display: none; background: #f1f8e9; padding: 12px; border-radius: 6px; border: 1px dashed #7cb342; margin-bottom: 12px;">
-                <label for="foto-resolucao" style="color: #2e7d32; font-weight: bold; display: block; margin-bottom: 6px; font-size: 13px;">Comprovação da Resolução (Foto obrigatória):</label>
-                <input type="file" id="foto-resolucao" accept="image/*">
-            </div>
-
-            <button type="button" onclick="enviarComentarioPrincipal()">Publicar</button>
-        </div>
-
-        <div id="lista-comentarios"></div>
+    <h2>Comentários</h2>
+    <div class="detalhe-comentar">
+        <textarea id="novo-comentario-texto" placeholder="Comente algo sobre esta reclamação..."></textarea>
+        <button type="button" onclick="enviarComentarioPrincipal()">Publicar</button>
+    </div>
+    <div id="lista-comentarios"></div>
     </section>
-</main>
+  </main>
 
-<!-- copie o <footer> do reclamacoes.html -->
+  <!-- copie o <footer> do reclamacoes.html -->
 </body>
 </html>
