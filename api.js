@@ -65,12 +65,12 @@ async function apiFetch(path, options = {}) {
         ...options,
     });
 
-    // BLINDAGEM: Somente o erro 401 (Token inválido/expirado) derruba a sessão.
-    // Erros 403 (Sem permissão) ou 500 (Erro no Render) não vão mais te deslogar!
+    // Somente o 401 (token inválido/expirado/não enviado) derruba a sessão local.
+    // 403 (sem permissão) ou 5xx (Render dormindo) NÃO deslogam o usuário.
     if (resp.status === 401) {
         localStorage.removeItem("usuario");
         aplicarEstadoHeader(null);
-        if (document.body.dataset.protegida === "true") {
+        if (document.body && document.body.dataset.protegida === "true") {
             window.location.replace("login.html");
         }
     }
@@ -78,23 +78,25 @@ async function apiFetch(path, options = {}) {
     return resp;
 }
 
+// Consulta a sessão no servidor.
+// - Retorna o usuário quando autenticado.
+// - Retorna null quando NÃO autenticado (401 / autenticado=false).
+// - Em falha de rede ou 5xx (ex.: Render acordando) devolve o cache local.
 async function obterDadosSessao() {
     try {
         const r = await apiFetch("/usuarios/sessao");
 
-        // Se a rota falhar (ex: Render dormindo e deu 500), NÃO apaga o usuário, usa o cache.
         if (!r.ok) {
-            if (r.status === 401) return null; // 401 já foi tratado e redirecionado pelo apiFetch
+            if (r.status === 401) return null; // apiFetch já limpou o cache
             return obterUsuarioCache();
         }
 
         const dados = await r.json();
 
-        // Se o servidor responder 200 OK mas disser que não está autenticado
         if (!dados.autenticado) {
             localStorage.removeItem("usuario");
             aplicarEstadoHeader(null);
-            if (document.body.dataset.protegida === "true") {
+            if (document.body && document.body.dataset.protegida === "true") {
                 window.location.replace("login.html");
             }
             return null;
@@ -114,15 +116,24 @@ async function obterDadosSessao() {
 
     } catch (erro) {
         console.error("Erro ao obter dados da sessão:", erro);
-        // Em caso de falha de rede, confia no cache para não derrubar o usuário
+        // Falha de rede: confia no cache para não derrubar o usuário
         return obterUsuarioCache();
     }
+}
+
+// Usada por perfil.js, reclamacao.js e editar-reclamacao.js
+// (antes não existia e causava ReferenceError).
+async function sessaoAtiva() {
+    const usuario = await obterDadosSessao();
+    return usuario !== null;
 }
 
 // ==========================================
 // Menu Mobile Hambúrguer e Header (Global)
 // ==========================================
 function initMenuMobileGlobal() {
+    aplicarEstadoHeader(obterUsuarioCache());
+
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
@@ -161,28 +172,8 @@ function initMenuMobileGlobal() {
     }
 }
 
-// ==========================================
-// Inicialização Principal da Aplicação
-// ==========================================
-async function initApp() {
-    // 1. Aplica o estado inicial via cache para renderizar o header imediatamente sem piscar
-    aplicarEstadoHeader(obterUsuarioCache());
-
-    // 2. Consulta o backend para validar o cookie HttpOnly e atualizar os dados reais
-    const usuarioServidor = await obterDadosSessao();
-
-    // 3. Se a página for protegida e o servidor confirmar que não há sessão válida, redireciona
-    if (!usuarioServidor && document.body.dataset.protegida === "true") {
-        window.location.replace("login.html");
-        return;
-    }
-
-    // 4. Inicializa o comportamento do menu mobile
-    initMenuMobileGlobal();
-}
-
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initApp);
+    document.addEventListener("DOMContentLoaded", initMenuMobileGlobal);
 } else {
-    initApp();
+    initMenuMobileGlobal();
 }

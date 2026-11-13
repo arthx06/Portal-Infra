@@ -65,10 +65,28 @@ function normalizarRelatoResolucao(raw) {
     };
 }
 
+/* =========================
+   INICIALIZAÇÃO E CONTROLE DE ACESSO
+========================= */
 document.addEventListener("DOMContentLoaded", async () => {
     const usuario = await obterDadosSessao();
 
-    if (!usuario || usuario.tipo !== "ADMIN") {
+    // Não autenticado (401 / sessão inexistente) -> login
+    if (!usuario) {
+        // Se o servidor está fora do ar e não há cache, avisa em vez de redirecionar às cegas
+        const aviso = document.getElementById("aviso-sessao");
+        if (aviso && !navigator.onLine) {
+            aviso.textContent =
+                "Sem conexão com o servidor. Verifique sua internet e recarregue a página.";
+            aviso.style.display = "block";
+            return;
+        }
+        window.location.replace("login.html");
+        return;
+    }
+
+    // Autenticado, mas sem permissão de administrador -> início
+    if (usuario.tipo !== "ADMIN") {
         window.location.replace("index.html");
         return;
     }
@@ -183,6 +201,7 @@ function configurarEventosInterface() {
         }
     });
 
+    // Permite abrir imagem em tamanho real ao clicar
     ["drawer-rec-foto", "drawer-com-foto"].forEach((imgId) => {
         const img = document.getElementById(imgId);
         if (img) {
@@ -220,6 +239,16 @@ async function carregarRelatosResolucao(resetarLimite = true) {
     try {
         const res = await apiFetch("/comentarios/admin/resolucoes");
 
+        if (res.status === 401) {
+            // apiFetch já limpou a sessão local; aqui só encaminhamos ao login.
+            window.location.replace("login.html");
+            return;
+        }
+
+        if (res.status === 403) {
+            throw new Error("Você não tem permissão para visualizar os relatos de resolução.");
+        }
+
         if (!res.ok) {
             throw new Error("Erro ao consultar os relatos de resolução no servidor.");
         }
@@ -231,7 +260,8 @@ async function carregarRelatosResolucao(resetarLimite = true) {
         renderizarListaFiltrada();
     } catch (erro) {
         console.error("Erro ao carregar relatos de resolução:", erro);
-        feedbackEl.textContent = "Não foi possível carregar os relatos de resolução no momento.";
+        feedbackEl.textContent =
+            erro.message || "Não foi possível carregar os relatos de resolução no momento.";
         feedbackEl.hidden = false;
     }
 }
@@ -314,24 +344,24 @@ function renderizarCardRelato(r) {
     return `
     <article class="val-card" data-id="${esc(r.id)}">
       ${thumbHtml}
-
+ 
       <div class="val-card-main">
         <div class="val-card-top">
           <span class="val-id-pill">Relato #${esc(r.id)} • Reclamação #${esc(r.reclamacao.id ?? "-")}</span>
           <span class="val-badge-prova">Prova de Resolução</span>
           <span class="val-date">${formatarDataHora(r.dataCriacao)}</span>
         </div>
-
+ 
         <h3 class="val-card-title">${esc(titulo)}</h3>
         <p class="val-card-excerpt">${esc(r.texto || "Clique em Analisar para conferir a foto de prova.")}</p>
-
+ 
         <div class="val-card-user">
           <span>Enviado por: <strong>${esc(r.autor.nome)}</strong></span>
           <span>${esc(r.autor.email)}</span>
           ${r.reclamacao.bairro ? `<span>Bairro: ${esc(r.reclamacao.bairro)}</span>` : ""}
         </div>
       </div>
-
+ 
       <div class="val-card-actions">
         ${badgeStatus}
         <button type="button" class="btn-analisar">Analisar</button>
@@ -352,7 +382,7 @@ function preencherImagemFrame(imgId, vazioId, url) {
         imgEl.hidden = false;
         vazioEl.hidden = true;
     } else {
-        imgEl.src = "";
+        imgEl.removeAttribute("src");
         imgEl.hidden = true;
         vazioEl.hidden = false;
     }
@@ -375,9 +405,11 @@ async function abrirGavetaRelato(relato) {
         statusBox.hidden = true;
     }
 
+    // Fotos Antes e Depois
     preencherImagemFrame("drawer-rec-foto", "sem-foto-antes", relato.reclamacao.fotoAntesUrl);
     preencherImagemFrame("drawer-com-foto", "sem-foto-depois", relato.fotoUrl);
 
+    // Dados da reclamação
     const linkOriginal = document.getElementById("drawer-link-original");
     if (relato.reclamacao.id) {
         linkOriginal.href = `detalhe-reclamacao.html?id=${encodeURIComponent(relato.reclamacao.id)}`;
@@ -394,11 +426,13 @@ async function abrirGavetaRelato(relato) {
         [relato.reclamacao.endereco, relato.reclamacao.bairro].filter(Boolean).join(" • ") ||
         "Localização não informada";
 
+    // Dados do relato do cidadão
     document.getElementById("drawer-com-texto").textContent =
         relato.texto || "Sem descrição adicional.";
     document.getElementById("drawer-com-data").textContent =
         `Enviado em ${formatarDataHora(relato.dataCriacao)}`;
 
+    // Autor
     const nome = relato.autor.nome || "Cidadão";
     document.getElementById("drawer-user-avatar").textContent = nome.charAt(0).toUpperCase();
     document.getElementById("drawer-user-nome").textContent = nome;
@@ -407,6 +441,7 @@ async function abrirGavetaRelato(relato) {
 
     document.getElementById("drawer-footer").hidden = isResolvida;
 
+    // Abre gaveta
     const overlay = document.getElementById("drawer-overlay");
     const drawer = document.getElementById("val-drawer");
     overlay.hidden = false;
@@ -416,6 +451,7 @@ async function abrirGavetaRelato(relato) {
         drawer.setAttribute("aria-hidden", "false");
     });
 
+    // Complementa dados e foto original da reclamação via GET /reclamacoes/{id}
     if (
         relato.reclamacao.id &&
         (!relato.reclamacao.fotoAntesUrl || !relato.reclamacao.descricao)

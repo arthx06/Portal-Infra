@@ -14,16 +14,13 @@
     <link rel="stylesheet" href="validar-resolucoes.css" />
     <script src="api.js" defer></script>
     <script src="validar-resolucoes.js" defer></script>
-    <style>
-        /* Classe utilitária para ocultar o conteúdo inicialmente e evitar o piscar na tela */
-        .val-conteudo-oculto {
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-    </style>
 </head>
-<body data-protegida="true">
+<!--
+    IMPORTANTE: não use data-protegida="true" aqui.
+    Esta página valida a sessão e o perfil ADMIN no próprio validar-resolucoes.js,
+    com redirecionamento correto (login se deslogado, início se não for admin).
+-->
+<body>
 <!-- CABEÇALHO -->
 <header class="header">
     <a href="index.html" class="logo"><span>Portal</span> Infra</a>
@@ -69,8 +66,8 @@
     </div>
 </header>
 
-<!-- CONTEÚDO PRINCIPAL (INICIA OCULTO ATÉ O JS VALIDAR A SESSÃO DO ADMIN) -->
-<main class="val-container val-conteudo-oculto" id="conteudo-validacao">
+<!-- CONTEÚDO PRINCIPAL (OCULTO ATÉ VALIDAR SESSÃO ADMIN) -->
+<main class="val-container" id="conteudo-validacao" style="visibility: hidden">
     <!-- TOPO DA PÁGINA -->
     <section class="val-header">
         <div>
@@ -145,6 +142,13 @@
         </div>
     </section>
 </main>
+
+<!-- AVISO QUANDO O SERVIDOR NÃO RESPONDE (visível mesmo com o conteúdo oculto) -->
+<div
+        id="aviso-sessao"
+        class="val-feedback"
+        style="max-width: 600px; margin: 60px auto; display: none"
+></div>
 
 <!-- OVERLAY E GAVETA LATERAL (DRAWER) -->
 <div id="drawer-overlay" class="drawer-overlay" hidden></div>
