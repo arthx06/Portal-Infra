@@ -1,4 +1,3 @@
-
 package org.example.portalinfra.config;
 
 import org.example.portalinfra.service.JwtService;
@@ -51,7 +50,8 @@ public class JwtCookieFilter extends OncePerRequestFilter {
         String token = null;
 
         for (Cookie cookie : cookies) {
-            if (COOKIE_NAME.equals(cookie.getName())) {
+            if (COOKIE_NAME.equals(cookie.getName())
+                    && jwtService.validarToken(cookie.getValue())) {
                 token = cookie.getValue();
                 break;
             }
@@ -59,15 +59,14 @@ public class JwtCookieFilter extends OncePerRequestFilter {
 
         if (token != null
                 && SecurityContextHolder.getContext()
-                        .getAuthentication() == null
-                && jwtService.validarToken(token)) {
+                .getAuthentication() == null) {
 
             try {
                 Long usuarioId =
                         jwtService.extrairUsuarioId(token);
 
-               Usuario usuario = usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                Usuario usuario = usuarioRepository.findById(usuarioId)
+                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
                 String autoridade =
                         "ADMIN".equalsIgnoreCase(usuario.getTipo())
@@ -92,4 +91,4 @@ public class JwtCookieFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-
+ 
