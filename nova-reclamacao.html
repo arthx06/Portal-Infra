@@ -1,185 +1,178 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Nova Reclamação | Portal Infra</title>
+  <title>Nova Reclamação | Portal Infra</title>
 
-    <script>
-      if (!localStorage.getItem("token")) {
-        window.location.replace("login.html?redirect=nova-reclamacao.html");
-      }
-    </script>
+  <!-- Adicionando a fonte Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+  />
 
-    <!-- Adicionando a fonte Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="nova-reclamacao.css" />
+  <script src="api.js" defer></script>
+  <script src="reclamacao.js" defer></script>
+</head>
 
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="nova-reclamacao.css" />
-    <script src="api.js" defer></script>
-    <script src="reclamacao.js" defer></script>
-    
+<!-- Adicionado data-protegida para o api.js agir sozinho -->
+<body data-protegida="true">
+<header class="header">
+  <a href="index.html" class="logo"> <span>Portal</span> Infra </a>
 
-  </head>
+  <nav id="nav-menu">
+    <a href="index.html">Início</a>
+    <a href="#">Mapa</a>
+    <a href="reclamacoes.html" class="active">Reclamações</a>
+    <a href="#">Sobre</a>
+  </nav>
 
-  <body>
-    <header class="header">
-      <a href="index.html" class="logo"> <span>Portal</span> Infra </a>
+  <div class="header-actions">
+    <a href="reclamacoes.html">
+      <button type="button" class="btn-secondary" id="btnVoltar">Voltar</button>
+    </a>
 
-      <nav id="nav-menu">
-        <a href="index.html">Início</a>
-        <a href="#">Mapa</a>
-        <a href="reclamacoes.html" class="active">Reclamações</a>
-        <a href="#">Sobre</a>
-      </nav>
+    <!-- Botão Menu Mobile (Hambúrguer) -->
+    <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Abrir menu de navegação"
+            aria-expanded="false"
+    >
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+  </div>
+</header>
 
-      <div class="header-actions">
-        <a href="reclamacoes.html">
-          <button type="button" class="btn-secondary" id="btnVoltar">Voltar</button>
-        </a>
+<main class="nova-reclamacao">
+  <section class="formulario-reclamacao">
+    <div class="formulario-cabecalho">
+      <span class="formulario-tag">PORTAL INFRA</span>
+      <h1>Registrar uma reclamação</h1>
+      <p>
+        Encontrou um problema na infraestrutura da cidade? Informe os
+        detalhes para registrar a ocorrência.
+      </p>
+    </div>
 
-        <!-- Botão Menu Mobile (Hambúrguer) -->
-        <button
-          class="menu-toggle"
-          id="menu-toggle"
-          type="button"
-          aria-label="Abrir menu de navegação"
-          aria-expanded="false"
-        >
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-        </button>
+    <form id="form-reclamacao">
+      <div class="campo-reclamacao">
+        <label for="titulo">Título da reclamação *</label>
+        <input
+                type="text"
+                id="titulo"
+                name="titulo"
+                placeholder="Ex.: Buraco grande na rua"
+                maxlength="100"
+                required
+        />
       </div>
-    </header>
 
-    <main class="nova-reclamacao">
-      <section class="formulario-reclamacao">
-        <div class="formulario-cabecalho">
-          <span class="formulario-tag">PORTAL INFRA</span>
-          <h1>Registrar uma reclamação</h1>
-          <p>
-            Encontrou um problema na infraestrutura da cidade? Informe os
-            detalhes para registrar a ocorrência.
-          </p>
+      <div class="campo-reclamacao">
+        <label for="categoria">Tipo de problema *</label>
+        <select id="categoria" name="categoria" required>
+          <option value="">Selecione o problema</option>
+          <option value="Buraco na rua">Buraco na rua</option>
+          <option value="Rua sem asfalto">Rua sem asfalto</option>
+          <option value="Poste sem iluminação">Poste sem iluminação</option>
+          <option value="Poste danificado">Poste danificado</option>
+          <option value="Árvore caída">Árvore caída</option>
+          <option value="Calçada danificada">Calçada danificada</option>
+          <option value="Alagamento">Alagamento</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+
+      <div class="campo-reclamacao">
+        <label for="descricao">Descrição do problema *</label>
+        <textarea
+                id="descricao"
+                name="descricao"
+                placeholder="Descreva o que aconteceu e como o problema afeta a região..."
+                maxlength="1500"
+                required
+        ></textarea>
+      </div>
+
+      <div class="campo-reclamacao">
+        <label for="endereco">Endereço do problema *</label>
+        <input
+                type="text"
+                id="endereco"
+                name="endereco"
+                placeholder="Nome da rua, avenida ou local"
+                maxlength="255"
+                required
+        />
+      </div>
+
+      <div class="campos-linha">
+        <div class="campo-reclamacao">
+          <label for="bairro">Bairro *</label>
+          <select id="bairro" name="bairro" required>
+            <option value="">Selecione o bairro</option>
+            <option value="Itaquera">Itaquera</option>
+            <option value="Tatuapé">Tatuapé</option>
+            <option value="Mooca">Mooca</option>
+            <option value="Vila Mariana">Vila Mariana</option>
+            <option value="São Mateus">São Mateus</option>
+            <option value="Aricanduva">Aricanduva</option>
+            <option value="Outro">Outro</option>
+          </select>
         </div>
 
-        <form id="form-reclamacao">
-          <div class="campo-reclamacao">
-            <label for="titulo">Título da reclamação *</label>
-            <input
-              type="text"
-              id="titulo"
-              name="titulo"
-              placeholder="Ex.: Buraco grande na rua"
-              maxlength="100"
-              required
-            />
-          </div>
+        <div class="campo-reclamacao">
+          <label for="gravidade">Gravidade *</label>
+          <select id="gravidade" name="gravidade" required>
+            <option value="">Selecione</option>
+            <option value="Leve">Leve</option>
+            <option value="Moderado">Moderado</option>
+            <option value="Grave">Grave</option>
+          </select>
+        </div>
+      </div>
 
-          <div class="campo-reclamacao">
-            <label for="categoria">Tipo de problema *</label>
-            <select id="categoria" name="categoria" required>
-              <option value="">Selecione o problema</option>
-              <option value="Buraco na rua">Buraco na rua</option>
-              <option value="Rua sem asfalto">Rua sem asfalto</option>
-              <option value="Poste sem iluminação">Poste sem iluminação</option>
-              <option value="Poste danificado">Poste danificado</option>
-              <option value="Árvore caída">Árvore caída</option>
-              <option value="Calçada danificada">Calçada danificada</option>
-              <option value="Alagamento">Alagamento</option>
-              <option value="Outro">Outro</option>
-            </select>
-          </div>
+      <div class="campo-reclamacao">
+        <label for="foto">Fotos do problema *</label>
 
-          <div class="campo-reclamacao">
-            <label for="descricao">Descrição do problema *</label>
-            <textarea
-              id="descricao"
-              name="descricao"
-              placeholder="Descreva o que aconteceu e como o problema afeta a região..."
-              maxlength="1500"
-              required
-            ></textarea>
-          </div>
-
-          <div class="campo-reclamacao">
-            <label for="endereco">Endereço do problema *</label>
-            <input
-              type="text"
-              id="endereco"
-              name="endereco"
-              placeholder="Nome da rua, avenida ou local"
-              maxlength="255"
-              required
-            />
-          </div>
-
-          <div class="campos-linha">
-            <div class="campo-reclamacao">
-              <label for="bairro">Bairro *</label>
-              <select id="bairro" name="bairro" required>
-                <option value="">Selecione o bairro</option>
-                <option value="Itaquera">Itaquera</option>
-                <option value="Tatuapé">Tatuapé</option>
-                <option value="Mooca">Mooca</option>
-                <option value="Vila Mariana">Vila Mariana</option>
-                <option value="São Mateus">São Mateus</option>
-                <option value="Aricanduva">Aricanduva</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
-
-            <div class="campo-reclamacao">
-              <label for="gravidade">Gravidade *</label>
-              <select id="gravidade" name="gravidade" required>
-                <option value="">Selecione</option>
-                <option value="Leve">Leve</option>
-                <option value="Moderado">Moderado</option>
-                <option value="Grave">Grave</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="campo-reclamacao">
-            <label for="foto">Fotos do problema *</label>
-
-            <input
+        <input
                 type="file"
                 id="foto"
                 name="fotos"
                 accept="image/jpeg,image/png"
                 multiple
                 required
-            >
+        >
 
-            <small>
-                Selecione de 1 a 3 fotos JPG ou PNG.
-                Cada imagem pode ter até 5 MB.
-            </small>
-            <div id="preview-fotos" class="preview-fotos"></div>
-          </div>
+        <small>
+          Selecione de 1 a 3 fotos JPG ou PNG.
+          Cada imagem pode ter até 5 MB.
+        </small>
+        <div id="preview-fotos" class="preview-fotos"></div>
+      </div>
 
-          <p id="mensagem-formulario" role="status" aria-live="polite"></p>
+      <p id="mensagem-formulario" role="status" aria-live="polite"></p>
 
-          <div class="acoes-formulario">
-            <a href="reclamacoes.html" class="btn-cancelar">Cancelar</a>
-            <button type="submit" class="btn-primary">Enviar reclamação</button>
-          </div>
-        </form>
-      </section>
-    </main>
+      <div class="acoes-formulario">
+        <a href="reclamacoes.html" class="btn-cancelar">Cancelar</a>
+        <button type="submit" class="btn-primary">Enviar reclamação</button>
+      </div>
+    </form>
+  </section>
+</main>
 
-    <footer>
-      <div class="logo"><span>Portal</span> Infra</div>
-      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
-      <span>© 2026 SP em Foco</span>
-    </footer>
-  </body>
+<footer>
+  <div class="logo"><span>Portal</span> Infra</div>
+  <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+  <span>© 2026 SP em Foco</span>
+</footer>
+</body>
 </html>
