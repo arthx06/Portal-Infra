@@ -123,8 +123,6 @@ async function obterDadosSessao() {
 // Menu Mobile Hambúrguer e Header (Global)
 // ==========================================
 function initMenuMobileGlobal() {
-    aplicarEstadoHeader(obterUsuarioCache());
-
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
@@ -163,8 +161,28 @@ function initMenuMobileGlobal() {
     }
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMenuMobileGlobal);
-} else {
+// ==========================================
+// Inicialização Principal da Aplicação
+// ==========================================
+async function initApp() {
+    // 1. Aplica o estado inicial via cache para renderizar o header imediatamente sem piscar
+    aplicarEstadoHeader(obterUsuarioCache());
+
+    // 2. Consulta o backend para validar o cookie HttpOnly e atualizar os dados reais
+    const usuarioServidor = await obterDadosSessao();
+
+    // 3. Se a página for protegida e o servidor confirmar que não há sessão válida, redireciona
+    if (!usuarioServidor && document.body.dataset.protegida === "true") {
+        window.location.replace("login.html");
+        return;
+    }
+
+    // 4. Inicializa o comportamento do menu mobile
     initMenuMobileGlobal();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initApp);
+} else {
+    initApp();
 }
