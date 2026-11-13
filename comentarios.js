@@ -1,285 +1,3 @@
-document.getElementById("btnVoltar")?.addEventListener("click", function () {
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.location.href = "index.html";
-    }
-});
-
-function mostrarTotal(total) {
-  const el = document.getElementById('count-resultados');
-  if (el) el.textContent = `${total.toLocaleString('pt-BR')} ${total === 1 ? 'reclamação' : 'reclamações'}`;
-}
-
-async function carregarTotal() {
-  try {
-    const salvo = localStorage.getItem('total_reclamacoes');
-    if (salvo) mostrarTotal(Number(salvo));
-  } catch (e) {}
-
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
-    if (!res.ok) return;
-    const d = await res.json();
-    mostrarTotal(d.total);
-    try { localStorage.setItem('total_reclamacoes', d.total); } catch (e) {}
-  } catch (e) {
-    console.error('Erro ao carregar total', e);
-  }
-}
-
-let filtroAtual = new URLSearchParams();
-
-function lerFiltros() {
-  const v = (id) => (document.getElementById(id)?.value || '').trim();
-  const p = new URLSearchParams();
-  [['titulo', 'filtro-busca'], ['categoria', 'filtro-categoria'],
-   ['bairro', 'filtro-bairro'], ['status', 'filtro-status']]
-    .forEach(([nome, id]) => {
-        const valor = v(id);
-        if (valor && !valor.toLowerCase().startsWith('todos')) p.set(nome, valor);
-    });
-  return p;
-}
-
-function aplicarFiltro() {
-  filtroAtual = lerFiltros();
-  paginaAtual = 0;
-  const lista = document.getElementById('lista-reclamacoes');
-  if (lista) lista.innerHTML = '';
-  carregarReclamacoes();
-}
-
-document.getElementById('btn-filtrar')?.addEventListener('click', aplicarFiltro);
-document.getElementById('filtro-busca')?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') aplicarFiltro();
-});
-
-let paginaAtual = 0;
-
-let usuarioLogadoId = (typeof obterUsuarioCache === 'function' && obterUsuarioCache()?.id)
-    ? obterUsuarioCache().id
-    : null;
-
-async function carregarUsuarioSessao() {
-    try {
-        const resposta = await apiFetch('/usuarios/sessao');
-
-        if (!resposta.ok) {
-            usuarioLogadoId = null;
-            return;
-        }
-
-        const sessao = await resposta.json();
-
-        usuarioLogadoId = sessao.autenticado
-            ? sessao.id
-            : null;
-
-    } catch (erro) {
-        console.error("Erro ao verificar sessão:", erro);
-        usuarioLogadoId = null;
-    }
-}
-
-const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-
-function criarCard(r) {
-    const classe = {
-        pendente: 'pending',
-        resolvida: 'resolved'
-    }[(r.status || '').toLowerCase()] || '';
-
-    const data = r.dataCriacao
-        ? new Date(r.dataCriacao).toLocaleDateString('pt-BR')
-        : '';
-
-    const ehDono = usuarioLogadoId != null &&
-        String(usuarioLogadoId) === String(r.usuarioId);
-
-    const botoesProprietario = ehDono ? `
-        <div class="acoes-reclamacao">
-            <button
-                type="button"
-                class="botao-editar-reclamacao"
-                data-acao="editar"
-                data-id="${Number(r.id)}">
-                Editar
-            </button>
-
-            <button
-                type="button"
-                class="botao-excluir-reclamacao"
-                data-acao="excluir"
-                data-id="${Number(r.id)}">
-                Excluir
-            </button>
-        </div>
-    ` : '';
-
-    const botaoDenunciarReclamacao = ehDono ? '' : `
-        <button
-            type="button"
-            class="botao-denunciar-reclamacao"
-            onclick="abrirModalDenunciaReclamacao(${Number(r.id)})">
-            🚩 Denunciar
-        </button>
-    `;
-
-    return `
-    <div class="complaint-card" data-id="${Number(r.id)}">
-        <div class="image-container">
-            <img src="${esc(r.fotoUrl)}" alt="${esc(r.titulo)}" />
-            <span class="category">${esc(r.categoria)}</span>
-        </div>
-
-        <div class="card-content">
-            <span class="status ${classe}">${esc(r.status)}</span>
-            <h2>${esc(r.titulo)}</h2>
-            <p class="location">${esc(r.endereco)}, ${esc(r.bairro)}</p>
-            <p class="description">${esc(r.descricao)}</p>
-
-            <div class="card-footer">
-                <span>${data}</span>
-                <button
-                    type="button"
-                    onclick="abrirComentarios(${Number(r.id)})">
-                    Comentários
-                </button>
-                ${botaoDenunciarReclamacao}
-            </div>
-
-            ${botoesProprietario}
-        </div>
-    </div>`;
-}
-
-async function excluirReclamacao(id, botao) {
-    const confirmar = confirm(
-        "Deseja realmente excluir esta reclamação?\n\n" +
-        "Os comentários, respostas e imagens relacionados também serão excluídos."
-    );
-
-    if (!confirmar) return;
-
-    botao.disabled = true;
-    botao.textContent = "Excluindo...";
-
-    try {
-        const resposta = await apiFetch(`/reclamacoes/${id}`, {
-            method: "DELETE"
-        });
-
-        if (!resposta.ok) {
-            const resultado = await resposta.json().catch(() => ({}));
-
-            throw new Error(
-                resultado.message ||
-                resultado.erro ||
-                "Não foi possível excluir a reclamação."
-            );
-        }
-
-        alert("Reclamação excluída com sucesso!");
-
-        // Atualiza a lista desde a primeira página
-        paginaAtual = 0;
-
-        const lista = document.getElementById('lista-reclamacoes');
-        if (lista) lista.innerHTML = '';
-
-        await carregarReclamacoes();
-        await carregarTotal();
-
-    } catch (erro) {
-        console.error("Erro ao excluir reclamação:", erro);
-        alert(erro.message);
-
-        botao.disabled = false;
-        botao.textContent = "Excluir";
-    }
-}
-
-
-async function carregarReclamacoes() {
-  const lista = document.getElementById('lista-reclamacoes');
-  const btn = document.getElementById('btn-mais');
-  const TAMANHO_PAGINA = 12;
-  if (!lista) return;
-
-  try {
-    const params = new URLSearchParams(filtroAtual);
-    params.set('page', paginaAtual);
-    params.set('size', TAMANHO_PAGINA);
-
-    const res = await fetch(`${API_BASE}/reclamacoes?${params}`);
-    if (!res.ok) return;
-    const pagina = await res.json();
-
-    if (paginaAtual === 0 && pagina.content.length === 0) {
-      lista.innerHTML = '<p>Nenhuma reclamação encontrada.</p>';
-    } else {
-      lista.insertAdjacentHTML('beforeend', pagina.content.map(criarCard).join(''));
-    }
-
-    if (btn) btn.hidden = pagina.content.length < TAMANHO_PAGINA;
-    paginaAtual++;
-  } catch (e) {
-    console.error('Erro ao carregar reclamações', e);
-  }
-}
-
-const btnMais = document.getElementById('btn-mais');
-if (btnMais) btnMais.addEventListener('click', carregarReclamacoes);
-
-
-document.getElementById('lista-reclamacoes')?.addEventListener('click', (e) => {
-    const botaoAcao = e.target.closest('[data-acao]');
-
-    if (botaoAcao) {
-        e.stopPropagation();
-
-        const id = botaoAcao.dataset.id;
-        const acao = botaoAcao.dataset.acao;
-
-        if (acao === 'editar') {
-            window.location.href =
-                `editar-reclamacao.html?id=${encodeURIComponent(id)}`;
-        }
-
-        if (acao === 'excluir') {
-            excluirReclamacao(id, botaoAcao);
-        }
-
-        return;
-    }
-
-    // O botão de comentários mantém seu próprio comportamento
-    if (e.target.closest('.card-footer button')) return;
-
-    const card = e.target.closest('.complaint-card');
-
-    if (card?.dataset.id) {
-       window.location.href =
-            `detalhe-reclamacao.html?id=${card.dataset.id}&origem=reclamacoes.html`;
-    }
-});
-
-
-// INICIALIZA A PÁGINA PÚBLICA
-
-async function inicializarPaginaReclamacoes() {
-    await carregarUsuarioSessao();
-
-    carregarTotal();
-    carregarReclamacoes();
-}
-
-inicializarPaginaReclamacoes();
-
-
 // =====================================================
 // COMENTÁRIOS E THREADS
 // =====================================================
@@ -289,6 +7,24 @@ async function estaLogado() {
         return res.ok && (await res.json()).autenticado === true;
     } catch (e) {
         return false;
+    }
+}
+
+// Controla a exibição e obrigatoriedade do campo de foto para sugestão de resolução
+function toggleResolucaoCampos() {
+    const checkResolucao = document.getElementById('check-resolucao');
+    const grupoFoto = document.getElementById('grupo-foto-resolucao');
+    const inputFoto = document.getElementById('foto-resolucao');
+
+    if (!checkResolucao || !grupoFoto || !inputFoto) return;
+
+    if (checkResolucao.checked) {
+        grupoFoto.style.display = 'block';
+        inputFoto.setAttribute('required', 'true');
+    } else {
+        grupoFoto.style.display = 'none';
+        inputFoto.removeAttribute('required');
+        inputFoto.value = '';
     }
 }
 
@@ -304,13 +40,22 @@ async function carregarComentarios(reclamacaoId) {
         const resposta = await fetch(`${API_BASE}/comentarios/reclamacao/${reclamacaoId}`);
         if (!resposta.ok) throw new Error("Erro ao carregar comentários");
 
-        const comentarios = await resposta.json();
+        let comentarios = await resposta.json();
         container.innerHTML = "";
 
         if (comentarios.length === 0) {
             container.innerHTML = "<p style='color: #888; font-size: 13px;'>Nenhum comentário ainda. Seja o primeiro a comentar!</p>";
             return;
         }
+
+        // Ordena os comentários principais: os marcados como resolução (isResolucao = true) ficam fixados no topo
+        comentarios.sort((a, b) => {
+            const aRes = a.isResolucao === true;
+            const bRes = b.isResolucao === true;
+            if (aRes && !bRes) return -1;
+            if (!aRes && bRes) return 1;
+            return new Date(b.dataCriacao || 0) - new Date(a.dataCriacao || 0);
+        });
 
         comentarios.forEach(comentario => {
             container.appendChild(criarElementoComentario(comentario, reclamacaoId));
@@ -324,7 +69,9 @@ async function carregarComentarios(reclamacaoId) {
 // Cria o elemento visual de um comentário e suas respostas encadeadas
 function criarElementoComentario(comentario, reclamacaoId) {
     const div = document.createElement("div");
-    div.className = "comentario-item";
+
+    const isResolucao = comentario.isResolucao === true;
+    div.className = isResolucao ? "comentario-item comentario-resolucao" : "comentario-item";
     div.id = `comentario-${comentario.id}`;
 
     const dataFormatada = comentario.dataCriacao ? new Date(comentario.dataCriacao).toLocaleDateString("pt-BR") : "";
@@ -343,12 +90,26 @@ function criarElementoComentario(comentario, reclamacaoId) {
         </button>
     `;
 
+    const badgeHtml = isResolucao ? `
+        <div style="margin-bottom: 8px;">
+            <span class="badge-resolucao">✓ Sugestão de Resolução</span>
+        </div>
+    ` : '';
+
+    const fotoResolucaoHtml = (isResolucao && comentario.fotoUrl) ? `
+        <div class="comentario-resolucao-foto">
+            <img src="${esc(comentario.fotoUrl)}" alt="Comprovação de Resolução" />
+        </div>
+    ` : '';
+
     div.innerHTML = `
+        ${badgeHtml}
         <div class="comentario-header">
             <span class="comentario-autor">${esc(comentario.usuarioNome || 'Usuário')}</span>
             <span class="comentario-data" style="color: #888; font-size: 11px; margin-left: 8px;">${dataFormatada}</span>
         </div>
         <div class="comentario-texto">${esc(comentario.texto)}</div>
+        ${fotoResolucaoHtml}
         <div class="comentario-acoes">
             <button class="btn-responder" type="button" onclick="mostrarFormularioResposta(${comentario.id}, ${reclamacaoId})">Responder</button>
             ${botaoDenunciar}
@@ -390,7 +151,7 @@ function mostrarFormularioResposta(comentarioId, reclamacaoId) {
 
 // Envia a resposta do comentário para o backend
 async function enviarResposta(comentarioPaiId, reclamacaoId) {
-   if (!(await estaLogado())) {
+    if (!(await estaLogado())) {
         alert("Você precisa estar logado para comentar!");
         return;
     }
@@ -416,7 +177,6 @@ async function enviarResposta(comentarioPaiId, reclamacaoId) {
 
         if (!resposta.ok) throw new Error("Erro ao salvar resposta");
 
-        // Recarrega os comentários para já exibir a thread atualizada
         carregarComentarios(reclamacaoId);
     } catch (erro) {
         console.error("Erro:", erro);
@@ -445,26 +205,50 @@ async function enviarComentarioPrincipal() {
 
     const campo = document.getElementById("novo-comentario-texto");
     const texto = campo ? campo.value.trim() : "";
+    const checkResolucao = document.getElementById("check-resolucao");
+    const isResolucao = checkResolucao ? checkResolucao.checked : false;
+    const inputFoto = document.getElementById("foto-resolucao");
+
     if (!texto) return;
+
+    if (isResolucao && (!inputFoto || inputFoto.files.length === 0)) {
+        alert("Para sugerir que a reclamação foi resolvida, é obrigatório anexar uma foto de comprovação.");
+        return;
+    }
 
     try {
         const form = new FormData();
+
+        // Objeto JSON contendo texto e a flag de sugestão de resolução
+        const payload = {
+            texto: texto,
+            isResolucao: isResolucao
+        };
+
         form.append(
             "dados",
             new Blob(
-                [JSON.stringify({ texto })],
+                [JSON.stringify(payload)],
                 { type: "application/json" }
             )
         );
+
+        // Se marcou resolução e anexou a foto, adiciona ao FormData
+        if (isResolucao && inputFoto && inputFoto.files[0]) {
+            form.append("foto", inputFoto.files[0]);
+        }
 
         const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoAtualId}`, {
             method: "POST",
             body: form
         });
-        
+
         if (!resposta.ok) throw new Error("Erro ao postar comentário");
 
         campo.value = "";
+        if (checkResolucao) checkResolucao.checked = false;
+        toggleResolucaoCampos();
+
         carregarComentarios(reclamacaoAtualId);
     } catch (erro) {
         console.error("Erro:", erro);
@@ -474,8 +258,6 @@ async function enviarComentarioPrincipal() {
 
 // =====================================================
 // SISTEMA DE DENÚNCIA DE COMENTÁRIOS (DenunciaService.java)
-// Opções: CONTEUDO_SEXUAL, DISCURSO_DE_ODIO, PALAVRAS_DE_BAIXO_CALAO,
-// CONTEUDO_FALSO, SPAM, VENDA_OU_SERVICOS, OUTROS
 // =====================================================
 
 function garantirModalDenunciaExiste() {
