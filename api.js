@@ -65,8 +65,8 @@ async function apiFetch(path, options = {}) {
         ...options,
     });
 
-    // Apenas 401 (não autenticado/token expirado) desloga e redireciona.
-    // 403 (proibido) agora apenas retorna a resposta normalmente sem destruir a sessão.
+    // BLINDAGEM: Somente o erro 401 (Token inválido/expirado) derruba a sessão.
+    // Erros 403 (Sem permissão) ou 500 (Erro no Render) não vão mais te deslogar!
     if (resp.status === 401) {
         localStorage.removeItem("usuario");
         aplicarEstadoHeader(null);
@@ -78,38 +78,25 @@ async function apiFetch(path, options = {}) {
     return resp;
 }
 
-async function sessaoAtiva() {
-    try {
-        const r = await apiFetch("/usuarios/sessao");
-
-        if (!r.ok) {
-            return false;
-        }
-
-        const dados = await r.json();
-
-        return dados.autenticado === true;
-    } catch (erro) {
-        console.error("Erro ao verificar sessão:", erro);
-        return false;
-    }
-}
-
 async function obterDadosSessao() {
     try {
         const r = await apiFetch("/usuarios/sessao");
 
+        // Se a rota falhar (ex: Render dormindo e deu 500), NÃO apaga o usuário, usa o cache.
         if (!r.ok) {
-            localStorage.removeItem("usuario");
-            aplicarEstadoHeader(null);
-            return null;
+            if (r.status === 401) return null; // 401 já foi tratado e redirecionado pelo apiFetch
+            return obterUsuarioCache();
         }
 
         const dados = await r.json();
 
+        // Se o servidor responder 200 OK mas disser que não está autenticado
         if (!dados.autenticado) {
             localStorage.removeItem("usuario");
             aplicarEstadoHeader(null);
+            if (document.body.dataset.protegida === "true") {
+                window.location.replace("login.html");
+            }
             return null;
         }
 
@@ -127,7 +114,8 @@ async function obterDadosSessao() {
 
     } catch (erro) {
         console.error("Erro ao obter dados da sessão:", erro);
-        return null;
+        // Em caso de falha de rede, confia no cache para não derrubar o usuário
+        return obterUsuarioCache();
     }
 }
 
