@@ -1,10 +1,31 @@
 // api.js
 const API_BASE = "https://portal-infra-backend.onrender.com";
 
+// Token JWT guardado no navegador. É enviado no header Authorization, o que
+// funciona em qualquer navegador (inclusive Safari, que bloqueia cookies de terceiros).
+const TOKEN_KEY = "token";
+
 const LINKS_ADMIN_DROPDOWN = [
     { id: "link-moderacao", href: "moderacao.html", texto: "Painel de Moderação" },
     { id: "link-validacao-resolucoes", href: "validar-resolucoes.html", texto: "Validar Resoluções" },
 ];
+
+function obterToken() {
+    try {
+        return localStorage.getItem(TOKEN_KEY);
+    } catch {
+        return null;
+    }
+}
+
+function limparSessaoLocal() {
+    try {
+        localStorage.removeItem("usuario");
+        localStorage.removeItem(TOKEN_KEY);
+    } catch {
+        // storage indisponível: nada a limpar
+    }
+}
 
 function obterUsuarioCache() {
     try {
@@ -60,15 +81,33 @@ function aplicarEstadoHeader(usuario) {
 }
 
 async function apiFetch(path, options = {}) {
+    // Monta os headers sem perder os que o chamador definiu.
+    // Para FormData, não definimos Content-Type (o navegador cuida disso).
+    const headers = new Headers(options.headers || {});
+    const token = obterToken();
+
+    if (token && !headers.has("Authorization")) {
+        headers.set("Authorization", "Bearer " + token);
+    }
+
     const resp = await fetch(API_BASE + path, {
-        credentials: "include", // envia o cookie JWT
+        credentials: "include", // mantém o cookie como alternativa
         ...options,
+        headers,
     });
 
-    // Somente o 401 (token inválido/expirado/não enviado) derruba a sessão local.
+    // Logout / desativação bem-sucedidos: apaga o token local também.
+    if (
+        resp.ok &&
+        (path === "/usuarios/logout" || path === "/usuarios/me/desativar")
+    ) {
+        limparSessaoLocal();
+    }
+
+    // Somente o 401 (token inválido/expirado/ausente) derruba a sessão local.
     // 403 (sem permissão) ou 5xx (Render dormindo) NÃO deslogam o usuário.
     if (resp.status === 401) {
-        localStorage.removeItem("usuario");
+        limparSessaoLocal();
         aplicarEstadoHeader(null);
         if (document.body && document.body.dataset.protegida === "true") {
             window.location.replace("login.html");
@@ -87,14 +126,14 @@ async function obterDadosSessao() {
         const r = await apiFetch("/usuarios/sessao");
 
         if (!r.ok) {
-            if (r.status === 401) return null; // apiFetch já limpou o cache
+            if (r.status === 401) return null; // apiFetch já limpou a sessão local
             return obterUsuarioCache();
         }
 
         const dados = await r.json();
 
         if (!dados.autenticado) {
-            localStorage.removeItem("usuario");
+            limparSessaoLocal();
             aplicarEstadoHeader(null);
             if (document.body && document.body.dataset.protegida === "true") {
                 window.location.replace("login.html");
@@ -122,7 +161,6 @@ async function obterDadosSessao() {
 }
 
 // Usada por perfil.js, reclamacao.js e editar-reclamacao.js
-// (antes não existia e causava ReferenceError).
 async function sessaoAtiva() {
     const usuario = await obterDadosSessao();
     return usuario !== null;
