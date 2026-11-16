@@ -578,6 +578,7 @@ async function salvarEdicaoConteudo(event) {
                 cep: recAtual.cep,
                 latitude: recAtual.latitude,
                 longitude: recAtual.longitude,
+                gravidade: recAtual.gravidade,
             };
 
             const formData = new FormData();
