@@ -1,347 +1,349 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Entrar - Portal Infra</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar - Portal Infra</title>
 
-    <!-- Adicionando a fonte moderna Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+  <!-- Adicionando a fonte moderna Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+  />
 
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="scriptlogin.js" defer></script>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="acessibilidade.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="scriptlogin.js" defer></script>
+  <script src="acessibilidade.js" defer></script>
 
 
-  </head>
-  <body>
-    <!-- CABEÇALHO -->
-    <header class="header">
-      <a href="index.html" class="logo"><span>Portal</span> Infra</a>
-      <nav id="nav-menu">
-        <a href="index.html">Início</a>
-        <a href="#">Mapa</a>
-        <a href="reclamacoes.html">Reclamações</a>
-        <a href="#">Sobre</a>
-      </nav>
+</head>
+<body>
+<!-- CABEÇALHO -->
+<header class="header">
+  <a href="index.html" class="logo"><span>Portal</span> Infra</a>
+  <nav id="nav-menu">
+    <a href="index.html">Início</a>
+    <a href="#">Mapa</a>
+    <a href="reclamacoes.html">Reclamações</a>
+    <a href="#">Sobre</a>
+  </nav>
 
-      <div class="header-actions">
-        <!-- Botão Voltar (estilizado via CSS) -->
-        <a href="index.html"><button class="btn-secondary" type="button">Voltar</button></a>
+  <div class="header-actions">
+    <!-- Botão Voltar (estilizado via CSS) -->
+    <a href="index.html"><button class="btn-secondary" type="button">Voltar</button></a>
 
-        <!-- Botão Menu Mobile (Hambúrguer) -->
-        <button
-          class="menu-toggle"
-          id="menu-toggle"
-          type="button"
-          aria-label="Abrir menu de navegação"
-          aria-expanded="false"
-        >
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-          <span class="hamburger-bar"></span>
-        </button>
+    <!-- Botão Menu Mobile (Hambúrguer) -->
+    <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Abrir menu de navegação"
+            aria-expanded="false"
+    >
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+  </div>
+</header>
+
+<!-- CONTEÚDO DE AUTENTICAÇÃO -->
+<main class="auth-page">
+  <div class="auth-container">
+    <!-- FORMULÁRIO DE LOGIN -->
+    <div class="auth-card" id="form-login">
+      <div class="auth-header">
+        <h2>Bem-vindo de volta</h2>
+        <p>Acesse sua conta para continuar</p>
       </div>
-    </header>
 
-    <!-- CONTEÚDO DE AUTENTICAÇÃO -->
-    <main class="auth-page">
-      <div class="auth-container">
-        <!-- FORMULÁRIO DE LOGIN -->
-        <div class="auth-card" id="form-login">
-          <div class="auth-header">
-            <h2>Bem-vindo de volta</h2>
-            <p>Acesse sua conta para continuar</p>
-          </div>
+      <form action="#" method="POST" id="login-form">
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Digite seu e-mail"
+                  required
+          />
+        </div>
 
-          <form action="#" method="POST" id="login-form">
-            <div class="input-group">
-              <label for="email">E-mail</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Digite seu e-mail"
-                required
-              />
-            </div>
+        <div class="input-group">
+          <label for="senha">Senha</label>
+          <input
+                  type="password"
+                  id="senha"
+                  name="senha"
+                  placeholder="Digite sua senha"
+                  required
+          />
+        </div>
 
-            <div class="input-group">
-              <label for="senha">Senha</label>
-              <input
-                type="password"
-                id="senha"
-                name="senha"
-                placeholder="Digite sua senha"
-                required
-              />
-            </div>
-
-            <div class="auth-options">
-              <label>
-                <input type="checkbox" name="lembrar" /> Lembrar de mim
-              </label>
-              <a
-                href="#"
-                class="forgot-password"
-                onclick="
+        <div class="auth-options">
+          <label>
+            <input type="checkbox" name="lembrar" /> Lembrar de mim
+          </label>
+          <a
+                  href="#"
+                  class="forgot-password"
+                  onclick="
                   toggleAuth('recuperar');
                   return false;
                 "
-                >Esqueceu a senha?</a
-              >
-            </div>
-
-            <button type="submit" class="btn-primary btn-full">Entrar</button>
-          </form>
-
-          <div class="auth-footer">
-            Não tem uma conta?
-            <button class="btn-link" onclick="toggleAuth('cadastro')">
-              Cadastre-se
-            </button>
-          </div>
+          >Esqueceu a senha?</a
+          >
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO -->
-        <div class="auth-card" id="form-cadastro" style="display: none">
-          <div class="auth-header">
-            <h2>Crie sua conta</h2>
-            <p>Junte-se a nós e ajude a melhorar a cidade</p>
-          </div>
+        <button type="submit" class="btn-primary btn-full">Entrar</button>
+      </form>
 
-          <div id="area-verificacao" style="display: none">
-            <div class="input-group">
-              <label for="codigo_cad">Código de verificação</label>
-              <input
-                type="text"
-                id="codigo_cad"
-                maxlength="6"
-                inputmode="numeric"
-                placeholder="Digite o código recebido"
-              />
-            </div>
-
-            <button
-              type="submit"
-              form="cadastro-form"
-              id="btn-confirmar-cadastro"
-              class="submit btn-primary btn-full"
-            >
-              Confirmar cadastro
-            </button>
-          </div>
-
-          <form action="#" method="POST" id="cadastro-form">
-            <div class="input-group">
-              <label for="nome_cad">Nome completo</label>
-              <input
-                type="text"
-                id="nome_cad"
-                name="nome"
-                placeholder="Digite seu nome"
-                required
-              />
-            </div>
-
-            <div class="input-group">
-              <label for="email_cad">E-mail</label>
-              <input
-                type="email"
-                id="email_cad"
-                name="email"
-                placeholder="Digite seu e-mail"
-                required
-              />
-            </div>
-
-            <div class="input-group">
-              <label for="telefone_cad">Telefone</label>
-              <input
-                type="tel"
-                id="telefone_cad"
-                name="telefone"
-                placeholder="(00) 00000-0000"
-                maxlength="15"
-                inputmode="numeric"
-                autocomplete="tel-national"
-                pattern="\(\d{2}\) \d{4,5}-\d{4}"
-                title="Digite o DDD e o número, por exemplo (11) 98765-4321"
-                required
-              />
-            </div>
-
-            <div class="input-group">
-              <label for="senha_cad">Senha</label>
-              <input
-                type="password"
-                id="senha_cad"
-                name="senha"
-                placeholder="Crie uma senha"
-                minlength="6"
-                required
-              />
-            </div>
-
-            <div class="input-group">
-              <label for="cep_cad">CEP</label>
-              <input
-                type="text"
-                id="cep_cad"
-                name="cep"
-                placeholder="00000-000"
-                maxlength="9"
-                inputmode="numeric"
-                autocomplete="postal-code"
-                required
-              />
-              <small id="cep-status"></small>
-            </div>
-
-            <div class="input-group">
-              <label for="data_nasc">Data de Nascimento</label>
-              <input
-                type="date"
-                id="data_nasc"
-                name="dataNascimento"
-                placeholder="Digite sua data de nascimento"
-                required
-              />
-            </div>
-
-            <div class="input-row">
-              <div class="input-group">
-                <label for="logradouro_cad">Rua</label>
-                <input
-                  type="text"
-                  id="logradouro_cad"
-                  name="logradouro"
-                  placeholder="Rua / Avenida"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <label for="numero_cad">Número</label>
-                <input
-                  type="text"
-                  id="numero_cad"
-                  name="numero"
-                  placeholder="Nº"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="input-group">
-              <label for="complemento_cad">Complemento</label>
-              <input
-                type="text"
-                id="complemento_cad"
-                name="complemento"
-                placeholder="Apto, bloco (opcional)"
-              />
-            </div>
-
-            <div class="input-group">
-              <label for="bairro_cad">Bairro</label>
-              <input
-                type="text"
-                id="bairro_cad"
-                name="bairro"
-                placeholder="Bairro"
-                required
-              />
-            </div>
-
-            <div class="input-row">
-              <div class="input-group">
-                <label for="cidade_cad">Cidade</label>
-                <input
-                  type="text"
-                  id="cidade_cad"
-                  name="cidade"
-                  placeholder="Cidade"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <label for="uf_cad">UF</label>
-                <input
-                  type="text"
-                  id="uf_cad"
-                  name="uf"
-                  placeholder="UF"
-                  maxlength="2"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              id="btn-enviar-codigo"
-              class="submit btn-primary btn-full"
-            >
-              Enviar código
-            </button>
-
-            <div class="auth-footer">
-              Já tem uma conta?
-              <button
-                type="button"
-                class="btn-link"
-                onclick="toggleAuth('login')"
-              >
-                Faça login
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- FORMULÁRIO DE RECUPERAR SENHA -->
-        <div class="auth-card" id="form-recuperar" style="display: none">
-          <div class="auth-header">
-            <h2>Recuperar senha</h2>
-            <p>Digite seu e-mail para receber instruções de recuperação</p>
-          </div>
-
-          <form action="#" method="POST" id="recuperar-form">
-            <div class="input-group">
-              <label for="email_rec">E-mail cadastrado</label>
-              <input
-                type="email"
-                id="email_rec"
-                name="email"
-                placeholder="Digite seu e-mail"
-                required
-              />
-            </div>
-
-            <button type="submit" class="submit btn-primary btn-full">
-              Enviar instruções
-            </button>
-          </form>
-
-          <div class="auth-footer">
-            Lembrou sua senha?
-            <button class="btn-link" onclick="toggleAuth('login')">
-              Faça login
-            </button>
-          </div>
-        </div>
+      <div class="auth-footer">
+        Não tem uma conta?
+        <button class="btn-link" onclick="toggleAuth('cadastro')">
+          Cadastre-se
+        </button>
       </div>
-    </main>
+    </div>
 
-    <!-- RODAPÉ -->
-    <footer>
-      <a href="index.html" class="logo"><span>Portal</span> Infra</a>
-      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
-      <span>© 2026 SP em Foco</span>
-    </footer>
-  </body>
+    <!-- FORMULÁRIO DE CADASTRO -->
+    <div class="auth-card" id="form-cadastro" style="display: none">
+      <div class="auth-header">
+        <h2>Crie sua conta</h2>
+        <p>Junte-se a nós e ajude a melhorar a cidade</p>
+      </div>
+
+      <div id="area-verificacao" style="display: none">
+        <div class="input-group">
+          <label for="codigo_cad">Código de verificação</label>
+          <input
+                  type="text"
+                  id="codigo_cad"
+                  maxlength="6"
+                  inputmode="numeric"
+                  placeholder="Digite o código recebido"
+          />
+        </div>
+
+        <button
+                type="submit"
+                form="cadastro-form"
+                id="btn-confirmar-cadastro"
+                class="submit btn-primary btn-full"
+        >
+          Confirmar cadastro
+        </button>
+      </div>
+
+      <form action="#" method="POST" id="cadastro-form">
+        <div class="input-group">
+          <label for="nome_cad">Nome completo</label>
+          <input
+                  type="text"
+                  id="nome_cad"
+                  name="nome"
+                  placeholder="Digite seu nome"
+                  required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="email_cad">E-mail</label>
+          <input
+                  type="email"
+                  id="email_cad"
+                  name="email"
+                  placeholder="Digite seu e-mail"
+                  required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="telefone_cad">Telefone</label>
+          <input
+                  type="tel"
+                  id="telefone_cad"
+                  name="telefone"
+                  placeholder="(00) 00000-0000"
+                  maxlength="15"
+                  inputmode="numeric"
+                  autocomplete="tel-national"
+                  pattern="\(\d{2}\) \d{4,5}-\d{4}"
+                  title="Digite o DDD e o número, por exemplo (11) 98765-4321"
+                  required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="senha_cad">Senha</label>
+          <input
+                  type="password"
+                  id="senha_cad"
+                  name="senha"
+                  placeholder="Crie uma senha"
+                  minlength="6"
+                  required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="cep_cad">CEP</label>
+          <input
+                  type="text"
+                  id="cep_cad"
+                  name="cep"
+                  placeholder="00000-000"
+                  maxlength="9"
+                  inputmode="numeric"
+                  autocomplete="postal-code"
+                  required
+          />
+          <small id="cep-status"></small>
+        </div>
+
+        <div class="input-group">
+          <label for="data_nasc">Data de Nascimento</label>
+          <input
+                  type="date"
+                  id="data_nasc"
+                  name="dataNascimento"
+                  placeholder="Digite sua data de nascimento"
+                  required
+          />
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label for="logradouro_cad">Rua</label>
+            <input
+                    type="text"
+                    id="logradouro_cad"
+                    name="logradouro"
+                    placeholder="Rua / Avenida"
+                    required
+            />
+          </div>
+          <div class="input-group">
+            <label for="numero_cad">Número</label>
+            <input
+                    type="text"
+                    id="numero_cad"
+                    name="numero"
+                    placeholder="Nº"
+                    required
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="complemento_cad">Complemento</label>
+          <input
+                  type="text"
+                  id="complemento_cad"
+                  name="complemento"
+                  placeholder="Apto, bloco (opcional)"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="bairro_cad">Bairro</label>
+          <input
+                  type="text"
+                  id="bairro_cad"
+                  name="bairro"
+                  placeholder="Bairro"
+                  required
+          />
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label for="cidade_cad">Cidade</label>
+            <input
+                    type="text"
+                    id="cidade_cad"
+                    name="cidade"
+                    placeholder="Cidade"
+                    required
+            />
+          </div>
+          <div class="input-group">
+            <label for="uf_cad">UF</label>
+            <input
+                    type="text"
+                    id="uf_cad"
+                    name="uf"
+                    placeholder="UF"
+                    maxlength="2"
+                    required
+            />
+          </div>
+        </div>
+
+        <button
+                type="button"
+                id="btn-enviar-codigo"
+                class="submit btn-primary btn-full"
+        >
+          Enviar código
+        </button>
+
+        <div class="auth-footer">
+          Já tem uma conta?
+          <button
+                  type="button"
+                  class="btn-link"
+                  onclick="toggleAuth('login')"
+          >
+            Faça login
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORMULÁRIO DE RECUPERAR SENHA -->
+    <div class="auth-card" id="form-recuperar" style="display: none">
+      <div class="auth-header">
+        <h2>Recuperar senha</h2>
+        <p>Digite seu e-mail para receber instruções de recuperação</p>
+      </div>
+
+      <form action="#" method="POST" id="recuperar-form">
+        <div class="input-group">
+          <label for="email_rec">E-mail cadastrado</label>
+          <input
+                  type="email"
+                  id="email_rec"
+                  name="email"
+                  placeholder="Digite seu e-mail"
+                  required
+          />
+        </div>
+
+        <button type="submit" class="submit btn-primary btn-full">
+          Enviar instruções
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Lembrou sua senha?
+        <button class="btn-link" onclick="toggleAuth('login')">
+          Faça login
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- RODAPÉ -->
+<footer>
+  <a href="index.html" class="logo"><span>Portal</span> Infra</a>
+  <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+  <span>© 2026 SP em Foco</span>
+</footer>
+</body>
 </html>

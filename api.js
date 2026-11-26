@@ -215,3 +215,24 @@ if (document.readyState === "loading") {
 } else {
     initMenuMobileGlobal();
 }
+
+// ==========================================
+// Acessibilidade (leitura em voz alta e preenchimento por voz)
+// Todas as páginas que incluem api.js passam a carregar automaticamente
+// acessibilidade.css e acessibilidade.js. A página login.html não usa
+// api.js e inclui esses dois arquivos diretamente no <head>.
+// ==========================================
+(function carregarAcessibilidade() {
+    if (!document.querySelector('link[href$="acessibilidade.css"]')) {
+        const css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = "acessibilidade.css";
+        document.head.appendChild(css);
+    }
+
+    if (!document.querySelector('script[src$="acessibilidade.js"]')) {
+        const script = document.createElement("script");
+        script.src = "acessibilidade.js";
+        document.head.appendChild(script);
+    }
+})();
