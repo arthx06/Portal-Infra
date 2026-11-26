@@ -152,10 +152,14 @@
     // =========================================================================
     // SÍNTESE DE VOZ (BASE)
     // =========================================================================
-    let velocidade = 1;
+    const VELOCIDADE_MIN = 0.5;
+    const VELOCIDADE_MAX = 2;
+    const VELOCIDADE_PADRAO = 1;
+
+    let velocidade = VELOCIDADE_PADRAO;
     try {
         const salvo = parseFloat(localStorage.getItem(CHAVE_VELOCIDADE));
-        if (salvo >= 0.5 && salvo <= 2) velocidade = salvo;
+        if (salvo >= VELOCIDADE_MIN && salvo <= VELOCIDADE_MAX) velocidade = salvo;
     } catch (e) { /* storage indisponível */ }
 
     let vozPortugues = null;
@@ -291,16 +295,39 @@
         textoVelocidade.appendChild(ui.valorVelocidade);
         const range = document.createElement("input");
         range.type = "range";
-        range.min = "0.6";
-        range.max = "1.6";
+        range.min = String(VELOCIDADE_MIN);
+        range.max = String(VELOCIDADE_MAX);
         range.step = "0.1";
         range.value = String(velocidade);
+        range.setAttribute("aria-valuetext", velocidade.toFixed(1) + "x");
         range.addEventListener("input", () => {
-            velocidade = parseFloat(range.value) || 1;
+            velocidade = parseFloat(range.value) || VELOCIDADE_PADRAO;
             ui.valorVelocidade.textContent = velocidade.toFixed(1) + "x";
+            range.setAttribute("aria-valuetext", velocidade.toFixed(1) + "x");
             try { localStorage.setItem(CHAVE_VELOCIDADE, String(velocidade)); } catch (e) { /* ignora */ }
         });
-        campoVelocidade.append(textoVelocidade, range);
+
+        // Marcadores visuais: extremos, 1x (padrão) e 1,5x
+        const trilho = criar("div", "a11y-range-wrap");
+        const marcas = criar("div", "a11y-marcas");
+        marcas.setAttribute("aria-hidden", "true");
+        [
+            { valor: VELOCIDADE_MIN, texto: "0,5x", destaque: false },
+            { valor: 1, texto: "1x padrão", destaque: true },
+            { valor: 1.5, texto: "1,5x", destaque: true },
+            { valor: VELOCIDADE_MAX, texto: "2x", destaque: false }
+        ].forEach((m) => {
+            const marca = criar("span", "a11y-marca" + (m.destaque ? " a11y-marca-destaque" : ""));
+            marca.style.setProperty(
+                "--pos",
+                String((m.valor - VELOCIDADE_MIN) / (VELOCIDADE_MAX - VELOCIDADE_MIN))
+            );
+            marca.appendChild(criar("i", "a11y-marca-traco"));
+            marca.appendChild(criar("span", "a11y-marca-texto", m.texto));
+            marcas.appendChild(marca);
+        });
+        trilho.append(range, marcas);
+        campoVelocidade.append(textoVelocidade, trilho);
 
         secLeitura.append(linhaPrincipal, linhaNavegacao, ui.btnSelecao, campoVelocidade);
         painel.appendChild(secLeitura);

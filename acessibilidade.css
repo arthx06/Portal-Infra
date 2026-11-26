@@ -149,9 +149,99 @@
     color: var(--text-dark, #0f172a);
 }
 
+.a11y-range-wrap {
+    position: relative;
+    padding-bottom: 34px;
+}
+
 .a11y-velocidade input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
     width: 100%;
-    accent-color: var(--primary, #2563eb);
+    height: 16px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.a11y-velocidade input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: #cbd5e1;
+}
+
+.a11y-velocidade input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: #cbd5e1;
+}
+
+.a11y-velocidade input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--primary, #2563eb);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.4);
+}
+
+.a11y-velocidade input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: var(--primary, #2563eb);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.4);
+}
+
+/* Marcadores sob a barra (posição = 8px do raio do botão + fração da largura útil) */
+.a11y-marcas {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 18px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.a11y-marca {
+    position: absolute;
+    left: calc(8px + (100% - 16px) * var(--pos));
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.a11y-marca-traco {
+    display: block;
+    width: 2px;
+    height: 6px;
+    background: #94a3b8;
+}
+
+.a11y-marca-texto {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted, #64748b);
+}
+
+.a11y-marca-destaque .a11y-marca-traco {
+    width: 3px;
+    height: 10px;
+    background: var(--primary, #2563eb);
+}
+
+.a11y-marca-destaque .a11y-marca-texto {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary, #2563eb);
 }
 
 .a11y-velocidade output {
