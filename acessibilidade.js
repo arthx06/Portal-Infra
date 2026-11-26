@@ -1139,8 +1139,7 @@
 
         if (!campos.length) {
             const msg =
-                "Não há campos que possam ser preenchidos por voz nesta tela. " +
-                "Se estiver no perfil, clique primeiro em alterar informações.";
+                "Não há campos que possam ser preenchidos por voz nesta tela.";
             status(msg);
             await utter(msg);
             return;
