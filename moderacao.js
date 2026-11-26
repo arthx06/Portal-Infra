@@ -1,3 +1,5 @@
+// moderacao.js
+
 const estadoModeracao = {
     adminAtual: null,
     tipoAtivo: "RECLAMACAO", // "RECLAMACAO" | "COMENTARIO"

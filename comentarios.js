@@ -1,3 +1,5 @@
+// comentarios.js
+
 document.getElementById("btnVoltar")?.addEventListener("click", function () {
     if (window.history.length > 1) {
         window.history.back();
