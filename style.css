@@ -407,6 +407,9 @@ nav .active::after {
 .blue-dot {
   background: var(--primary);
 }
+.purple-dot {
+  background: #8b5cf6;
+}
 
 /* =========================
    RECLAMAÇÕES
